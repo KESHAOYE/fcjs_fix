@@ -3,7 +3,7 @@
         <div class="my_balance">
             <div class="my_balance_top">
                 <span class="top_title">余额</span>
-                <countTo class="countto" :startVal='startVal' :endVal='endVal' :duration='3000'></countTo>
+                <countTo class="countto" :startVal='startVal' :endVal='endVal' :duration='1500'></countTo>
             </div>
             <div class="transaction_record">
                 <div class="person_title">交易记录</div>

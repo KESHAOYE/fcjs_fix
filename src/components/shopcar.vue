@@ -46,6 +46,7 @@
       <div class="shopcar_count">
         <span class="count_tip">已选择<span>{{count}}</span>件商品</span>
         <span class="count_tip">总价<span class="count_price">{{price}}</span>元</span>
+        <span class="count_tip" v-if="count>0&&price>0"><div class="el-button">去下单</div></span>
       </div>
     </div>
   </div>

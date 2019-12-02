@@ -9,6 +9,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import vRegion from 'v-region';
 import reg from './utils/reg'
 import axios from './http/http';
+import filter from './utils/filters'
+Object.keys(filter).forEach(e=>Vue.filter(e,filter[e]))
 Vue.prototype.axios=axios;
 Vue.use(vRegion);
 Vue.prototype.animate = animate;

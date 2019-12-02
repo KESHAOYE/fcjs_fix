@@ -7,8 +7,7 @@
                 <div class="showimg">
                     <div class="selectmachine">
                         <ul>
-                            <router-link v-for="(item,index) in brandlist"
-                                :to="{name:'fixfirst',query:{brand:item.value}}" v-if="index<=6" :key="index">
+                            <router-link v-for="(item,index) in brandlist" :to="{name:'fixfirst',query:{brand:item.value}}" v-if="index<=6" :key="index">
                                 <li>{{item.name}}/{{item.value}}</li>
                             </router-link>
                             <router-link to="/fixfirst">
@@ -49,7 +48,9 @@
                                 <swiper-slide>
                                     <li>
                                         <img src="../assets/phone/mate30pro.png" alt="" srcset="">
-                                        <span>华为Mate 30 Pro</span>
+                                        <span class="shop_name">华为Mate 30 Pro</span>
+                                        <span class="shopdes">双模5G 快速到达</span>
+                                        <span class="shopprice">4999</span>
                                     </li>
                                 </swiper-slide>
                                 <swiper-slide>
@@ -184,7 +185,7 @@
                             </el-image>
                             <div class="topshop_content">
                                 <div class="shop_name">testtesttesttesttesttesttesttesttesttesttesttesttesttest</div>
-                                <div class="shop_des">test test</div>
+                                <div class="shsop_des">test test</div>
                                 <div class="shop_price">1230</div>
                             </div>
                         </div>
@@ -426,7 +427,7 @@
                     let sh = document.documentElement.scrollHeight || document.body.scrollHeight
                     let bh = document.documentElement.scrollTop || document.body.scrollTop;
                     let ch = document.documentElement.clientHeight || document.body.clientHeight;
-                    if (sh == bh + ch && document.getElementsByClassName("loadinganimate")[0] == undefined) {
+                    if (sh == bh + ch && document.getElementsByClassName("loadinganimate")[0] == undefined&&window.navigator.onLine) {
                         if (document.getElementsByClassName("commend_over")[0] == undefined) {
                             this.animate.loading("commend_shop")
                             setTimeout(() => {
@@ -436,6 +437,12 @@
                                 this.animate.stoploading()
                             }, 500);
                         }
+                    }else if(sh == bh + ch&&!window.navigator.onLine){
+                        this.$message({
+                            type:"error",
+                            message:"无网络,请连接网络后再试",
+                            duration:2000
+                        })
                     }
                 }
             },
@@ -1294,7 +1301,7 @@
             justify-content: flex-start;
             align-items: center;
 
-            div:nth-of-type(6n) {
+            div:nth-of-type(5n-4) {
                 .commend_top {
                     margin-left: 0px;
                 }

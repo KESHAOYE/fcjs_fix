@@ -14,16 +14,15 @@
             <div class="first">
                 <div class="choosephone">
                     <div class="title"><span>选择您的机型</span>
-                        <hr />
+                        <hr/>
                     </div>
                     <div class="choose">
                         <div class="null_phone" v-show="this.phonelist.length<=0">暂无可维修的机型</div>
                         <el-tabs v-model="activeName" @tab-click="handleClick" v-show="this.phonelist.length>0">
-                            <el-tab-pane v-for="(item,index) in phonelist" :key="index" :label="item.name"
-                                :name="item.value" :class="{active:}">
+                            <el-tab-pane v-for="(item,index) in phonelist" :key="index" :label="item.name" :name="item.value">
                                 <ul class="phone">
                                     <li v-for="(phone,index) in item.list" :key="index" @click="choosephone"
-                                        :value="phone.phonename">{{phone.phonename}}</li>
+                                        :value="phone.phonename" :class="{active:fixedmodel.selectphone==phone.phonename}">{{phone.phonename}}</li>
                                 </ul>
                             </el-tab-pane>
                         </el-tabs>
@@ -36,17 +35,16 @@
                     <div class="problem">
                         <div class="null_problem" v-show="this.fixitem.length<=0">该机型暂无可维修项目</div>
                         <el-collapse v-model="activefix" v-if="this.fixitem.length>0">
-                            <el-collapse-item v-for="(item,index) in fixitem" :key="index" :title="item.typename"
-                                :name="item.name">
+                            <el-collapse-item v-for="(item,index) in fixitem" :key="index" :title="item.typename" :accordion="true" :name="item.name" >
                                 <div class="problemitem">
                                     <div class="item" v-for="(fix,index) in item.typeitem" :key="index"
-                                        @click="problemclick(fix.price,$event)" :value="fix.name">
+                                        @click="problemclick($event)" :name="fix.name" :price="fix.price" :value="fix.value" :class="{active:fixedmodel.selectitems.indexOf(fix.name)>=0}">
                                         <div class="title">
                                             <div class="title_top">
                                                 <span>{{fix.name}}</span>
-                                                <span :value="fixedmodel.selectitems">维修价格:{{fix.price}}元</span>
+                                                <span>维修价格:{{fix.price}}元</span>
                                             </div>
-                                            <hr />
+                                            <hr/>
                                         </div>
                                         <div class="detail">
                                             <div class="row"><span>故障描述：</span><span>{{fix.des}}</span></div>
@@ -63,8 +61,7 @@
                 </div>
                 <div class="count" v-show="this.fixedmodel.selectphone.length>0">
                     <div class="infoshow">
-                        <span>共选择了<span class="show">{{this.fixedmodel.selectitems.length}}</span>项,共计<span
-                                class="show">{{fixedmodel.totalprice}}</span>元</span>
+                        <span>共选择了<span class="show">{{fixedmodel.selectitems.length}}</span>项,共计<span class="show">{{fixedmodel.totalprice}}</span>元</span>
                     </div>
                     <div class="next" @click="next()">下一步</div>
                 </div>
@@ -77,7 +74,7 @@
         data() {
             return {
                 activeName: "null",
-                activefix: "1",
+                activefix: "",
                 fixitem: [{
                     typename: "屏幕维修",
                     name: "screenfix",
@@ -91,7 +88,7 @@
                 }],
                 fixedmodel:{
                     selectphone: "",
-                    selectitems: ["cos"],
+                    selectitems: [],
                     totalprice: "0"
                 }
             }
@@ -99,42 +96,33 @@
         methods: {
             handleClick(tab, event) {
                 this.fixedmodel.selectphone = ""
+                this.fixedmodel.selectitems=[]
+                //关闭Collapse面板
+                this.activefix=""
                 localStorage.setItem("selectphone", "")
-                Array.from(document.getElementsByClassName("phone")).forEach((e) => {
-                    Array.from(e.children).forEach((ec) => {
-                        ec.classList.remove("active")
-                    })
-                })
             },
             //机型选择
             choosephone(el) {
-                let arr = Array.from(el.srcElement.parentNode.parentNode.parentNode.children);
-                arr.forEach(function (e) {
-                    if (e.children[0]) {
-                        e.children[0].children[0].classList.remove("active")
-                    }
-                }) //移除兄弟元素类
-                el.srcElement.classList.add("active"); //添加类
                 this.fixedmodel.selectphone = el.srcElement.attributes.value.value
                 //写入localstorage
                 localStorage.setItem("selectphone", this.fixedmodel.selectphone)
-                this.selectitems=[];
+                //清空问题表
+                this.fixedmodel.selectitems=[];
             },
             //问题选择
-            problemclick(price, el) {
-                let isactive = el.currentTarget.classList.value.indexOf('active') == -1
-                if (!isactive) {
-                    el.currentTarget.classList.remove('active');
-                    this.fixedmodel.totalprice = Number(this.fixedmodel.totalprice) - Number(price);
-                    for (let i = 0; i < this.fixedmodel.selectitems.length+1; i++) {
-                        if (el.currentTarget.attributes.value.value.indexOf(this.fixedmodel.selectitems[i])) {
-                            this.fixedmodel.selectitems.splice(i-1, 1);
-                        }
-                    }
-                } else {
-                    this.fixedmodel.selectitems.push(el.currentTarget.attributes.value.value);
-                    el.currentTarget.classList.add('active');
-                    this.fixedmodel.totalprice = Number(this.fixedmodel.totalprice) + Number(price);
+            problemclick(el) {
+                let fixinfo=el.currentTarget.attributes;
+                let name=fixinfo.name.value;
+                let price=fixinfo.price.value;
+                let value=fixinfo.value.value;
+                let active=this.fixedmodel.selectitems.indexOf(name)
+                if(active<0){
+                    this.fixedmodel.selectitems.push(name);
+                    console.log(this.fixedmodel.selectitems);
+                    this.fixedmodel.totalprice=Number(this.fixedmodel.totalprice)+Number(price);
+                }else{
+                    this.fixedmodel.selectitems.splice(active,1);
+                    this.fixedmodel.totalprice=Number(this.fixedmodel.totalprice)-Number(price);
                 }
             },
             //跳转至下一步
@@ -161,13 +149,10 @@
         },
         mounted() {
             this.activeName = this.$route.query.brand ? this.$route.query.brand : "Apple";
-            //this.selectitems=[];
-            console.log(this.fixmodel.selectitems.find("cos"));
         },
         activated() {
             //根据路由参数决定品牌，默认为苹果。
             this.activeName = this.$route.query.brand ? this.$route.query.brand : "Apple";
-             //this.selectitems=[];
         }
     }
 </script>

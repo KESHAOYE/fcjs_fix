@@ -60,7 +60,7 @@ export default new Vuex.Store({
         ]
       },
     ],
-    //是否打开添加地址
+    //是否打开添加地址组件
     isopenaddress:false,
     //维修信息
     fixedmodel:[{
@@ -72,6 +72,15 @@ export default new Vuex.Store({
      }
     ]
   },
+  //支付方式
+  payinfo:[
+    {
+      payid:"0001",
+      payname:"招商银行",
+      payename:"zsbank",
+      payid:"6222 1054 0948 5552"
+    }
+  ],
   getters:{
     countshopcarprice:state=>{
       let price=0;

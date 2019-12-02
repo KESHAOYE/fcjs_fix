@@ -11,7 +11,7 @@
                         :class="{'active':activeType==types.value}">{{types.typename}}</span>
                 </div>
                 <div class="order_search">
-                    <el-input size="small" placeholder="订单编号/商品名"></el-input>
+                    <el-input size="small" placeholder="订单编号/商品名" v-model="ordersearch"></el-input>
                     <span class="search el-icon-search"></span>
                 </div>
             </div>
@@ -111,6 +111,7 @@
         data() {
             return {
                 activeType: "all",
+                ordersearch:"",
                 ordertype: [{
                         typename: "全部订单",
                         value: "all"

@@ -31,32 +31,34 @@
             <span class="price">500</span>
             <span class="oldprice">900</span>
           </div>
-          <div class="shop_type">
-            <span class="shop_title">类型</span>
-            <span class="type">二手</span>
+          <div class="shop_type" v-for="(el,index) in type" :key="index">
+            <span class="shop_title">{{el.name}}:</span>
+            <span class="type">{{el.data}}</span>
           </div>
+          <hr/>
           <div class="specs">
-            <span class="shop_title">规格</span>
+            <div class="specs_items" v-for="(e,index) in specs" :key="index">
+            <span class="shop_title" :value="e.name">{{e.name}}</span>
             <div class="choosespecs">
-              <div class="specs_item active" @click="changespecs">
-                黑色
-              </div>
-              <div class="specs_item" @click="changespecs">
-                白色
+              <div class="specs_item" v-for="(el,index) in e.data" :value="el.specs_id" :class="{active:e.select==el.specs_id}" :key="index" @click="changespecs(e,el.specs_id)">
+                {{el.specs_name}}
               </div>
             </div>
           </div>
-          <div class="count">
-            <span class="shop_title">数量</span>
-            <el-input-number v-model="shopnumber" @change="changecount" :min="1"></el-input-number>
           </div>
           <div class="shopsubmit">
+            <div class="count">
+            <el-input-number v-model="shopnumber" @change="changecount" :min="1"></el-input-number>
+          </div>
             <div class="add_shopcar">
               加入购物车
             </div>
             <div class="add_order">
               立即下单
             </div>
+          </div>
+          <div class="null" style="width:100%;height:15px;text-align:left;position:relative;top:-15px;color:#d2d2d2;font-size:0.7em;">
+            *由福城建设发货并提供售后服务
           </div>
         </div>
       </div>
@@ -148,7 +150,65 @@
               require("../../assets/phone/mate30pro.png"),
             ]
           }
-        ]
+        ],
+        type:[
+          {
+            name:"类型",
+            data:"二手"
+          },
+          {
+            name:"新旧程度",
+            data:"9.5成新"
+          },
+          {
+            name:"重量",
+            data:"1.8KG"
+          }
+        ],
+        specs:[{
+           name:"颜色",
+           select:"",           
+           data:[
+             {
+               specs_id:"0213",
+               specs_name:"黑色",
+             },
+             {
+               specs_id:"0214",
+               specs_name:"白色",
+             },
+             {
+               specs_id:"0215",
+               specs_name:"金色"
+             }
+           ]
+        },{
+          name:"存储",
+          select:"",
+          data:[
+            {
+              specs_id:"0216",
+              specs_name:"64G",
+              price:"",
+            },
+            {
+               specs_id:"0217",
+               specs_name:"256G",
+               price:""
+            }
+          ]
+        },
+        {
+          name:"成色",
+          select:"",
+          data:[
+            {
+              specs_id:"0218",
+              specs_name:"95新"
+            }
+          ]
+        }],
+        choosespecs:[],
       }
     },
     methods:{
@@ -163,16 +223,12 @@
       commenttypechange(el){
         
       },
-      changespecs(el){
-        if(el.currentTarget.classList.value.indexOf("active")==-1){
-         var arr = Array.from(el.srcElement.parentNode.children);
-         for(let i=0;i<arr.length;i++){
-             arr[i].classList.remove("active")
-         }
-        el.currentTarget.classList.add("active");
-      }else{
-        el.currentTarget.classList.remove("active")
-      }
+      /**
+       * 改变商品规格，同时更改商品售价
+       */
+      changespecs(name,data){
+        this.choosespecs.push({name:name.name,data:data})
+        name.select=data;
     }
     },
     mounted() {
@@ -197,7 +253,6 @@
         min-height: 500px;
         margin-top: 20px;
         background: #fff;
-
         .left {
           width: 500px;
           height: 500px;
@@ -252,19 +307,18 @@
 
         .right {
           width: 680px;
-          height: 500px;
-          position: relative;
-
+          min-height: 500px;
+          overflow: hidden;
           .shop_name {
             font-size: 1.1em;
             margin-top: 10px;
             text-align: left;
             width: 100%;
-            min-height: 10px;
+            height: 100%;
           }
           .shop_des{
             width: 100%;
-            min-height: 15px;
+            height: 100%;
             color: red;
             margin-top: 5px;
             text-align: left;
@@ -274,17 +328,21 @@
             font-size: 0.9em;
             float: left;
           }
-
+           hr{
+             border: 0;
+             border-top: 1px solid #d2d2d2;
+           }
           .shop_type {
             width: 100%;
-            height: 50px;
-            line-height: 50px;
-            margin-top: 25px;
+            height: 100%;
+            line-height: 40px;
+            margin-top: 4px;
             text-align: left;
-
+            margin-left: 15px;
+            color: #b2b2b2;
             .type {
-
-              margin-left: 25px;
+              margin-left: 4px;
+              font-size: 0.8em;
             }
           }
 
@@ -331,20 +389,27 @@
 
           .specs {
             width: 100%;
-            min-height: 40px;
-            margin-top: 25px;
+            height: 100%;
+            margin-top: 0px;
             text-align: left;
-          }
+            display:flex;
+            flex-flow:column wrap;
 
+          }
+          .specs_items{
+            margin-top: 20px;
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            height: 100%;
+          }
           .choosespecs {
             display: flex;
             flex-flow: row wrap;
-            min-height: 10px;
+            height: 100%;
             float: left;
             width: 500px;
             margin-left: 15px;
-            position: relative;
-            top: -3px;
 
             .active {
               background: #303c30;
@@ -366,20 +431,27 @@
           }
         }
         .count{
-          width:235px;
-          height:30px;
-          margin-top:25px;
-          margin-bottom: 0px;
-          display:flex;
-          flex-flow:row nowrap;
+          width:75px;
+          height:25px;
+          margin:0;
+          margin-right: 15px;
+          .el-input-number{
+            width: 75px;
+          }
+          .el-input-number__decrease,.el-input-number__increase{
+            width: 18px;
+          }
+          .el-input input{
+            padding:0;
+          }
         }
         .shopsubmit {
           width: 100%;
           height: 60px;
           display: flex;
-          position: absolute;
-          bottom: 30px;
-
+          margin-bottom:20px;
+          margin-top: 40px;
+          align-items: center;
           .add_shopcar,
           .add_order {
             width: 150px;

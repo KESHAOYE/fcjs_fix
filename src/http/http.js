@@ -1,6 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
-import {message} from 'element-ui';
+import {Message} from 'element-ui';
 import store from '../store';
 import router from 'vue-router';
 //判断环境
@@ -42,6 +42,14 @@ server.interceptors.response.use(
        if(error.response){
        if(error.response.status){
            switch(error.response.status){
+               //400：请求错误
+               case 400:
+                    Message({
+                        message:"请求发生错误！工程师紧急维修中",
+                        type:"error",
+                        duration:"2500"
+                    })
+                break;
                //401：登陆失败：即用户名或密码错误
                case 401:
                  router.push(
@@ -49,18 +57,18 @@ server.interceptors.response.use(
                          path:"/login",
                      }
                  )
-                 message({
+                 Message({
                      message:"用户名或密码错误",
                      type:"error",
-                     duration:"1500"
+                     duration:"2500"
                  })   
                  break;
                  //402：验证码错误：手机验证码发生错误
                case 402:
-                message({
+                Message({
                     message:"验证码错误",
                     type:"error",
-                    duration:"1500"
+                    duration:"2500"
                 })
                 break;
                 //403：拒绝访问：token过期/无token情况已经由请求拦截器截拦
@@ -72,18 +80,18 @@ server.interceptors.response.use(
                            prepath: router.currentRoute.fullPath
                        }
                    })
-                    message({
+                    Message({
                         message: "登陆过期,请重新登录!",
                         type: "error",
-                        duration: "1500"
+                        duration: "2500"
                     })
                     break;
                 //404：不存在接口
                 case 404:
-                    message({
+                    Message({
                         message: "请求错误!",
                         type: "error",
-                        duration: "1500"
+                        duration: "2500"
                     })
                     break;
                 //405：未登录
@@ -94,32 +102,31 @@ server.interceptors.response.use(
                        prepath: router.currentRoute.fullPath
                    }
                })
-               message({
+               Message({
                    message: "您暂未登录!",
                    type: "error",
-                   duration: "1500"
+                   duration: "2500"
                })
                break;
                default:
-                   message(
+                   Message(
                        {
-                           message:"发生错误,请重试！",
+                           message:"发生错误,请重试！"+error,
                            type:"error",
-                           duration:"1500"
+                           duration:"2500"
                        }
                    )
            }
            return Promise.reject(error.response)
        }
     }else{
-          message(
+          Message(
                {
                     message: "网络错误,请刷新重试！",
                     type: "error",
-                    duration: "1500"
+                    duration: "2000"
                }
            )
-           console.log("error:"+error)
            return Promise.reject(error)
        }
     }

@@ -170,6 +170,11 @@ export default new Router({
             ]
         },
         {
+            name:"ordersubmit",
+            path:"/ordersubmit",
+            component:()=>import("./components/person/ordersubmit")
+        },
+        {
             redirect: "/",
             path: "/"
         }
