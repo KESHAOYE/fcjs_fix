@@ -5,7 +5,7 @@ import {inmemory} from 'apollo-cache-inmemory'
 import apollo from 'vue-apollo'
 
 const httplink=new ApolloLink({
-    uri:"http://localhost:3000/api"
+    uri:"http://localhost:3000/adapi"
 })
 
 const ApolloClient=new ApolloClient({

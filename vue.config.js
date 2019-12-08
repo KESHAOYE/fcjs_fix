@@ -1,15 +1,15 @@
 module.exports={
     baseUrl:"/",
     devServer:{
-        host:"localhost",
+        host:"127.0.0.1",
         port:8080,
         proxy:{
-        '/api':{
-            target:"http://localhost:3000/api/",
+        '/':{
+            target:"http://localhost:3000",
             changeOrigin:true,
             ws:true,
             pathRewrite:{
-                "^/api":''
+                "^/":''
             }
         }
     }

@@ -427,7 +427,7 @@
                     let sh = document.documentElement.scrollHeight || document.body.scrollHeight
                     let bh = document.documentElement.scrollTop || document.body.scrollTop;
                     let ch = document.documentElement.clientHeight || document.body.clientHeight;
-                    if (sh == bh + ch && document.getElementsByClassName("loadinganimate")[0] == undefined&&window.navigator.onLine) {
+                    if (sh == bh + ch && document.getElementsByClassName("loadinganimate")[0] == undefined&&window.navigator.onLine&&this.$route.path=='/') {
                         if (document.getElementsByClassName("commend_over")[0] == undefined) {
                             this.animate.loading("commend_shop")
                             setTimeout(() => {
@@ -633,7 +633,7 @@
     .hot_items {
         width: 100%;
         height: 350px;
-        border: 1px solid #d2d2d2;
+        border: 1px solid #f2f2f2;
         margin-top: 25px;
         display: flex;
         flex-flow: row nowrap;
@@ -642,7 +642,7 @@
         .hot_floor_show {
             width: 235px;
             height: 350px;
-            border-right: 1px solid #d2d2d2;
+            border-right: 1px solid #f2f2f2;
             display: flex;
             flex-flow: column nowrap;
             justify-content: center;
@@ -686,7 +686,7 @@
         .official_recommend {
             width: 390px;
             height: 350px;
-            border-right: 1px solid #d2d2d2;
+            border-right: 1px solid #f2f2f2;
             display: flex;
             flex-flow: row wrap;
             justify-content: space-around;
@@ -710,7 +710,7 @@
             .topshop_items {
                 width: 390px;
                 height: 125px;
-                border: 1px solid #d2d2d2;
+                border: 1px solid #f2f2f2;
                 margin-top: -10px;
                 display: flex;
                 flex-flow: row nowrap;
@@ -767,14 +767,14 @@
         .official_recommend_second {
             width: 275px;
             height: 350px;
-            border-right: 1px solid #d2d2d2;
+            border-right: 1px solid #f2f2f2;
             display: flex;
             flex-flow: column nowrap;
             justify-content: center;
 
             .topshop_items {
                 width: 275px;
-                border: 1px solid #d2d2d2;
+                border: 1px solid #f2f2f2;
                 border-left: 0;
                 border-right: 0;
                 height: 115px;
@@ -849,13 +849,13 @@
                 text-align: left;
                 font-family: "幼圆";
                 padding-left: 20px;
-                border-bottom: 1px solid #d2d2d2;
+                border-bottom: 1px solid #f2f2f2;
             }
 
             .topshop_items {
                 width: 100%;
                 height: 99px;
-                border: 1px solid #d2d2d2;
+                border: 1px solid #f2f2f2;
                 border-left: 0;
                 border-right: 0;
                 margin-top: -1px;

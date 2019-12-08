@@ -17,6 +17,37 @@
                 <router-link to="/myorder?mid=11"><span>我的订单</span></router-link>
                 <router-link to="#"><span @mouseleave="showpilot=false" @mouseenter="showpilot=true"
                         :class="{select:showpilot}">网站导航</span></router-link>
+                <router-link to="" class="myshopcar" v-if="isshowshopcar" :class={select:shopcarshow} @click.native="toshopcar">
+                    <div class="shopcarbutton" @mouseenter="changeshopcar"
+                        @mouseleave="changeshopcar" @blur="changeshopcar">
+                        <span style="min-width:100px;display:flex;flex-flow:row nowrap">
+                        <i style="font-size:1.5em;font-weight:bolder;position:relative;"> &#xe635;</i>
+                        <i style="font-size:0.7em;font-weight:bold;position:relative;top:-5px;margin-right:3px;font-family:'幼圆'">{{this.$store.state.shopcar.length}}</i>
+                        <span style="position:relative;left:-3px;">我的购物车</span>
+                        </span>
+                    </div>
+                    </router-link>
+                    <div class="shopcarlist" v-show="shopcarshow" @mouseover="changeshopcar" @mouseout="changeshopcar">
+                    <div class="empty" v-if="this.$store.state.shopcar.length<=0">
+                        <i class="shopempty"></i>
+                        购物车中没有东西，赶紧下单选购吧！
+                    </div>
+                    <div class="shopcar_item" v-for="(item,index) in shopcar" :key="index">
+                        <img :src="item.img" alt="">
+                        <div class="shopname">
+                            {{item.shopname}}
+                        </div>
+                        <div class="shopprice">
+                            <span class="price">{{item.price}}*{{item.count}}</span>
+                            <span class="delete" style="font-size:0.9em">删除</span>
+                        </div>
+                    </div>
+                    <div class="shopcar_bottom">
+                        <div class="shopcar_count">共<span class="showcount">{{this.shopcar.length}}</span>件商品,总计<span
+                                class="showcount">{{this.shopprice}}</span>元</div>
+                        <div class="toshopcar" @click="toshopcar">进入购物车 ></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="pilot" v-show="showpilot" @mouseleave="showpilot=false" @mouseenter="showpilot=true">
@@ -51,6 +82,8 @@
         data() {
             return {
                 showpilot: false,
+                shopcarshow: false,
+                isshowshopcar: true,
                 shopcenter: [{
                         router: "",
                         name: "手机"
@@ -96,34 +129,68 @@
                 ]
             }
         },
+         computed: {
+            shopcar() {
+                return this.$store.state.shopcar;
+            },
+            shopprice() {
+                return this.$store.getters.countshopcarprice;
+            }
+        },
+        watch:{
+            $route:{
+                handler(val,oldval){
+                    if(val.path=='/shopcar'){
+                        this.isshowshopcar=false
+                        console.log(this.isshowshopcar);
+                    }else{
+                        this.isshowshopcar=true
+                    }
+                }
+            }
+        },
         methods: {
-
+           changeshopcar() {
+                this.shopcarshow = this.shopcarshow == false ? true : false;
+            },
+           toshopcar() {
+                this.$router.push({
+                    name: "shopcar"
+                })
+                this.shopcarshow=false
+            }
         }
     }
 </script>
 
 <style lang="scss" scoped>
-         .personal_info{
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: center;
-                justify-content: space-around;
-                width: 200px;
-                height: 80px;
-                img{
-                    width: 55px;
-                    height: 55px;
-                    border-radius: 50%;
-                    border: 3px double #c2c2c2;
-                }
-                .outlogin:hover{
-                  color: #ff4d4d;
-                  cursor: pointer;
-                }
-            }
+    .content{
+      position: relative;
+    }
+    .personal_info {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-around;
+        width: 200px;
+        height: 80px;
+        
+        img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 3px double #c2c2c2;
+        }
+
+        .outlogin:hover {
+            color: #ff4d4d;
+            cursor: pointer;
+        }
+    }
+
     .person {
         width: 100%;
-        min-height: 40px;
+        height: 40px;
         background: #f2f2f2;
         transition: .5s;
         border: 0;
@@ -136,10 +203,10 @@
             background: white;
             height: 40px;
             line-height: 40px;
-            width: 80px;
-            display: block;
+            display: inline-block;
             border: 1px solid #d2d2d2;
             border-bottom: 0;
+            box-sizing: border-box;
         }
 
         .login_state_tool {
@@ -165,6 +232,7 @@
 
                 }
             }
+
             a {
                 span {
                     margin-left: 5px;
@@ -182,9 +250,149 @@
                 }
             }
         }
+        .myshopcar {
+        min-width: 120px;
+        min-height: 40px;
+        float: left;
+        .shopcarbutton {
+            width: 150px;
+            height: 40px;
+            line-height: 40px;
+            cursor: pointer;
+            position: relative;
+            z-index: 999;
+            display: flex;
+            flex-flow: row nowrap;
+        }
 
+        .shopcarbuttonhover {
+            background: white;
+            color: #f2f2f2;
+            border: 1px solid #f2f2f2;
+            border-bottom: 0;
+        }
+        }
+        .shopcarlist {
+            width: 350px;
+            min-height: 80px;
+            position: absolute;
+            top: 40px;
+            z-index: 9999;
+            background: #fff;
+            border:1px solid #00303c;
+            border-top: 0;
+            display: flex;
+            flex-flow: column nowrap;
+            right: 0;
+            
+
+            .shopcar_item {
+                width: 100%;
+                min-height: 80px;
+                border-bottom: 1px solid #d2d2d2;
+                display: flex;
+                align-items: center;
+
+                img {
+                    width: 60px;
+                    height: 60px;
+                    margin-left: 10px;
+                    border: 1px solid #d2d2d2
+                }
+
+                .shopname {
+                    width: 180px;
+                    height: auto;
+                    font-size: 0.7em;
+                    text-align: left;
+                    margin-left: 10px;
+                }
+
+                .shopprice {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    height: 40px;
+                    width: 70px;
+                    margin-left: 5px;
+                    justify-content: flex-start;
+
+                    .price {
+                        font-size: 0.9em;
+                    }
+
+                    .price::before {
+                        content: "\e6cb";
+                        font-family: iconfont !important;
+
+                    }
+
+                    .delete {
+                        font-size: 0.9em;
+                        cursor: pointer;
+                    }
+
+                    .delete:hover {
+                        color: red;
+                    }
+                }
+            }
+
+            .shopcar_bottom {
+                width: 100%;
+                height: 40px;
+                background: #00303c;
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                font-size: 0.8em;
+                justify-content: space-between;
+
+                .shopcar_count {
+                    min-width: 200px;
+                    justify-content: flex-start;
+                    display: flex;
+                    flex-flow: row nowrap;
+                    align-items: center;
+                    margin-left: 15px;
+                }
+
+                .showcount {
+                    color: white;
+                    font-size: 1.1em;
+                    font-weight: bolder;
+                    width: 35px;
+                    line-height:41px; 
+                }
+
+                .toshopcar {
+                    width: 80px;
+                    height: 25px;
+                    line-height: 25px;
+                    color: white;
+                    background: #00303c;
+                    margin-right: 20px;
+                    cursor: pointer;
+                }
+            }
+        }
+        .empty {
+            height: 80px;
+            font-size: 1em;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: center;
+            color: #a2a2a2;
+        }
+
+        .shopempty {
+            width: 50px;
+            height: 50px;
+            background: url("../../assets/shopempty.png");
+            margin-left: 15px;
+        }
         .pilot {
-            width: 1280px;
+            width: 1218px;
             min-height: 200px;
             background: white;
             position: absolute;

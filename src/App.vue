@@ -19,13 +19,16 @@
     },
     mounted() {
       let data={username:"likewei"}
-      let query=`query Account($username :String){
-        account(username:$username){
-          name
-          department
+      let query=`query{
+        adinfos{
+          id
+          adid
+          adimg
+          create_time
+          startdue
         }
       }`
-      this.axios.post("/api",{
+      this.axios.post("/adapi",{
         query:query,
         variables:data
       })
