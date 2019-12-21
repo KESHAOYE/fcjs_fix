@@ -6,16 +6,14 @@
             <div class="topshow">
                 <div class="selectmachine">
                     <ul>
-                        <router-link v-for="(item,index) in brandlist" :to="{name:'fixfirst',query:{brand:item.value}}" v-if="index<=6" :key="index">
+                        <router-link v-for="(item,index) in brandlist" :key="index" @mouseleave="showMenu('out',index)" @mouseenter="showMenu('in',index)" to="#">
+                            <template v-if="index<=6">
                             <li>{{item.name}}/{{item.value}}</li>
-                        </router-link>
-                        <router-link to="/fixfirst">
-                            <li>更多/MORE</li>
+                            <div class='sortInfo' :class="'sort'+index">
+                             </div>
+                            </template>
                         </router-link>
                     </ul>
-                </div>
-                <div class="sortInfo">
-
                 </div>
                 <div class="showimg">
                     <swiper :options="swiperOption" ref="homeswipers">
@@ -26,6 +24,9 @@
                     <div class="imgpagination"></div>
                     <div class="imgnext"></div>
                     <div class="imgprev"></div>
+                </div>
+                <div class="person_center_list">
+                    
                 </div>
             </div>
             <div class="shopshow_bar">
@@ -395,6 +396,14 @@
                         callback(data.data)
                     })
             },
+            // 展示目前的分类信息
+            showMenu(type,key){
+              if(type === 'in'){
+                document.getElementsByClassName(`sort${key}`)[0].style.display = 'block'
+              } else if (type === 'out') {
+                document.getElementsByClassName(`sort${key}`)[0].style.display = 'none'
+              }
+            },
             //创建加载图片
             loadingcommends() {
                 let arr = []
@@ -504,7 +513,7 @@
         }
 
         .selectmachine {
-            width: 180px;
+            width: 190px;
             height: 550px;
             background: rgba(255, 255, 255, 1);
 
@@ -515,11 +524,31 @@
                 list-style: none;
                 height: 550px;
             }
-
+            .sortInfo {
+               width: calc(100% - 190px);
+               min-height: 550px;
+               background: white;
+               position: absolute;
+               right: 0;
+               top: 0;
+               display: none;
+               box-shadow: 1px 5px 10px #d2d2d2;
+               z-index: 9999;
+              }
             a {
                 width: 100%;
                 height: 55px;
                 line-height: 55px;
+            &:hover{
+                li{
+                  background: #ff3333;
+                  color: white;
+                  font-weight: bold;
+                }
+                .sortInfo{
+                    display: block;
+                }
+              }
             }
 
             li {
@@ -529,26 +558,10 @@
                 transition: .2s;
                 font-family: "等线";
                 color: #000;
-                &:hover{
-                  background: #ff3333;
-                  color: white;
-                  font-weight: bold;
-                }
             }
         }
-        .sortInfo {
-          width: calc(100% - 180px);
-          height: 550px;
-          background: white;
-          position: absolute;
-          right: 0;
-          display: none;
-          box-shadow: 1px 5px 10px #d2d2d2;
-          z-index: 9999;
-        }
-
         .showimg {
-            width: calc(100% - 230px);
+            width: calc(100% - 200px);
             height: 550px;
             background: white;
             //position: absolute;

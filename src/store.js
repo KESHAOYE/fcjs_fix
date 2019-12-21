@@ -15,7 +15,7 @@ export default new Vuex.Store({
     //购物车信息
     shopcar:[
       {id:"1",
-       shopname:"荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待",
+       shopname:"荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待",
        shoptype:"黑色",
        img:require("./assets/phone/iphone5s.png"),
        price:"100.00",
@@ -41,6 +41,10 @@ export default new Vuex.Store({
     order:[],
     //维修品牌机型信息
     fixmodel:[
+      {
+        name:'小米',
+        value:'xiaomi'
+      }
     ],
     //是否打开添加地址组件
     isopenaddress:false,

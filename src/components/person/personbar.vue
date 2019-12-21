@@ -292,6 +292,7 @@
                 min-height: 80px;
                 border-bottom: 1px solid #c2c2c2;
                 display: flex;
+                color: rgb(19, 19, 19);
                 align-items: center;
 
                 img {
@@ -302,11 +303,17 @@
                 }
 
                 .shopname {
-                    width: 180px;
+                    width: 170px;
                     height: auto;
                     font-size: 0.7em;
                     text-align: left;
                     margin-left: 10px;
+                    color: black;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp:3;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 .shopprice {

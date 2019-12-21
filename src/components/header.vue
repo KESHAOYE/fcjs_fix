@@ -3,7 +3,7 @@
         <div class="content">
             <div class="left logo">
                 <router-link to="/">
-                    <img src="" alt="logo加载失败">
+                    <img src="" alt="logo制作中">
                 </router-link>
             </div>
             <div class="headright">
@@ -296,7 +296,7 @@
         flex-flow: column nowrap;
         justify-content: space-around;
         //align-items: center;
-        margin-left: 55px;
+        margin-left: 125px;
 
         .right_top {
             height: 120px;
