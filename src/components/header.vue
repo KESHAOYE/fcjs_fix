@@ -3,20 +3,20 @@
         <div class="content">
             <div class="left logo">
                 <router-link to="/">
-                    <img src="../assets/logo.svg" alt="logo加载失败">
+                    <img src="" alt="logo加载失败">
                 </router-link>
             </div>
             <div class="headright">
                 <div class="right_top">
                     <div class="search">
                         <div class="searchinput">
-                            <div class="hoticon" v-if="!isselect">
+                            <!-- <div class="hoticon" v-if="!isselect">
                                 <i>&#xe6a6;</i>
-                            </div>
+                            </div> -->
                             <input type="text" v-model="search" placeholder="iPhone8 Plus" @keyup.enter="searchto"
                                 @change="changeselect" @blur="changeselect" />
                             <div class="searchbutton" @click="searchto">
-                                <i>&#xe623;</i>
+                                <i class="searchicon">&#xe623;</i>
                             </div>
                             <div class="hotsearch">
                                 <ul>
@@ -48,7 +48,7 @@
                     </div>
                     
                 </div>
-                <div class="right_bottom">
+                <!-- <div class="right_bottom">
                     <ul>
                         <router-link to="/getcoupon">
                             <li class="hotmenu">优惠券</li>
@@ -66,7 +66,7 @@
                             <li>更多</li>
                         </router-link>
                     </ul>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -140,13 +140,13 @@
 </script>
 
 <style lang="scss" scoped>
-    $main-color:#00303c;
+    $main-color:#ff3333;
 
     .header {
         background: white;
         width: 100%;
-        height: 160px;
-        border-bottom: 1px solid #d2d2d2;
+        height: 120px;
+        border-bottom: 1px solid #c9c9c9;
     }
 
     //  logo begin
@@ -193,6 +193,7 @@
         border: 2px solid $main-color;
         height: 35px;
         position: absolute;
+        padding-left: 15px;
         top: 50%;
         margin-top: -17.5px;
         display: flex;
@@ -239,9 +240,12 @@
         }
 
         .searchbutton:hover {
-            background: rgb(0, 63, 78);
+            background: red;
         }
-
+        .searchicon{
+            color:white;
+            font-weight: bolder;
+        }
         .hotsearch {
 
             width: 650px;
@@ -287,15 +291,15 @@
     //right begin
     .headright {
         float: left;
-        height: 180px;
+        height: 120px;
         display: flex;
         flex-flow: column nowrap;
         justify-content: space-around;
         //align-items: center;
-        margin-left: 20px;
+        margin-left: 55px;
 
         .right_top {
-            height: 80px;
+            height: 120px;
         }
 
         .right_bottom {

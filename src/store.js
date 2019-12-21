@@ -10,6 +10,8 @@ export default new Vuex.Store({
     islogin:false,
     userinfo:[],
     usercoupon:[],
+    brandinfo:[],
+    fixmodel:[],
     //购物车信息
     shopcar:[
       {id:"1",
@@ -39,26 +41,6 @@ export default new Vuex.Store({
     order:[],
     //维修品牌机型信息
     fixmodel:[
-      {
-        id:"1",
-        name:"苹果",
-        value:"Apple",
-        list:[
-          {
-            phonename:"iPhone 11 Pro Max"
-          }
-        ]
-      },
-      {
-        id:"2",
-        name:"三星",
-        value:"SamSung",
-        list:[
-          {
-            phonename:"三星 NOTE10",
-          }
-        ]
-      },
     ],
     //是否打开添加地址组件
     isopenaddress:false,
@@ -99,6 +81,8 @@ export default new Vuex.Store({
     }
   },
   actions: {
-
+    getBrand (Store) {
+       
+    }
   }
 })

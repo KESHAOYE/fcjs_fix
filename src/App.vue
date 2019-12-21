@@ -24,11 +24,11 @@
           id
           adid
           adimg
-          create_time
+          createTime
           startdue
         }
       }`
-      this.axios.post("/adapi",{
+      this.$http.post("/adapi",{
         query:query,
         variables:data
       })

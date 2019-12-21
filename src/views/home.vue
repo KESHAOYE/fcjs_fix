@@ -4,17 +4,20 @@
         <headers />
         <div class="content">
             <div class="topshow">
+                <div class="selectmachine">
+                    <ul>
+                        <router-link v-for="(item,index) in brandlist" :to="{name:'fixfirst',query:{brand:item.value}}" v-if="index<=6" :key="index">
+                            <li>{{item.name}}/{{item.value}}</li>
+                        </router-link>
+                        <router-link to="/fixfirst">
+                            <li>更多/MORE</li>
+                        </router-link>
+                    </ul>
+                </div>
+                <div class="sortInfo">
+
+                </div>
                 <div class="showimg">
-                    <div class="selectmachine">
-                        <ul>
-                            <router-link v-for="(item,index) in brandlist" :to="{name:'fixfirst',query:{brand:item.value}}" v-if="index<=6" :key="index">
-                                <li>{{item.name}}/{{item.value}}</li>
-                            </router-link>
-                            <router-link to="/fixfirst">
-                                <li>更多/MORE</li>
-                            </router-link>
-                        </ul>
-                    </div>
                     <swiper :options="swiperOption" ref="homeswipers">
                         <swiper-slide v-for="(items,index) in homeswiper" :key="index" :color="items.color">
                             <router-link :to="items.router"><img :src="items.src" alt="图片加载失败"></router-link>
@@ -387,7 +390,7 @@
             },
             //获取数据的方法
             getdata(callback) {
-                this.axios.get("http://jsonplaceholder.typicode.com/photos")
+                this.$http.get("http://jsonplaceholder.typicode.com/photos")
                     .then((data) => {
                         callback(data.data)
                     })
@@ -427,7 +430,8 @@
                     let sh = document.documentElement.scrollHeight || document.body.scrollHeight
                     let bh = document.documentElement.scrollTop || document.body.scrollTop;
                     let ch = document.documentElement.clientHeight || document.body.clientHeight;
-                    if (sh == bh + ch && document.getElementsByClassName("loadinganimate")[0] == undefined&&window.navigator.onLine&&this.$route.path=='/') {
+                    if (sh == bh + ch && document.getElementsByClassName("loadinganimate")[0] == undefined && window
+                        .navigator.onLine && this.$route.path == '/') {
                         if (document.getElementsByClassName("commend_over")[0] == undefined) {
                             this.animate.loading("commend_shop")
                             setTimeout(() => {
@@ -437,11 +441,11 @@
                                 this.animate.stoploading()
                             }, 500);
                         }
-                    }else if(sh == bh + ch&&!window.navigator.onLine){
+                    } else if (sh == bh + ch && !window.navigator.onLine) {
                         this.$message({
-                            type:"error",
-                            message:"无网络,请连接网络后再试",
-                            duration:2000
+                            type: "error",
+                            message: "无网络,请连接网络后再试",
+                            duration: 2000
                         })
                     }
                 }
@@ -487,17 +491,14 @@
         height: 550px;
         display: flex;
         flex-flow: row nowrap;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         margin-top: 35px;
         position: relative;
-
         .top_show_left {
-            background: #0084ff;
-            width: calc(100% - 1080px);
-            //position: relative;
+          background: #0084ff;
+          width: calc(100% - 1080px);
         }
-
         .swiper-container {
             height: 550px;
         }
@@ -505,10 +506,7 @@
         .selectmachine {
             width: 180px;
             height: 550px;
-            background: rgba(0, 0, 0, 0.5);
-            position: absolute;
-            top: 0;
-            z-index: 999;
+            background: rgba(255, 255, 255, 1);
 
             ul {
                 display: flex;
@@ -518,27 +516,43 @@
                 height: 550px;
             }
 
+            a {
+                width: 100%;
+                height: 55px;
+                line-height: 55px;
+            }
+
             li {
                 cursor: pointer;
                 width: 100%;
                 display: inline-block;
                 transition: .2s;
                 font-family: "等线";
-                color: #fff;
-                margin-top: 35px;
+                color: #000;
+                &:hover{
+                  background: #ff3333;
+                  color: white;
+                  font-weight: bold;
+                }
             }
-
-            li:hover {
-                font-weight: bolder;
-            }
+        }
+        .sortInfo {
+          width: calc(100% - 180px);
+          height: 550px;
+          background: white;
+          position: absolute;
+          right: 0;
+          display: none;
+          box-shadow: 1px 5px 10px #d2d2d2;
+          z-index: 9999;
         }
 
         .showimg {
-            width: 100%;
+            width: calc(100% - 230px);
             height: 550px;
             background: white;
-            position: absolute;
-            top: 0;
+            //position: absolute;
+            //top: 0;
             z-index: 1;
 
             img {
@@ -598,15 +612,14 @@
         }
 
         .imgprev {
-            left: 180px;
             border-top-right-radius: 45%;
             border-bottom-right-radius: 45%;
         }
 
         .imgpagination {
             position: relative;
-            top: -20px;
-            left: 200px;
+            top: -35px;
+            left: 35px;
             z-index: 999;
 
             span {
@@ -1100,16 +1113,17 @@
                     list-style-type: none;
                     height: 300px;
                     background: #f4f4f4;
-                //     .swiper-slide:first-child{
-                //         li{
-                //             margin-left: 0;
-                //         }
-                //     }
-                // .swiper-slide:nth-of-type(6n){
-                //     li{
-                //         margin-left: 0;
-                //     }
-                //}
+
+                    //     .swiper-slide:first-child{
+                    //         li{
+                    //             margin-left: 0;
+                    //         }
+                    //     }
+                    // .swiper-slide:nth-of-type(6n){
+                    //     li{
+                    //         margin-left: 0;
+                    //     }
+                    //}
                     li {
                         background: white;
                         width: 235px;
@@ -1161,6 +1175,7 @@
             }
         }
     }
+
     // shopshow end
     //fixshow start
     .fixshow {

@@ -11,7 +11,7 @@ import reg from './utils/reg'
 import axios from './http/http';
 import filter from './utils/filters'
 Object.keys(filter).forEach(e=>Vue.filter(e,filter[e]))
-Vue.prototype.axios=axios;
+Vue.prototype.$http=axios;
 Vue.use(vRegion);
 Vue.prototype.animate = animate;
 Vue.prototype.virtual = virtual;

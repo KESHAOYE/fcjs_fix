@@ -45,7 +45,7 @@
                     <div class="shopcar_bottom">
                         <div class="shopcar_count">共<span class="showcount">{{this.shopcar.length}}</span>件商品,总计<span
                                 class="showcount">{{this.shopprice}}</span>元</div>
-                        <div class="toshopcar" @click="toshopcar">进入购物车 ></div>
+                        <div class="toshopcar" @click="toshopcar">去购物车</div>
                     </div>
                 </div>
             </div>
@@ -166,6 +166,7 @@
 <style lang="scss" scoped>
     .content{
       position: relative;
+      z-index: 9999;
     }
     .personal_info {
         display: flex;
@@ -204,9 +205,10 @@
             height: 40px;
             line-height: 40px;
             display: inline-block;
-            border: 1px solid #d2d2d2;
+            border: 1px solid #c2c2c2;
             border-bottom: 0;
             box-sizing: border-box;
+            color: red;
         }
 
         .login_state_tool {
@@ -277,19 +279,18 @@
             min-height: 80px;
             position: absolute;
             top: 40px;
-            z-index: 9999;
+            z-index: 9998;
             background: #fff;
-            border:1px solid #00303c;
-            border-top: 0;
             display: flex;
             flex-flow: column nowrap;
+            box-shadow:0px 2px 10px #c2c2c2;
             right: 0;
             
 
             .shopcar_item {
                 width: 100%;
                 min-height: 80px;
-                border-bottom: 1px solid #d2d2d2;
+                border-bottom: 1px solid #c2c2c2;
                 display: flex;
                 align-items: center;
 
@@ -297,7 +298,7 @@
                     width: 60px;
                     height: 60px;
                     margin-left: 10px;
-                    border: 1px solid #d2d2d2
+                    border: 1px solid #c2c2c2
                 }
 
                 .shopname {
@@ -340,7 +341,7 @@
             .shopcar_bottom {
                 width: 100%;
                 height: 40px;
-                background: #00303c;
+                background: #c2c2c2;
                 display: flex;
                 flex-flow: row nowrap;
                 align-items: center;
@@ -354,6 +355,7 @@
                     flex-flow: row nowrap;
                     align-items: center;
                     margin-left: 15px;
+                    color: white;
                 }
 
                 .showcount {
@@ -365,11 +367,13 @@
                 }
 
                 .toshopcar {
-                    width: 80px;
-                    height: 25px;
-                    line-height: 25px;
+                    width: 85px;
+                    height: 30px;
+                    text-align: center;
+                    line-height: 30px;
                     color: white;
-                    background: #00303c;
+                    background: #ff3333;
+                    font-weight: bolder;
                     margin-right: 20px;
                     cursor: pointer;
                 }
@@ -398,7 +402,7 @@
             position: absolute;
             top: 40px;
             z-index: 1200;
-            border: 1px solid #d2d2d2;
+            border: 1px solid #c2c2c2;
             border-top: none;
             display: flex;
             flex-flow: row nowrap;
@@ -409,7 +413,7 @@
             }
 
             .pilot_item {
-                border-right: 1px solid #d2d2d2;
+                border-right: 1px solid #c2c2c2;
                 min-height: 150px;
                 width: 420px;
                 display: flex;
