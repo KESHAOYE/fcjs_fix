@@ -26,7 +26,14 @@
                     <div class="imgprev"></div>
                 </div>
                 <div class="person_center_list">
-                    
+                    <div class="person_center_head">
+                      <!-- 引导登录或个人中心 -->
+                    </div>
+                    <div class="functionList">
+                       <ul>
+                         <li v-for="(item, index) in alseFunction" :key="index" @click="unopen()"></li>
+                       </ul>
+                    </div>
                 </div>
             </div>
             <div class="shopshow_bar">
@@ -305,6 +312,7 @@
 </template>
 
 <script>
+import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
     export default {
         name: "home",
         data() {
@@ -325,6 +333,32 @@
                         color: "#bedde0",
                         router: "#"
                     }
+                ],
+                alseFunction:[
+                  {
+                    icon: 'icon-fuzhouditie',
+                    value: '地铁',
+                  },
+                  {
+                    icon: 'icon-chengshi',
+                    value: '城市',
+                  },
+                  {
+                    icon: 'icon-tianqi',
+                    value: '天气',
+                  },
+                  {
+                    icon: 'icon-database',
+                    value: '城市数据库',
+                  },
+                  {
+                    icon: 'icon-luntanxuanze',
+                    value: '论坛',
+                  },
+                  {
+                    icon: 'icon-huoche',
+                    value: '高铁',
+                  },
                 ],
                 swiperOption: { //swiper3
                     autoplay: {
@@ -497,7 +531,7 @@
     //  topshow start
     .topshow {
         width: 100%;
-        height: 550px;
+        height: 450px;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
@@ -509,12 +543,12 @@
           width: calc(100% - 1080px);
         }
         .swiper-container {
-            height: 550px;
+            height: 450px;
         }
 
         .selectmachine {
             width: 190px;
-            height: 550px;
+            height: 450px;
             background: rgba(255, 255, 255, 1);
 
             ul {
@@ -522,11 +556,11 @@
                 flex-flow: column nowrap;
                 align-items: center;
                 list-style: none;
-                height: 550px;
+                height: 450px;
             }
             .sortInfo {
                width: calc(100% - 190px);
-               min-height: 550px;
+               min-height: 450px;
                background: white;
                position: absolute;
                right: 0;
@@ -561,19 +595,42 @@
             }
         }
         .showimg {
-            width: calc(100% - 200px);
-            height: 550px;
+            width: calc(100% - 450px);
+            height: 450px;
             background: white;
-            //position: absolute;
+            position: relative;
             //top: 0;
             z-index: 1;
 
             img {
                 width: 100%;
-                height: 550px;
+                height: 450px;
             }
         }
+        .person_center_list{
+            width: 230px;
+            height: 450px;
+            background: white;
+            .title{
+                height: auto;
+                padding: 5px 0;
+            }
+            .person_center_head{
+              margin: auto;
+              width: 215px;
+              height: 120px;
+              border-bottom: 1px solid #f2f2f2;
+            }
+            .functionList{
+              width: 215px;
+              margin:auto;
+              margin: 10px 0;
+              height:310px;
+              ul{
 
+              }
+            }
+        }
         .imgnext,
         .imgprev {
             width: 30px;
@@ -1014,7 +1071,7 @@
             float: left;
             width: 150px;
             height: 25px;
-            margin-top: 30px;
+            margin-top: 15px;
             margin-bottom: 20px;
             font-size: 1.3em;
             text-align: left;
