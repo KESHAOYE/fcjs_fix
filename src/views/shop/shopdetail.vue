@@ -283,7 +283,7 @@
             .swiper-button-prev {
               width: 35px;
               height: 100px;
-              background: #303c30;
+              background: #ff3333;
               color: white;
               position: absolute;
               top: 20px;
@@ -300,7 +300,7 @@
             .swiper-slide-active {
               width: 100px;
               height: 100px;
-              border: 1px solid #303c30;
+              border: 1px solid #ff3333;
             }
           }
         }
@@ -412,14 +412,15 @@
             margin-left: 15px;
 
             .active {
-              background: #303c30;
+              background: #ff3333;
               color: white;
+              border: 1px solid #ff3333 !important;
             }
 
             .specs_item {
               min-width: 50px;
               padding: 2px 5px;
-              border: 1px solid #303c30;
+              border: 1px solid #00303c;
               text-align: center;
               height: 20px;
               line-height: 20px;
@@ -464,7 +465,7 @@
           }
 
           .add_order {
-            background: #303c30;
+            background: #ff3333;
             margin-left: 25px;
           }
         }
@@ -513,7 +514,7 @@
             }
 
             .active {
-              background: #303c30;
+              background: #ff3333;
               color: white;
             }
           }

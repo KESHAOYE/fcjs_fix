@@ -350,7 +350,7 @@
             .sortbyprice {
                 width: 35px;
                 height: 20px;
-                background: #303c30;
+                background: #ff3333;
                 color: white;
                 font-size: 0.6em;
                 position: relative;
@@ -360,7 +360,7 @@
             }
 
             .sort_item:hover {
-                color: #303c30;
+                color: #ff3333;
             }
         }
     }
@@ -396,7 +396,7 @@
             }
 
             .active {
-                background: #303c30;
+                background: #ff3333;
                 color: white;
             }
         }
@@ -459,7 +459,7 @@
     .isold {
         width: 70px;
         height: 15px;
-        background: #303c30;
+        background: #ff3333;
         color: white;
         border-radius: 10px;
         float: left;
@@ -476,7 +476,7 @@
         height: 18px;
         line-height: 18px;
         border-radius: 10px;
-        background: #303c30;
+        background: #ff3333;
         color: white;
         font-size: 0.2em;
         text-align: center;

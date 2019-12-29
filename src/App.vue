@@ -8,6 +8,7 @@
 </template>
 <script>
   import headers from './components/header.vue'
+
   export default {
     data() {
       return {
@@ -46,7 +47,12 @@
   img {
     border: 0
   }
- 
+  .icon {
+       width: 1em; height: 1em;
+       vertical-align: -0.15em;
+       fill: currentColor;
+       overflow: hidden;
+    }
   .alipay {
     background: #00a0e9;
     border: 0;

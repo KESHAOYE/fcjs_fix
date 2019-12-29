@@ -166,7 +166,7 @@
 <style lang="scss" scoped>
     .content{
       position: relative;
-      z-index: 9999;
+      z-index: 1200;
     }
     .personal_info {
         display: flex;
@@ -225,7 +225,9 @@
                 flex-flow: row nowrap;
                 align-items: center;
                 cursor: pointer;
-
+                position:relative;
+                top: -2px;
+                
                 span {
                     margin-left: 7px;
                     font-size: 0.8em;

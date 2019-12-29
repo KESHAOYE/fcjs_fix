@@ -188,10 +188,10 @@
             }
 
             .is-success {
-                color: #23a96f;
+                color: #ff3333;
 
                 .el-step__line {
-                    background: #23a96f;
+                    background: #ff3333;
                 }
             }
 
@@ -200,7 +200,7 @@
                 width: 18px;
                 height: 18px;
                 border-radius: 50%;
-                background: #23a96f;
+                background: #ff3333;
                 position: absolute;
                 top: -12px;
                 left: -10px;
@@ -262,11 +262,11 @@
                 }
 
                 li:hover {
-                    border: 1px solid #23a96f;
+                    border: 1px solid #ff3333;
                 }
 
                 .active {
-                    background: #23a96f;
+                    background: #ff3333;
                     color: white;
                     border: 0;
                 }
@@ -283,12 +283,12 @@
         }
 
         .el-tabs__active-bar {
-            background-color: #23a96f;
+            background-color: #ff3333;
 
         }
 
         .el-tabs__item:hover {
-            color: #23a96f;
+            color: #ff3333;
         }
 
         .el-tabs__item {
@@ -297,7 +297,7 @@
         }
 
         .el-tabs__item.is-active {
-            color: #23a96f;
+            color: #ff3333;
         }
     }
 
@@ -333,7 +333,7 @@
             position: relative;
 
             .item:hover {
-                border: 1px solid #23a96f;
+                border: 1px solid #ff3333;
             }
 
             .item_null {
@@ -402,7 +402,7 @@
                     text-align: center;
                     border-width: 15px;
                     border-style: solid;
-                    border-color: #23a96f #23a96f transparent transparent;
+                    border-color: #ff3333 #ff3333 transparent transparent;
                     display: none;
                     i{
                         color: white;
@@ -416,7 +416,7 @@
             }
 
             .active {
-                border: 1px solid #23a96f;
+                border: 1px solid #ff3333;
 
                 .success_tag {
                     display: block;
@@ -448,7 +448,7 @@
             font-family: "等线";
 
             .show {
-                color: #23a96f;
+                color: #ff3333;
                 font-size: 1.1em;
                 margin: 0 5px;
             }

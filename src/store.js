@@ -11,7 +11,46 @@ export default new Vuex.Store({
     userinfo:[],
     usercoupon:[],
     brandinfo:[],
-    fixmodel:[],
+    sortList:[
+      { name:'手机',
+        value: 'PHONE',
+        shopList:[
+          
+        ]
+      },
+      { name:'电脑',
+        value: 'COMPUTER',
+        shopList: [
+          {
+            img: '',
+            shopid: '',
+            shopName: ''
+          }
+        ]
+      },
+      {
+        name: '耳机',
+        value: 'EARPHONE',
+        shopList: [
+
+        ]
+      },
+      {
+        name: '维修',
+        value: 'FIX',
+        shopList: [
+
+        ]
+      },
+      {
+        name: 'TEST',
+        value: '..'
+      },
+      {
+        name: 'TEST',
+        value: '..'
+      },
+    ],
     //购物车信息
     shopcar:[
       {id:"1",

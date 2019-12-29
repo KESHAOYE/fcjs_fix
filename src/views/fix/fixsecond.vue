@@ -119,7 +119,7 @@ export default {
             .row{
                 .row_price{
                     font-size: 1.2em;
-                    color:#23a96f; 
+                    color:#ff3333; 
                 }
                 .row_title{
                     color: #d2d2d2;

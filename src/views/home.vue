@@ -6,11 +6,13 @@
             <div class="topshow">
                 <div class="selectmachine">
                     <ul>
-                        <router-link v-for="(item,index) in brandlist" :key="index" @mouseleave="showMenu('out',index)" @mouseenter="showMenu('in',index)" to="#">
+                        <router-link v-for="(item,index) in sortList" :key="index" @mouseleave="showMenu('out',index)"
+                            @mouseenter="showMenu('in',index)" to="#">
                             <template v-if="index<=6">
-                            <li>{{item.name}}/{{item.value}}</li>
-                            <div class='sortInfo' :class="'sort'+index">
-                             </div>
+                                <li>{{item.name}}/{{item.value}}</li>
+                                <div class='sortInfo' :class="'sort'+index">
+                                    
+                                </div>
                             </template>
                         </router-link>
                     </ul>
@@ -27,12 +29,20 @@
                 </div>
                 <div class="person_center_list">
                     <div class="person_center_head">
-                      <!-- 引导登录或个人中心 -->
+                        引导登录或个人中心
+                    </div>
+                    <div class="toLogin">
+                        <!-- 预留未登录块 -->
                     </div>
                     <div class="functionList">
-                       <ul>
-                         <li v-for="(item, index) in alseFunction" :key="index" @click="unopen()"></li>
-                       </ul>
+                        <ul>
+                            <li v-for="(item, index) in elseFunction" :key="index" @click="unopen()">
+                                <svg class="icon" aria-hidden="true">
+                                    <use :xlink:href='item.icon'></use>
+                                </svg>
+                                <span>{{item.value}}</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -146,7 +156,7 @@
                 </div>
                 <div class="topshop_show">
                     <div class="topshop_head">
-                        Top榜单
+                        TOP榜单
                     </div>
                     <router-link to="#">
                         <div class="topshop_items">
@@ -195,8 +205,8 @@
                             <el-image style="width:110px;height:110px;" src="../assets/battery.png" fit="cover">
                             </el-image>
                             <div class="topshop_content">
-                                <div class="shop_name">testtesttesttesttesttesttesttesttesttesttesttesttesttest</div>
-                                <div class="shsop_des">test test</div>
+                                <div class="shop_name"></div>
+                                <div class="shsop_des"></div>
                                 <div class="shop_price">1230</div>
                             </div>
                         </div>
@@ -223,7 +233,7 @@
                 </div>
                 <div class="topshop_show">
                     <div class="topshop_head">
-                        Top榜单
+                        TOP榜单
                     </div>
                     <router-link to="#">
                         <div class="topshop_items">
@@ -312,7 +322,6 @@
 </template>
 
 <script>
-import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
     export default {
         name: "home",
         data() {
@@ -334,31 +343,34 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                         router: "#"
                     }
                 ],
-                alseFunction:[
-                  {
-                    icon: 'icon-fuzhouditie',
-                    value: '地铁',
-                  },
-                  {
-                    icon: 'icon-chengshi',
-                    value: '城市',
-                  },
-                  {
-                    icon: 'icon-tianqi',
-                    value: '天气',
-                  },
-                  {
-                    icon: 'icon-database',
-                    value: '城市数据库',
-                  },
-                  {
-                    icon: 'icon-luntanxuanze',
-                    value: '论坛',
-                  },
-                  {
-                    icon: 'icon-huoche',
-                    value: '高铁',
-                  },
+                elseFunction: [{
+                        icon: '#icon-fuzhouditie',
+                        value: '地铁',
+                    },
+                    {
+                        icon: '#icon-chengshi',
+                        value: '城市',
+                    },
+                    {
+                        icon: '#icon-tianqi',
+                        value: '天气',
+                    },
+                    {
+                        icon: '#icon-database',
+                        value: '数据库',
+                    },
+                    {
+                        icon: '#icon-luntanxuanze',
+                        value: '论坛',
+                    },
+                    {
+                        icon: '#icon-huoche',
+                        value: '高铁',
+                    },
+                    {
+                        icon: '#icon-remen1',
+                        value: '福城热搜'
+                    },
                 ],
                 swiperOption: { //swiper3
                     autoplay: {
@@ -431,12 +443,12 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                     })
             },
             // 展示目前的分类信息
-            showMenu(type,key){
-              if(type === 'in'){
-                document.getElementsByClassName(`sort${key}`)[0].style.display = 'block'
-              } else if (type === 'out') {
-                document.getElementsByClassName(`sort${key}`)[0].style.display = 'none'
-              }
+            showMenu(type, key) {
+                if (type === 'in') {
+                    document.getElementsByClassName(`sort${key}`)[0].style.display = 'block'
+                } else if (type === 'out') {
+                    document.getElementsByClassName(`sort${key}`)[0].style.display = 'none'
+                }
             },
             //创建加载图片
             loadingcommends() {
@@ -500,11 +512,18 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                     if (i > this.swipercolor.length) i = 0;
                     e.childNodes[0].style.borderTop = "1px solid" + this.swipercolor[i++];
                 })
+            },
+            unopen () {
+              this.$message({
+                message: '该功能暂未开放,稍后福城建设将为您提供更多服务',
+                duration: 1500,
+                type: 'error'
+              })
             }
         },
         computed: {
-            brandlist() {
-                return this.$store.state.fixmodel
+            sortList() {
+                return this.$store.state.sortList
             }
         },
         mounted() {
@@ -538,10 +557,12 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
         align-items: center;
         margin-top: 35px;
         position: relative;
+
         .top_show_left {
-          background: #0084ff;
-          width: calc(100% - 1080px);
+            background: #0084ff;
+            width: calc(100% - 1080px);
         }
+
         .swiper-container {
             height: 450px;
         }
@@ -558,31 +579,35 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                 list-style: none;
                 height: 450px;
             }
+
             .sortInfo {
-               width: calc(100% - 190px);
-               min-height: 450px;
-               background: white;
-               position: absolute;
-               right: 0;
-               top: 0;
-               display: none;
-               box-shadow: 1px 5px 10px #d2d2d2;
-               z-index: 9999;
-              }
+                width: calc(100% - 190px);
+                min-height: 450px;
+                background: white;
+                position: absolute;
+                right: 0;
+                top: 0;
+                display: none;
+                box-shadow: 1px 5px 10px #d2d2d2;
+                z-index: 9999;
+            }
+
             a {
                 width: 100%;
                 height: 55px;
                 line-height: 55px;
-            &:hover{
-                li{
-                  background: #ff3333;
-                  color: white;
-                  font-weight: bold;
+
+                &:hover {
+                    li {
+                        background: #ff3333;
+                        color: white;
+                        font-weight: bold;
+                    }
+
+                    .sortInfo {
+                        display: block;
+                    }
                 }
-                .sortInfo{
-                    display: block;
-                }
-              }
             }
 
             li {
@@ -594,6 +619,7 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                 color: #000;
             }
         }
+
         .showimg {
             width: calc(100% - 450px);
             height: 450px;
@@ -607,30 +633,54 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                 height: 450px;
             }
         }
-        .person_center_list{
+
+        .person_center_list {
             width: 230px;
             height: 450px;
             background: white;
-            .title{
+
+            .title {
                 height: auto;
                 padding: 5px 0;
             }
-            .person_center_head{
-              margin: auto;
-              width: 215px;
-              height: 120px;
-              border-bottom: 1px solid #f2f2f2;
-            }
-            .functionList{
-              width: 215px;
-              margin:auto;
-              margin: 10px 0;
-              height:310px;
-              ul{
 
-              }
+            .person_center_head {
+                margin: auto;
+                width: 215px;
+                height: 120px;
+                border-bottom: 1px solid #f2f2f2;
+            }
+
+            .functionList {
+                width: 215px;
+                margin: auto;
+                margin: 10px 0;
+                height: 310px;
+
+                ul {
+                    display: flex;
+                    flex-flow: row wrap;
+                    align-items: center;
+                    list-style: none;
+                    li{
+                        margin-left: 10px;
+                        width: 60px;
+                        height: 70px;
+                        display: flex;
+                        flex-flow: column nowrap;
+                        justify-content: space-around;
+                        align-items: center;
+                        font-size:0.8em;
+                        cursor: pointer;
+                        .icon{
+                            width: 30px;
+                            height: 30px;
+                        }
+                    }
+                }
             }
         }
+
         .imgnext,
         .imgprev {
             width: 30px;
@@ -926,11 +976,10 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
             .topshop_head {
                 width: calc(100%-20px);
                 height: 50px;
-                font-size: 1.1em;
+                font-size: 1.2em;
                 color: red;
                 line-height: 50px;
                 text-align: left;
-                font-family: "幼圆";
                 padding-left: 20px;
                 border-bottom: 1px solid #f2f2f2;
             }
@@ -949,7 +998,7 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                     width: 80px;
                     height: 100px;
                     line-height: 100px;
-                    font-size: 3em;
+                    font-size: 2.5em;
                     font-weight: bolder;
                     color: transparent;
                     background: #06beb6;
@@ -1034,7 +1083,7 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
 
             a:nth-child(3) {
                 .topcount {
-                    font-size: 2.5em;
+                    font-size: 2.2em;
                     background: #00c3ff;
                     /* fallback for old browsers */
                     background: -webkit-linear-gradient(to right, #ffff1c, #00c3ff);
@@ -1049,7 +1098,7 @@ import 'http://at.alicdn.com/t/font_1334874_5dbcg32whnk.js'
                 border-bottom: 0;
 
                 .topcount {
-                    font-size: 2em;
+                    font-size: 1.8em;
                     background: #bdc3c7;
                     /* fallback for old browsers */
                     background: -webkit-linear-gradient(to right, #2c3e50, #bdc3c7);
