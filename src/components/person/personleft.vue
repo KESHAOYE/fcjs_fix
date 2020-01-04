@@ -61,7 +61,7 @@
               {
                 personmenuid: "33",
                 name: "我的客服",
-                router: "#",
+                router: "chat",
               }
             ]
           },
@@ -140,7 +140,7 @@
 
     .active {
       color: white;
-      background: #303b30;
+      background: #ff3333;
       border-radius: 20px;
       text-align: center !important;
       line-height: 35px;

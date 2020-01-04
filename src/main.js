@@ -25,6 +25,13 @@ Vue.use(elementui);
 //数字滚动
 import countto from 'vue-count-to';
 Vue.component('countTo',countto);
+//socket
+import VueSocketIo from 'vue-socket.io';
+import socketio from 'socket.io-client';
+Vue.use(new VueSocketIo({
+    debug: true,
+    connection: 'localhost:200',
+}))
 Vue.config.productionTip = false
 import headers from './components/header.vue';
 Vue.component('headers', headers);

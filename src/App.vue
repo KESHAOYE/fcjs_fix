@@ -19,9 +19,9 @@
       headers
     },
     mounted() {
-      let data={username:"likewei"}
+      let data={adid: '3'}
       let query=`query{
-        adinfos{
+        adinfos(adinfo:3){
           id
           adid
           adimg

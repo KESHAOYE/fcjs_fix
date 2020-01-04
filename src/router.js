@@ -11,7 +11,7 @@ import el from "element-ui"
 Vue.use(Router)
 
 export default new Router({
-    mode: 'history',
+    mode: 'hash',
     base: process.env.BASE_URL,
     routes: [{
             path: "/",
@@ -97,11 +97,6 @@ export default new Router({
             }
         },
         {
-            path:"/more",
-            name:"more",
-            component:()=>import("./components/more")
-        },
-        {
             path:"/login",
             name:"login",
             component:()=>import("./components/login")
@@ -161,6 +156,11 @@ export default new Router({
                     name: "changepassword",
                     path: "/changepassword",
                     component: () => import("./components/person/myaccount/changepassword")
+                },
+                {
+                    path:"/chat",
+                    name:"chat",
+                    component:()=>import("./components/chat")
                 },
                 {
                     name: "addressmanage",
