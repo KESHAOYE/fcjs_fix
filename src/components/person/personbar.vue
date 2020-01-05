@@ -23,7 +23,7 @@
                         <span style="min-width:100px;display:flex;flex-flow:row nowrap">
                         <i style="font-size:1.5em;font-weight:bolder;position:relative;"> &#xe635;</i>
                         <i style="font-size:0.7em;font-weight:bold;position:relative;top:-5px;margin-right:3px;font-family:'幼圆'">{{this.$store.state.shopcar.length}}</i>
-                        <span style="position:relative;left:-3px;">我的购物车</span>
+                        <span style="position:relative;left:-3px;width:100px;">我的购物车</span>
                         </span>
                     </div>
                     </router-link>
@@ -192,18 +192,18 @@
     .person {
         width: 100%;
         height: 40px;
-        background: #f2f2f2;
+        background: #e3e4e5;
         transition: .5s;
         border: 0;
-        color: #b2b2b2;
+        color: #999;
         display: flex;
         flex-flow: column nowrap;
         align-items: center;
 
         .select {
             background: white;
-            height: 40px;
-            line-height: 40px;
+            height: 35px !important;
+            line-height: 32px !important;
             display: inline-block;
             border: 1px solid #c2c2c2;
             border-bottom: 0;
@@ -226,7 +226,10 @@
                 align-items: center;
                 cursor: pointer;
                 position:relative;
-                top: -2px;
+                // top: -2px;
+                border-right:1px solid #d2d2d2;
+                padding: 0px 10px;
+                height: 25px;
                 
                 span {
                     margin-left: 7px;
@@ -244,8 +247,10 @@
                     display: block;
                     box-sizing: border-box;
                     width: 80px;
-                    height: 40px;
-                    line-height: 40px;
+                    height: 25px;
+                    border-right: 1px solid #d2d2d2;
+                    padding: 0 5px;
+                    line-height: 25px;
                     text-align: center;
                 }
 
@@ -257,16 +262,22 @@
         .myshopcar {
         min-width: 120px;
         min-height: 40px;
+        display: flex;
+        align-items: center;
         float: left;
         .shopcarbutton {
             width: 150px;
-            height: 40px;
-            line-height: 40px;
+            height: 25px;
+            line-height: 25px;
             cursor: pointer;
             position: relative;
             z-index: 999;
             display: flex;
             flex-flow: row nowrap;
+            span{
+                border: 0;
+                padding:0;
+            }
         }
 
         .shopcarbuttonhover {

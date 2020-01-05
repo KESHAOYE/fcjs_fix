@@ -23,7 +23,10 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+    .content{
+      width: 1250px;
+    }
     .personcenter_card {
         width: 100%;
         height: auto;
@@ -34,6 +37,7 @@
         .person_right {
             width: 1020px;
             height: auto;
+            margin-bottom: 50px;
         }
     }
 </style>

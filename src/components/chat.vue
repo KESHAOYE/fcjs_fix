@@ -2,10 +2,10 @@
     <div class="chat">
         <div class="chat_head">
             <div class="back">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href='#icon-houtui'></use>
-              </svg>
-            </div> 
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href='#icon-houtui'></use>
+                </svg>
+            </div>
             <div class="userstatus">
             </div>
             <div>{{chathead}}</div>
@@ -16,11 +16,13 @@
         </div>
         <div class="input_block">
             <input type="text" v-model="text">
-            <div class="expression">
-                <svg class="icon" aria-hidden="true">
-                    <use xlink:href='#icon-biaoqing'></use>
-                </svg>
-            </div>
+            <el-popover ref="popover" placement="top" title="标题" width="200" trigger="click">
+                <div class="expression" slot="reference">
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href='#icon-biaoqing'></use>
+                    </svg>
+                </div>
+            </el-popover>
             <div class="expression">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href='#icon-tupian'></use>
@@ -80,7 +82,7 @@
 <style lang="scss" scoped>
     .chat {
         background: white;
-        height: 700px;
+        min-height: 700px;
         margin: 20px 0 10px 0;
         border-radius: 10px;
         border: 1px solid #f1f1f1;
@@ -100,9 +102,9 @@
             border-top-right-radius: 10px;
 
             .back {
-              position: absolute;
-              left: 10px;
-              font-size: 1.8em;  
+                position: absolute;
+                left: 10px;
+                font-size: 1.8em;
             }
 
             .userstatus {
@@ -118,6 +120,7 @@
             width: 100%;
             height: 600px;
             background: white;
+            overflow-y: auto;
         }
 
         .input_block {
@@ -145,6 +148,7 @@
                 font-size: 1.8em;
                 cursor: pointer;
             }
+
             .button {
                 width: 80px;
                 height: 35px;

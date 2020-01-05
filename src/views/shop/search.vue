@@ -281,10 +281,10 @@
 
     .searchbreadcrumb {
         width: 100%;
-        height: 50px;
-        line-height: 50px;
+        min-height: 20px;
+        line-height: 20px;
         margin-top: 35px;
-        padding-left: 50px;
+        padding-left: 10px;
 
         .searchresult {
             color: black;
@@ -299,7 +299,7 @@
     .list_sort {
         width: 100%;
         min-height: 50px;
-        margin-top: 5px;
+        margin-top: 15px;
         background: white;
         border-top: 1px solid #d2d2d2;
         border-bottom: 1px solid #d2d2d2;
@@ -317,13 +317,13 @@
 
             .sort_title {
                 border-right: 1px solid #d2d2d2;
-                width: 190px;
+                min-width: 120px;
                 text-align: left;
                 padding-left: 10px;
                 display: flex;
                 align-items: center;
                 font-size: 0.8em;
-                background: #e6e6e6;
+                background: #f3f3f3;
             }
 
             .sort_item {
@@ -377,8 +377,10 @@
         //border:1px solid #d2d2d2;
         .result_sort_bar {
             width: 98%;
-            height: 35px;
-            background: #e6e6e6;
+            height: 45px;
+            background: #f1f1f1;
+            border-top: 1px solid #d2d2d2;
+            border-bottom: 1px solid #d2d2d2;
             display: flex;
             flex-flow: row nowrap;
             align-items: center;

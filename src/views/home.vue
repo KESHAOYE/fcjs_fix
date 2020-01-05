@@ -188,83 +188,6 @@
                     </router-link>
                 </div>
             </div>
-            <!-- 热门商品 -->
-            <div class="hot_items">
-                <div class="hot_floor_show shopshow">
-                    <div class="floor second_floor">2F 福城推荐</div>
-                </div>
-                <div class="official_recommend">
-                    <div class="topshop_swiper">
-                        <swiper :options="topshopOption" ref="topshopswipers">
-                            <swiper-slide v-for="(items,index) in homeswiper" :key="index">
-                                <router-link :to="items.router"><img :src="items.src" alt="图片加载失败"></router-link>
-                            </swiper-slide>
-                        </swiper>
-                    </div>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <el-image style="width:110px;height:110px;" src="../assets/battery.png" fit="cover">
-                            </el-image>
-                            <div class="topshop_content">
-                                <div class="shop_name"></div>
-                                <div class="shsop_des"></div>
-                                <div class="shop_price">1230</div>
-                            </div>
-                        </div>
-                    </router-link>
-                </div>
-                <div class="official_recommend_second">
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <el-image style="width:90px;height:90px;" src="../assets/battery.png" fit="cover">
-                            </el-image>
-                            <div class="topshop_content">
-                                <div class="shop_name">testtesttesttesttesttesttesttesttesttesttesttesttesttest</div>
-                                <div class="shop_des">test test</div>
-                                <div class="shop_price">1230</div>
-                            </div>
-                        </div>
-                    </router-link>
-                    <div class="topshop_items">
-
-                    </div>
-                    <div class="topshop_items">
-
-                    </div>
-                </div>
-                <div class="topshop_show">
-                    <div class="topshop_head">
-                        TOP榜单
-                    </div>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <div class="topcount">1</div>
-                            <div class="topcontent">
-                                <el-image style="width:120px;height:90px;" src="../assets/battery.png" fit="cover">
-                                </el-image>
-                                <div class="topshop_content">
-                                    <div class="shop_name">testtesttesttesttesttesttesttesttesttesttesttesttesttest
-                                    </div>
-                                    <div class="shop_des">test test</div>
-                                    <div class="shop_price">1230</div>
-                                </div>
-                            </div>
-                        </div>
-                    </router-link>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <div class="topcount">2</div>
-                            <div class="topcontent"></div>
-                        </div>
-                    </router-link>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <div class="topcount">3</div>
-                            <div class="topcontent"></div>
-                        </div>
-                    </router-link>
-                </div>
-            </div>
             <div class="shopshow_bar">
                 <div class="shopshow_title">热门维修项目</div>
             </div>
@@ -312,7 +235,7 @@
                 </div>
             </div>
             <div class="recommend">
-                <div class="loadtitle">为你推荐-周边商品</div>
+                <div class="loadtitle">为你推荐</div>
                 <div class="shopshow commend_shop" ref="commend_shop">
 
                 </div>
@@ -551,7 +474,7 @@
     //  topshow start
     .topshow {
         width: 100%;
-        height: 450px;
+        height: 420px;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
@@ -565,12 +488,12 @@
         }
 
         .swiper-container {
-            height: 450px;
+            height: 420px;
         }
 
         .selectmachine {
-            width: 190px;
-            height: 450px;
+            width: 170px;
+            height: 420px;
             background: rgba(255, 255, 255, 1);
 
             ul {
@@ -582,8 +505,8 @@
             }
 
             .sortInfo {
-                width: calc(100% - 190px);
-                min-height: 450px;
+                width: calc(100% - 170px);
+                min-height: 420px;
                 background: white;
                 position: absolute;
                 right: 0;
@@ -616,14 +539,15 @@
                 width: 100%;
                 display: inline-block;
                 transition: .2s;
-                font-family: "等线";
+                font-family: "微软雅黑";
                 color: #000;
+                font-size: 0.9em;
             }
         }
 
         .showimg {
-            width: calc(100% - 450px);
-            height: 450px;
+            width: calc(100% - 420px);
+            height: 420px;
             background: white;
             position: relative;
             //top: 0;
@@ -631,13 +555,13 @@
 
             img {
                 width: 100%;
-                height: 450px;
+                height: 420px;
             }
         }
 
         .person_center_list {
             width: 230px;
-            height: 450px;
+            height: 420px;
             background: white;
 
             .title {
@@ -1116,13 +1040,16 @@
     .shopshow_bar {
         width: 100%;
         height: 40px;
-
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 20px;
+        margin-bottom: 20px;
         .shopshow_title {
             float: left;
             width: 150px;
             height: 25px;
-            margin-top: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 1.3em;
             text-align: left;
         }
@@ -1136,8 +1063,6 @@
         float: right;
         background: #fff;
         margin-right: 30px;
-        margin-top: 30px;
-        margin-bottom: 20px;
 
         .control_prev,
         .control_next {
@@ -1168,7 +1093,6 @@
     .shopshow {
         width: 100%;
         height: 320px;
-        margin-top: 30px;
         //margin-bottom: 30px;
         display: flex;
         flex-flow: row nowrap;
@@ -1411,7 +1335,7 @@
             width: 25px;
             height: 25px;
             position: absolute;
-            margin-left: -40px;
+            margin-left: -35px;
             background: url("../assets/tuijian.png") no-repeat;
         }
 
@@ -1436,7 +1360,7 @@
             justify-content: flex-start;
             align-items: center;
 
-            div:nth-of-type(5n-4) {
+            div:nth-of-type(6n-5) {
                 .commend_top {
                     margin-left: 0px;
                 }
@@ -1449,17 +1373,19 @@
             }
 
             .commend_top {
-                width: 240px;
-                height: 350px;
+                width: 190px;
+                height: 266px;
                 background: white;
                 margin-top: 10px;
                 margin-left: 17px;
                 transition: .3s;
                 cursor: pointer;
+                position: relative;
+                top: 0;
 
                 img {
-                    width: 200px;
-                    height: 200px;
+                    width: 150px;
+                    height: 150px;
                     margin: auto;
                     margin-top: 10px;
                     background: #f2f2f2;
@@ -1467,8 +1393,14 @@
                 }
 
                 .commend_bottom {
-                    width: 200px;
-                    min-height: 50px;
+                    width: 160px;
+                    height: 60px;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    line-clamp: 2;
+                    -webkit-box-orient: vertical;
                     background: #f2f2f2;
                     margin: auto;
                     margin-top: 20px;
@@ -1479,7 +1411,7 @@
 
             .commend_top:hover {
                 box-shadow: 0px 0px 20px #d2d2d2;
-
+                top: -2px;
             }
 
             .commend_over {

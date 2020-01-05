@@ -116,10 +116,10 @@
 
 <style lang="scss">
   .personleft {
-    width: 230px;
-    min-height: 500px;
+    width: 200px;
+    min-height: 400px;
     background: #fff;
-    margin-top: 20px;
+    margin: 20px 0;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;

@@ -7,66 +7,49 @@
                 </router-link>
             </div>
             <div class="headright">
-                <div class="right_top">
-                    <div class="search">
-                        <div class="searchinput">
-                            <!-- <div class="hoticon" v-if="!isselect">
+                <div class="search">
+                    <div class="searchinput">
+                        <!-- <div class="hoticon" v-if="!isselect">
                                 <i>&#xe6a6;</i>
                             </div> -->
-                            <input type="text" v-model="search" placeholder="iPhone8 Plus" @keyup.enter="searchto"
-                                @change="changeselect" @blur="changeselect" />
-                            <div class="searchbutton" @click="searchto">
-                                <i class="searchicon">&#xe623;</i>
-                            </div>
-                            <div class="hotsearch">
-                                <ul>
-                                    <router-link to="/fixfirst">
-                                        <li style="color:#ff4d4d;">屏幕维修</li>
-                                    </router-link>
-                                    <router-link to="/fixfirst">
-                                        <li>电池更换</li>
-                                    </router-link>
-                                    <router-link to="/search?search=iPhone 7 PLUS">
-                                        <li>iPhone 7 PLUS</li>
-                                    </router-link>
-                                    <router-link to="/search?search=iPhone XR">
-                                        <li>iPhone XR</li>
-                                    </router-link>
-                                    <router-link to="/search?search=小米9">
-                                        <li>小米9</li>
-                                    </router-link>
-                                    <router-link to="/fixfirst">
-                                        <li>进水</li>
-                                    </router-link>
-                                    <router-link to="/fixfirst">
-                                        <li>死机</li>
-                                    </router-link>
-                                </ul>
-                            </div>
+                        <input type="text" v-model="search" placeholder="iPhone8 Plus" @keyup.enter="searchto"
+                            @change="changeselect" @blur="changeselect" />
+                        <div class="searchbutton" @click="searchto">
+                            <i class="searchicon">&#xe623;</i>
+                        </div>
+                        <div class="hotsearch">
+                            <ul>
+                                <router-link to="/fixfirst">
+                                    <li style="color:#ff4d4d;">屏幕维修</li>
+                                </router-link>
+                                <router-link to="/fixfirst">
+                                    <li>电池更换</li>
+                                </router-link>
+                                <router-link to="/search?search=iPhone 7 PLUS">
+                                    <li>iPhone 7 PLUS</li>
+                                </router-link>
+                                <router-link to="/search?search=iPhone XR">
+                                    <li>iPhone XR</li>
+                                </router-link>
+                                <router-link to="/search?search=小米9">
+                                    <li>小米9</li>
+                                </router-link>
+                                <router-link to="/fixfirst">
+                                    <li>进水</li>
+                                </router-link>
+                                <router-link to="/fixfirst">
+                                    <li>死机</li>
+                                </router-link>
+                            </ul>
                             <div class="searchresult" v-if="showresult"></div>
                         </div>
                     </div>
-                    
+
                 </div>
-                <!-- <div class="right_bottom">
-                    <ul>
-                        <router-link to="/getcoupon">
-                            <li class="hotmenu">优惠券</li>
-                        </router-link>
-                        <router-link to="#">
-                            <li>回收</li>
-                        </router-link>
-                        <router-link to="/fixfirst">
-                            <li>维修</li>
-                        </router-link>
-                        <span @click="$router.push({name:'search',query:{newtype:'old'}})">
-                            <li>福城优品(优质二手商品)</li>
-                        </span>
-                        <router-link to="/more">
-                            <li>更多</li>
-                        </router-link>
-                    </ul>
-                </div> -->
+            </div>
+            <!-- 头部广告 -->
+            <div class="head_ad">
+
             </div>
         </div>
     </div>
@@ -147,19 +130,19 @@
         width: 100%;
         height: 120px;
         border-bottom: 1px solid #c9c9c9;
+
+        .content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
     }
 
     //  logo begin
     .logo {
-        float: left;
-        position: relative;
-        top: 50%;
         height: 95px;
-        margin-top: -40px;
-        margin-left: 50px;
-        background-color: #0093E9;
-        background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
-        -webkit-background-clip: text;
+        background:black;
+        margin-left: 25px;
 
         .logo_top {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -181,21 +164,21 @@
     //  logo end
     //search begin
     .search {
-        width: 650px;
+        min-width: 650px;
         min-height: 100px;
-        float: left;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
         position: relative;
-        left: 90px;
+        top: -5px;
     }
 
     .searchinput {
-        width: 650px;
+        width: 680px;
         border: 2px solid $main-color;
         height: 35px;
         position: absolute;
         padding-left: 15px;
-        top: 50%;
-        margin-top: -17.5px;
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-start;
@@ -220,7 +203,7 @@
         input {
             height: 35px;
             outline: 0;
-            width: 580px;
+            width: 610px;
             border: 0;
             font-size: 1em;
             font-family: '等线';
@@ -242,19 +225,21 @@
         .searchbutton:hover {
             background: red;
         }
-        .searchicon{
-            color:white;
+
+        .searchicon {
+            color: white;
             font-weight: bolder;
         }
+
         .hotsearch {
 
-            width: 650px;
+            width: 680px;
             height: 30px;
             position: absolute;
             top: 40px;
 
             ul {
-                width: 600px;
+                width: 630px;
                 height: 30px;
                 display: flex;
                 flex-flow: row nowrap;
@@ -275,13 +260,13 @@
         }
 
         .searchresult {
-            width: 620px;
+            width: 660px;
             min-height: 50px;
             background: #fff;
             z-index: 999;
-            position: absolute;
-            top: 37px;
-            left: -3px;
+            position:absolute;
+            top: 0;
+            left: -16px;
             border: 1px solid #b2b2b2;
             border-top: 0;
         }
@@ -296,7 +281,8 @@
         flex-flow: column nowrap;
         justify-content: space-around;
         //align-items: center;
-        margin-left: 125px;
+        margin-left: 35px;
+        min-width: 500px;
 
         .right_top {
             height: 120px;
@@ -335,6 +321,12 @@
     //right end
     .hotmenu {
         color: #ff4d4d;
+    }
+
+    .head_ad {
+        width: 230px;
+        height: 120px;
+        background: black;
     }
 
     // 缩放头部

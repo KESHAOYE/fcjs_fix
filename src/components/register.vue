@@ -21,13 +21,13 @@
                         </el-button>
                     </el-form-item>
                     <el-form-item label="新密码" prop="password">
-                        <el-input v-model="userinfo.password" placeholder="请输入密码"></el-input>
+                        <el-input v-model="userinfo.password" type='password' placeholder="请输入密码"></el-input>
                     </el-form-item>
                     <el-form-item label="确认密码" prop="spassword">
-                        <el-input v-model="userinfo.spassword" placeholder="请确认密码"></el-input>
+                        <el-input v-model="userinfo.spassword" type='password' placeholder="请确认密码"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="register('userinfo')">确认注册</el-button>
+                        <el-button type="primary" @click="register('userinfo')" style="margin-left:80px;">确认注册</el-button>
                         <el-button type="info" @click="cancel">取消</el-button>
                     </el-form-item>
                 </el-form>
@@ -82,7 +82,7 @@
                 loading:"",
                 bookVisiable: true,
                 book_content: {
-                    title: "感谢您注册福城建设商城,福城建设注册协议（'以下简称本协议'）由福城建设商城平台与您签订。",
+                    title: "感谢您注册福城建设,福城建设注册协议（'以下简称本协议'）由福城建设平台（包括商城在内的所有项目通用账号）与您签订。",
                     content_detail: [{
                             name: "1.协议的确认",
                             children: [{
@@ -97,14 +97,27 @@
                                     name: "1.3",
                                     content: "如您为无民事行为能力人或为限制民事行为能力人，请告知您的监护人，在您监护人的指导下阅读本协议，并在取得您监护人同意的前提下使用本服务。"
                                 },
+                                {
+                                    name: "1.4",
+                                    content:'本协议不具备法律效应,本项目为毕业设计。'
+                                },
                             ],
                         },
                         {
                             name: "2.内测特别提醒",
                             children: [{
-                                name: "2.1",
-                                content: "感谢您参与福城建设商城内测活动，目前协议不完善，待正式版上线后将完善本协议,注册账号即为同意本公司所有协议(包括后期),谢谢!"
-                            }]
+                                 name: "2.1",
+                                 content: "感谢您参与福城建设商城内测活动，目前协议不完善，待正式版上线后将完善本协议,注册账号即为同意本公司所有协议(包括后期),谢谢!"
+                                },
+                                {
+                                 name: "2.2",
+                                 content: "注册时建议使用真实信息,以免后续带来不便"
+                                },
+                                {
+                                  name: "2.3",
+                                  content: '本项目于2018年9月开工'
+                                }
+                            ]
                         }
                     ],
                 },
@@ -160,7 +173,7 @@
                     this.buttoninfo.message = time + "秒后发送";
                     if (time <= 0) {
                         this.buttoninfo = {
-                            message: "重新发送",
+                            message: "重新发送码",
                             time: "60",
                             disable: false
                         }
@@ -178,14 +191,17 @@
 <style lang="scss" scoped>
     .register {
         background: url("../assets/customer-head-bg.svg") no-repeat bottom;
+        height: 100vh;
+        overflow: hidden;
     }
 
     .content {
-        margin-top: 50px;
+        margin: 50px auto;
 
         .r_title {
             font-size: 1.5em;
-            font-family: "等线"；
+            font-family: "等线";
+            margin-left: 65px;
         }
 
         .info_detail {

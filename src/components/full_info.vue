@@ -36,7 +36,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="changeuserinfo('userinfo')">确认</el-button>
+                        <el-button type="primary" @click="changeuserinfo('userinfo')" style="margin-left:65px;">确认</el-button>
                         <el-button type="info" @click="jumpstep()">跳过</el-button>
                     </el-form-item>
                 </el-form>
@@ -114,14 +114,17 @@
 <style lang="scss" scoped>
     .full_info {
         background: url("../assets/customer-head-bg.svg") no-repeat bottom;
+        height: 100vh;
+        overflow: hidden;
 
         .content {
-            margin-top: 50px;
+        margin: 50px auto;
 
-            .r_title {
-                font-size: 1.5em;
-                font-family: "等线"；
-            }
+        .r_title {
+            font-size: 1.5em;
+            font-family: "等线";
+            margin-left: 55px;
+        }
 
             .info_detail {
                 width: 100%;
@@ -169,6 +172,7 @@
                     border-radius: 50%;
                     background: #d2d2d2;
                     margin-top: 15px;
+                    margin-left: 40px;
                     cursor: pointer;
                 }
             }
