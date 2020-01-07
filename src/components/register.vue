@@ -3,7 +3,7 @@
         <personbar />
         <headers />
         <div class="content">
-            <div class="r_title">你好，朋友，欢迎注册福城建设账号</div>
+            <div class="r_title">你好，朋友，欢迎注册福城建设平台账号</div>
             <div class="info_detail">
                 <el-form :inline="true" :model="userinfo" ref="userinfo" :label-width="labelwidth"
                     :label-position="labelposition" status-icon :rules="userinforule">
@@ -197,11 +197,14 @@
 
     .content {
         margin: 50px auto;
-
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
         .r_title {
             font-size: 1.5em;
             font-family: "等线";
-            margin-left: 65px;
+            width: 100%;
+            text-align: center;
         }
 
         .info_detail {
@@ -209,6 +212,10 @@
             padding-top: 10px;
             min-height: auto;
             border-radius: 5px;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
 
             .el-form-item {
                 display: flex;
