@@ -29,10 +29,10 @@
           startdue
         }
       }`
-      this.$http.post("/adapi",{
-        query:query,
-        variables:data
-      })
+      //this.$http.post("/adapi",{
+        //query:query,
+        //variables:data
+      //})
     }
   }
 </script>

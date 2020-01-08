@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     //用户登录信息
-    loginToken:"",
+    loginToken:"akndvlalvmalml",
     islogin:false,
     userinfo:[],
     usercoupon:[],

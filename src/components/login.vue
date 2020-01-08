@@ -28,22 +28,21 @@
              <img src="http://localhost:3033/news/api/regnum.php" ref="regimg" alt="加载失败" srcset="">
              </div> -->
                     <div class="errormsg" v-show="errormsg.length>0">{{errormsg}}</div>
-                    <button class="btn_login">登录</button>
+                    <el-button class="btn_login" ref="btnLogin" @click="Login">登录</el-button>
                     <span class="toreg">还没注册?<router-link to="/register">账号注册</router-link></span>
                     <span class="intro">Copyright © 2016-2019 FCJS KESHAOYE</span>
                     <div class="validator_img" v-if="show_validator">
                         <div class="validator_top">
                             <span>请完成拼图验证</span>
                             <div>
-                                <span class="validator_refresh" @click="imgValidator"><i
-                                        class="el-icon-refresh"></i>换一张</span>
+                                <span class="validator_refresh" @click="initValidator"><i class="el-icon-refresh"></i>换一张</span>
                                 <span class="close" @click="show_validator = false"><i class="el-icon-close"></i></span>
                             </div>
                         </div>
-                        <div class="validator_img_content">
-                            <img src="" alt="加载失败" ref="mainValidator">
-                            <img src="" alt="" ref="slide_block" class="slide_block"
-                                :style="{top: slide_top + 'px', left:slide_left + 'px'}">
+                        <div class="validator_img_content" ref="mainValidator">
+                            <img :src="mainValidator" alt="加载失败" >
+                            <img :src=" slideValidator" alt="" ref="slide_block" class="slide_block"
+                                :style="{top: slide_top + 'px', left:slide_left + 'px', width:slideWidth + 'px', height:slideWidth + 'px'}">
                         </div>
                         <div class="slide_bar">
                             <span>向右滑动完成拼图</span>
@@ -61,7 +60,7 @@
 
 <script>
     import reg from '../utils/reg'
-    // import store from '../../../store'
+    import {getImgValidator,checkImgValidator} from '../http/api'
     export default {
         name: "login",
         data() {
@@ -72,7 +71,12 @@
                 errormsg: "",
                 slide_top: 0,
                 slide_left: 0,
-                show_validator: true,
+                slideWidth: 0,
+                // 拼图主图
+                mainValidator: '',
+                // 拼图验证
+                slideValidator: '',
+                show_validator: false,
                 // 拼图验证成功后可登录
                 canLogin: false
             }
@@ -88,6 +92,13 @@
             },
             back() {
                 this.$router.go(-1)
+            },
+            Login () {
+              if(reg.checkphonenumber(null,this.username,this.checkok)&&reg.checkpassword(null,this.password,this.checkok)){
+                  // 验证成功
+                  this.show_validator = true
+                  this.initValidator()
+              }
             },
             drapSlide(el) {
                 let slideRound = this.$refs.slideRound
@@ -110,35 +121,43 @@
                     this.validatorimg()
                 }
             },
-            /**
-             * 获取拼图验证码
-             */
-            imgValidator() {
-                login.getImgValidator(this)
-                    .then(data => {
-                        if (data.data.code === 200) {
-                            this.slide_left = 0
-                            this.$refs.mainValidator.src = `data:image/png;base64,${data.data.bg}`
-                            this.$refs.slide_block.src = `data:image/png;base64,${data.data.patch}`
-                            this.slide_top = data.data.y
-                        }
-                    })
+            initValidator () {
+              this.$nextTick(function(){
+               let {offsetWidth, offsetHeight} = this.$refs.mainValidator
+               const data = {
+                   width: offsetWidth,
+                   height: offsetHeight,
+                   phone: this.username
+               }
+               console.log(this.$refs.mainValidator.offsetWidth)
+               getImgValidator(data).then(data=>{
+                  this.mainValidator = data.data.bg
+                  this.slideValidator = data.data.patch
+                  this.slide_top = data.data.y
+                  this.slideWidth = data.data.valwidth
+               })
+              })
             },
             /**
              * 验证拼图验证码
              */
             validatorimg() {
                 if (!this.canLogin) {
-                    login.checkImgValidator(this, this.slide_left, this.loginInfo)
+                    const data ={
+                        x: this.slide_left,
+                        phone: this.username
+                    }
+                    checkImgValidator(data)
                         .then(data => {
                             if (data.success === '1') {
                                 this.canLogin = true
                                 this.show_validator = false
-                                this.Login()
+                                this.slide_left = 0
+                                // this.Login()
                             } else {
                                 this.$refs.isSlide.style.background = '#e31515'
                                 this.slide_left = 0
-                                this.imgValidator()
+                                //this.imgValidator()
                             }
                         })
                 }
@@ -150,7 +169,6 @@
             },
         },
         mounted() {
-
         },
     }
 </script>
@@ -173,7 +191,7 @@
         margin-left: 30px;
         margin-top: 10px;
         font-size: 1.5em;
-        color: #000;
+        color: #b2b2b2;
         cursor: pointer;
 
         i {
@@ -317,23 +335,24 @@
     }
 
     .validator_img {
-        width: 320px;
-        height: 240px;
+        width: 30%;
+        height: 260px;
         background: white;
         z-index: 999;
         position: absolute;
         top: 60px;
-        left: 0;
+        right: 0;
         padding: 10px;
         box-shadow: 0 0 15px #d2d2d2;
-        border-radius: 6px;
-
+        border-radius: 10px;
+        i{
+          font-family: 'element-icons' !important;
+        }
         .validator_top {
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
             align-items: center;
-
             .validator_refresh {
                 color: #06c;
                 cursor: pointer;
@@ -350,50 +369,49 @@
 
         .validator_img_content {
             width: 100%;
-            height: 120px;
-            background: black;
+            height: 160px;
+            background: white;
             margin-top: 10px;
             position: relative;
             border-radius: 6px;
 
             img {
                 width: 100%;
-                height: 120px;
+                height: 160px;
             }
 
             .slide_block {
                 z-index: 9999;
-                width: 41px;
-                height: 41px;
                 position: absolute;
                 top: 0;
                 left: 0;
+                border:1px solid #fff;
             }
         }
 
         .slide_bar {
-            width: 300px;
+            width: 90%;
             margin: auto;
-            height: 36px;
+            height: 45px;
             background: white;
             box-shadow: inset 0px 0px 15px #41c2fc;
             margin-top: 18px;
             border-radius: 25px;
             text-align: center;
-            line-height: 36px;
+            line-height: 45px;
             position: relative;
             color: #41c2fc;
 
             .slide_round {
-                width: 46px;
-                height: 46px;
+                width: 50px;
+                height: 50px;
                 z-index: 9999;
                 position: absolute;
                 background: white;
-                top: -5px;
+                top: -3px;
                 border-radius: 50%;
                 cursor: pointer;
-                line-height: 46px;
+                line-height: 50px;
                 text-align: center;
                 font-size: 1.7em;
                 box-shadow: 0em 0em 10px #41c2fc;
@@ -410,7 +428,7 @@
                 position: absolute;
                 left: 0;
                 top: 0;
-                height: 36px;
+                height: 45px;
                 border-radius: 25px;
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;

@@ -9,7 +9,7 @@ if (process.env.NODE_ENV == "development") {
 } else if (process.env.NODE_ENV == "debug"){
  process.env.BASE_API = "localhost:3000"
 }else if(process.env.NODE_ENV=="production"){
- process.env.BASE_API=""
+ process.env.BASE_API="localhost:3000"
 }
 const server=axios.create({
     baseURL:process.env.BASE_API,
@@ -19,7 +19,7 @@ const server=axios.create({
 //请求拦截器-在发送请求前判断是否带token
 server.interceptors.request.use(
     config=>{
-        const token=store.state.loginToken;
+        const token=store.state.loginToken
         token&&(config.headers.Authorization=token);
         return config;
     },
@@ -141,7 +141,7 @@ export function get(url,params){
   return new Promise((resolve,reject)=>{
       axios.get(url,params)
       .then((data)=>{
-          resolve(data)
+          resolve(data.data)
       })
       .catch((error)=>{
           reject(error)
@@ -158,7 +158,7 @@ export function post(url,params){
   return new Promise((resolve,reject)=>{
       axios.post(url,qs.stringify(params))
       .then((data)=>{
-          resolve(data)
+          resolve(data.data)
       })
       .catch((error)=>{
           reject(error)
