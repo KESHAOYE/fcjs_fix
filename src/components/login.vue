@@ -72,6 +72,8 @@
                 slide_top: 0,
                 slide_left: 0,
                 slideWidth: 0,
+                imgWidth: 0,
+                imgHeight: 0,
                 // 拼图主图
                 mainValidator: '',
                 // 拼图验证
@@ -113,10 +115,14 @@
                 }
                 slideRound.onmouseleave = (event) => {
                     slideRound.onmousemove = null
+                    slideRound.onmouseleave = null
+                    slideRound.onmouseup =null
                     this.validatorimg()
                 }
                 slideRound.onmouseup = (event) => {
                     slideRound.onmousemove = null
+                    slideRound.onmouseup = null
+                    slideRound.onmouseleave = null
                     this.validatorimg()
                 }
             },
@@ -126,12 +132,14 @@
               this.slide_left =0
               this.$nextTick(function(){
                let {offsetWidth, offsetHeight} = this.$refs.mainValidator
+               this.imgWidth = offsetWidth
+               this.imgHeight = offsetHeight
+               this.$refs.isSlide.style.background = 'linear-gradient(90deg, rgba(62, 192, 251, 1) 18%, rgba(0, 212, 255, 1) 63%)'
                const data = {
-                   width: offsetWidth,
-                   height: offsetHeight,
+                   width: this.imgWidth,
+                   height: this.imgHeight,
                    phone: this.username
                }
-               console.log(this.$refs.mainValidator.offsetWidth)
                getImgValidator(data).then(data=>{
                   this.mainValidator = data.data.bg
                   this.slideValidator = data.data.patch
@@ -154,25 +162,35 @@
                         .then(data => {
                             if (data.code === 200) {
                                 this.canLogin = true
+                                this.$refs.isSlide.style.background = '#66ff33'
+                                setTimeout(()=>{                                
                                 this.show_validator = false
                                 this.slide_left = 0
+                                console.log('ok')
+                                },500)
+                                return 
                             } else {
                                 this.$refs.isSlide.style.background = '#e31515'
-                                this.slide_left = 0
+                                setTimeout(()=>{
                                 this.initValidator()
+                                console.log(1)
+                                },500)
+                                return
                             }
                         })
                         .catch(err => {
                             this.$refs.isSlide.style.background = '#e31515'
-                            this.slide_left = 0
-                            this.initValidator()
+                            setTimeout(()=>{
+                                this.initValidator()
+                                },500)
+                                return
                         })
                 }
             },
         },
         watch: {
             slide_left: function (val) {
-                this.slide_left = val > 260 ? 260 : val
+                this.slide_left = val > this.imgWidth - this.slideWidth ? this.imgWidth - this.slideWidth : val
             },
         },
         mounted() {
