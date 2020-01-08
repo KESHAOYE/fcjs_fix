@@ -96,7 +96,6 @@
             Login () {
               if(reg.checkphonenumber(null,this.username,this.checkok)&&reg.checkpassword(null,this.password,this.checkok)){
                   // 验证成功
-                  this.show_validator = true
                   this.initValidator()
               }
             },
@@ -122,6 +121,9 @@
                 }
             },
             initValidator () {
+              if(!this.canLogin){
+              this.show_validator = true
+              this.slide_left =0
               this.$nextTick(function(){
                let {offsetWidth, offsetHeight} = this.$refs.mainValidator
                const data = {
@@ -137,6 +139,7 @@
                   this.slideWidth = data.data.valwidth
                })
               })
+              }
             },
             /**
              * 验证拼图验证码
@@ -149,16 +152,20 @@
                     }
                     checkImgValidator(data)
                         .then(data => {
-                            if (data.success === '1') {
+                            if (data.code === 200) {
                                 this.canLogin = true
                                 this.show_validator = false
                                 this.slide_left = 0
-                                // this.Login()
                             } else {
                                 this.$refs.isSlide.style.background = '#e31515'
                                 this.slide_left = 0
-                                //this.imgValidator()
+                                this.initValidator()
                             }
+                        })
+                        .catch(err => {
+                            this.$refs.isSlide.style.background = '#e31515'
+                            this.slide_left = 0
+                            this.initValidator()
                         })
                 }
             },
@@ -413,7 +420,7 @@
                 cursor: pointer;
                 line-height: 50px;
                 text-align: center;
-                font-size: 1.7em;
+                font-size: 1.6em;
                 box-shadow: 0em 0em 10px #41c2fc;
                 color: #41c2fc;
 
