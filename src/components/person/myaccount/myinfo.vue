@@ -24,7 +24,7 @@
                     <el-input v-model="userinfo.name" placeholder="请输入昵称"></el-input>
                 </el-form-item>
                 <el-form-item label="出生日期" prop="birth">
-                    <el-date-picker v-model="userinfo.birth" type="date" placeholder="选择日期">
+                    <el-date-picker v-model="userinfo.birth" type="date" placeholder="选择日期" :editable='false' :picker-options="pickerOptions">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="手机号码" prop="phonenumber">
@@ -52,6 +52,13 @@
                     manid: "",
                     phonenumber: "",
                     birth: ""
+                },
+                pickerOptions: {
+                    disabledDate(time) {
+                        let _now = Date.now()
+                        return time.getTime() > _now;
+                        //大于当前的禁止，小于7天前的禁止
+                    }
                 },
                 size: "large",
                 userinforule: {

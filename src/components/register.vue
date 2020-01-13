@@ -10,11 +10,11 @@
                     <el-form-item label="昵称" prop="name">
                         <el-input v-model="userinfo.name" placeholder="请输入昵称"></el-input>
                     </el-form-item>
-                    <el-form-item label="手机号码" prop="phonenumber">
-                        <el-input v-model="userinfo.phonenumber" placeholder="请输入电话号码"></el-input>
+                    <el-form-item label="手机号码" prop="phone">
+                        <el-input v-model="userinfo.phone" placeholder="请输入电话号码"></el-input>
                     </el-form-item>
                     <el-form-item label="验证码" prop="code">
-                        <el-input v-model="userinfo.code" :placeholder="codeplaceholder" class="code">
+                        <el-input v-model="userinfo.code" maxlength='4' :placeholder="codeplaceholder" class="code">
                         </el-input>
                         <el-button class="sendmessage" @click="sendmessage" :disabled="buttoninfo.disable">
                             {{buttoninfo.message}}
@@ -27,8 +27,8 @@
                         <el-input v-model="userinfo.spassword" type='password' placeholder="请确认密码"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="register('userinfo')" style="margin-left:80px;">确认注册</el-button>
-                        <el-button type="info" @click="cancel">取消</el-button>
+                        <el-button type="primary" @click="register('userinfo')" style="margin-left:80px;" :disabled='buttonUse'>{{buttonText}}</el-button>
+                        <el-button type="info" @click="cancel" :disabled='buttonUse'>取消</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+    import {register,fullinfo} from '../http/api'
     let that;
     export default {
         data() {
@@ -74,12 +75,14 @@
                 labelposition: "right",
                 userinfo: {
                     name: "",
-                    phonenumber: "",
+                    phone: "",
                     code: "",
                     password: "",
                     spassword: ""
                 },
                 loading:"",
+                buttonText: "注册",
+                buttonUse: false,
                 bookVisiable: true,
                 book_content: {
                     title: "感谢您注册福城建设,福城建设注册协议（'以下简称本协议'）由福城建设平台（包括商城在内的所有项目通用账号）与您签订。",
@@ -115,7 +118,7 @@
                                 },
                                 {
                                   name: "2.3",
-                                  content: '本项目于2018年9月开工'
+                                  content: '本项目于2019年9月开工'
                                 }
                             ]
                         }
@@ -131,10 +134,9 @@
                 userinforule: {
                     name: [{
                         trigger: 'blur',
-                        message: "昵称不能为空",
-                        required: "true"
+                        validator: this.reg.checkusername
                     }],
-                    phonenumber: [{
+                    phone: [{
                         trigger: 'blur',
                         validator: this.reg.checkphonenumber
                     }],
@@ -155,11 +157,32 @@
         },
         methods: {
             register(val) {
-                this.$refs[val].validate((valid) => {
+                this.$refs[val].validate(function(valid){
                     if (valid) {
-                      that.$router.push({name:"fullinfo"})
+                    that.buttonText = '注册中...'
+                    that.buttonUse = true
+                      register(that.userinfo)
+                      .then(data=>{
+                          if(data.code === 200){
+                            that.$message({
+                              message: '注册成功',
+                              type: 'success',
+                              duration: 1500
+                            })
+                            window.localStronge.setItem('_ID_',data.id)
+                            that.$router.push({name:"fullinfo"})
+                          } else {
+                            that.$message({
+                              message: `注册失败:${data.message}`,
+                              type: 'error',
+                              duration: 1500
+                            })
+                          }
+                          that.buttonText = '注册'
+                          that.buttonUse = false
+                      })
                     } else {
-                        console.log("faild");
+                        console.log("验证失败");
                     }
                 })
             },
@@ -216,6 +239,7 @@
             flex-flow: column nowrap;
             justify-content: center;
             align-items: center;
+            margin-right: 65px;
 
             .el-form-item {
                 display: flex;
