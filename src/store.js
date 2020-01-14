@@ -6,7 +6,6 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     //用户登录信息
-    loginToken:"akndvlalvmalml",
     islogin:false,
     userinfo:[],
     usercoupon:[],
@@ -121,6 +120,9 @@ export default new Vuex.Store({
     },
     changefixedmodel(state,value){
       state.fixedmodel=value
+    },
+    changeUserInfo (state, value) {
+      state.userinfo = value
     }
   },
   actions: {

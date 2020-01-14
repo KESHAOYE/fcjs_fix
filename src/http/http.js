@@ -19,7 +19,7 @@ const server=axios.create({
 //请求拦截器-在发送请求前判断是否带token
 server.interceptors.request.use(
     config=>{
-        const token=store.state.loginToken
+        const token=window.localStorage.getItem('_T_')
         token&&(config.headers.Authorization=token);
         return config;
     },

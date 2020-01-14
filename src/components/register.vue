@@ -50,7 +50,7 @@
 </template>
 
 <script>
-    import {register,fullinfo} from '../http/api'
+    import {register,fullinfo,login,getuserinfo} from '../http/api'
     let that;
     export default {
         data() {
@@ -169,8 +169,7 @@
                               type: 'success',
                               duration: 1500
                             })
-                            window.localStronge.setItem('_ID_',data.id)
-                            that.$router.push({name:"fullinfo"})
+                            return data.userId
                           } else {
                             that.$message({
                               message: `注册失败:${data.message}`,
@@ -180,6 +179,26 @@
                           }
                           that.buttonText = '注册'
                           that.buttonUse = false
+                      })
+                      .then(data=>{
+                          const qs = {
+                                phone:that.userinfo.phone, 
+                                password: that.userinfo.password
+                            }
+                            login(qs).then(datas=>{
+                                if(datas.code === 200){
+                                  window.localStorage.setItem('_T_',datas.token)
+                                  const qss = {
+                                      id:data
+                                  }
+                                  getuserinfo(qss).then(datass=>{
+                                    console.log(datass)
+                                    that.$store.commit('changeUserInfo', datass.info)
+                                  })
+                                  console.log(that.$store.state.userinfo)
+                                  that.$router.push({name:"fullinfo"})    
+                                }
+                            })
                       })
                     } else {
                         console.log("验证失败");
