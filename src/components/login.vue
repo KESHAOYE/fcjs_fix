@@ -28,7 +28,7 @@
              <img src="http://localhost:3033/news/api/regnum.php" ref="regimg" alt="加载失败" srcset="">
              </div> -->
                     <div class="errormsg" v-show="errormsg.length>0">{{errormsg}}</div>
-                    <el-button class="btn_login" ref="btnLogin" @click="Login">登录</el-button>
+                    <el-button class="btn_login" ref="btnLogin" @click="initValidator">登录</el-button>
                     <span class="toreg">还没注册?<router-link to="/register">账号注册</router-link></span>
                     <span class="intro">Copyright © 2016-2019 FCJS KESHAOYE</span>
                     <div class="validator_img" v-if="show_validator">
@@ -60,7 +60,8 @@
 
 <script>
     import reg from '../utils/reg'
-    import {getImgValidator,checkImgValidator} from '../http/api'
+    import {getImgValidator,checkImgValidator,login,getuserinfo} from '../http/api'
+    let that
     export default {
         name: "login",
         data() {
@@ -98,7 +99,31 @@
             Login () {
               if(reg.checkphonenumber(null,this.username,this.checkok)&&reg.checkpassword(null,this.password,this.checkok)){
                   // 验证成功
-                  this.initValidator()
+                  const data= {
+                      phone: this.username,
+                      password: this.password
+                  }
+                  login(data).then(data=>{
+                        if(data.code === 200){
+                            window.localStorage.setItem('_T_',datas._T_)
+                            const qss = {
+                              id:data.userid
+                            }
+                            getuserinfo(qss).then(datass=>{
+                              console.log(datass)
+                              that.$store.commit('changeUserInfo', datass.info)
+                            })
+                              console.log(that.$store.state.userinfo)
+                              that.$router.push({name:"fullinfo"})    
+                            }else{
+                                this.$message({
+                                    message: `登录失败:${data.message}`,
+                                    type: 'error',
+                                    duration:1500
+                                })
+                                this.canLogin =false
+                            }
+                        })
               }
             },
             drapSlide(el) {
@@ -127,7 +152,7 @@
                 }
             },
             initValidator () {
-              if(!this.canLogin){
+              if(!this.canLogin&&reg.checkphonenumber(null,this.username,this.checkok)&&reg.checkpassword(null,this.password,this.checkok)){
               this.show_validator = true
               this.slide_left =0
               this.$nextTick(function(){
@@ -147,6 +172,8 @@
                   this.slideWidth = data.data.valwidth
                })
               })
+              }else{
+                  this.Login()
               }
             },
             /**
@@ -163,10 +190,10 @@
                             if (data.code === 200) {
                                 this.canLogin = true
                                 this.$refs.isSlide.style.background = '#66ff33'
-                                setTimeout(()=>{                                
+                                setTimeout(()=>{
+                                that.Login()                                
                                 this.show_validator = false
                                 this.slide_left = 0
-                                console.log('ok')
                                 },500)
                                 return 
                             } else {
@@ -194,6 +221,7 @@
             },
         },
         mounted() {
+            that = this
         },
     }
 </script>

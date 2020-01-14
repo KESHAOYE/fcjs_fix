@@ -2,17 +2,17 @@
     <div class="person">
         <div class="content">
             <div class="login_state_tool">
-                <el-popover placement="bottom" width="200" trigger="hover">
+                <el-popover placement="bottom" width="200" trigger="hover" v-if='islogin'>
                     <div class="personal_info">
-                        <img src="../../assets/phone/iphone5s.png" alt="">
-                        <div class="outlogin">退出登录</div>
+                        <img :src="userinfo.headimg" alt="">
+                        <div class="outlogin" @click='outlogin'>退出登录</div>
                     </div>
                     <div class="person_info" slot="reference">
-                        <span>KESHAOYE</span>
+                        <span>{{userinfo.username}}</span>
                     </div>
                 </el-popover>
-                <router-link to="/login"><span>登录</span></router-link>
-                <router-link to="/register"><span class="red">免费注册</span></router-link>
+                <router-link to="/login" v-if='!islogin'><span>登录</span></router-link>
+                <router-link to="/register" v-if='!islogin'><span class="red">免费注册</span></router-link>
                 <router-link to="/personcenter"><span>个人中心</span></router-link>
                 <router-link to="/myorder?mid=11"><span>我的订单</span></router-link>
                 <router-link to="#"><span @mouseleave="showpilot=false" @mouseenter="showpilot=true"
@@ -135,6 +135,12 @@
             },
             shopprice() {
                 return this.$store.getters.countshopcarprice;
+            },
+            islogin() {
+                return this.$store.state.islogin
+            },
+            userinfo(){
+                return this.$store.state.userinfo
             }
         },
         watch:{
@@ -158,6 +164,11 @@
                     name: "shopcar"
                 })
                 this.shopcarshow=false
+            },
+            outlogin(){
+                this.$store.commit('outlogin')
+                window.localStorage.removeItem('_T_')
+                this.$router.push({name:'login'})
             }
         }
     }

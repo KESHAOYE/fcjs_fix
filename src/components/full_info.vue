@@ -6,31 +6,31 @@
             <div class="r_title">接下来,请完善您的账户信息</div>
             <div class="info_detail">
                 <el-upload class="avatar-uploader" :show-file-list="false" action='https://jsonplaceholder.typicode.com/posts' :before-upload="beforeAvatarUpload">
-                    <el-avatar :size="70" :src="userinfo.head" class="userhead"></el-avatar>
+                    <el-avatar :size="70" :src="userinfo.headimg" class="userhead"></el-avatar>
                 </el-upload>
                 <el-form :inline="true" :model="userinfo" ref="userinfo" :label-width="labelwidth"
                     :label-position="labelposition" status-icon :rules="userinforule">
-                    <el-form-item label="真实姓名" prop="username">
-                        <el-input v-model="userinfo.username" placeholder="请输入真实姓名"
-                            :disabled="this.userinfo.username.length>0&&this.userinfo.isname"></el-input>
+                    <el-form-item label="真实姓名" prop="name">
+                        <el-input v-model="userinfo.name" placeholder="请输入真实姓名"
+                            :disabled="userinfo.isname"></el-input>
                     </el-form-item>
-                    <el-form-item label="身份证号" prop="manid">
-                        <el-input v-model="userinfo.manid" placeholder="请输入身份证号"
-                            :disabled="this.userinfo.manid.length<0&&this.userinfo.isname">
+                    <el-form-item label="身份证号" prop="id">
+                        <el-input v-model="userinfo.id" placeholder="请输入身份证号"
+                            :disabled="userinfo.isname">
                         </el-input>
                     </el-form-item>
 
                     <el-form-item label="出生日期" prop="birth">
                         <el-date-picker v-model="userinfo.birth" type="date" placeholder="选择日期"
-                            :picker-options="pickerOptions" :editable='false'>
+                            :picker-options="pickerOptions" :editable='false' value-format='yyyy-MM-dd'>
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="性别" prop="sex">
                         <el-select v-model="userinfo.sex" placeholder="请选择">
-                            <el-option value="男">
+                            <el-option value='男'>
                                 男
                             </el-option>
-                            <el-option value="女">
+                            <el-option value='女'>
                                 女
                             </el-option>
                         </el-select>
@@ -47,26 +47,20 @@
 </template>
 
 <script>
+    import {fullinfo,getuserinfo} from '../http/api'
+    let that;
     export default {
         name: "full_info",
         data() {
             return {
                 labelwidth: "120px",
                 labelposition: "right",
-                userinfo: {
-                    head: "",
-                    username: "",
-                    name: "",
-                    manid: "",
-                    sex: "",
-                    birth: "",
-                    isname: false
-                },
+                userinfos:{},
                 buttonText: '确认',
                 buttonUse: false,
                 size: "large",
                 userinforule: {
-                    username: [{
+                    name: [{
                         validator: this.reg.checkname,
                         trigger: 'blur'
                     }],
@@ -98,8 +92,28 @@
             changeuserinfo(val) {
                 this.$refs[val].validate((valid) => {
                     if (valid) {
-
-                        // this.$router.push({name: "login"})
+                       fullinfo(this.userinfo)
+                       .then(data=>{
+                           if(data.code == 200){
+                               this.$message({
+                                   message:'成功！',
+                                   type:'success',
+                                   duration:1500
+                               })
+                             this.$router.push({name: "home"})
+                           }else{
+                               this.$message({
+                                   message: data.message,
+                                   type:'error',
+                                   duration: 1500
+                               })
+                           }
+                       })
+                       .then(()=>{
+                          getuserinfo(that.userinfo.userid).then(data=>{
+                            that.$store.commit('changeUserInfo', datass.info)
+                          })
+                       })
                     } else {
 
                     }
@@ -119,10 +133,18 @@
                     files.readAsDataURL(file)
                     files.onload = e => {
                         let imgFile = e.target.result;
-                        this.userinfo.head = imgFile
+                        this.userinfo.headimg = imgFile
                     }
                 }
             }
+        },
+        computed:{
+            userinfo(){
+                return this.$store.state.userinfo
+            }
+        },
+        mounted(){
+            that = this
         }
     }
 </script>
@@ -147,6 +169,7 @@
                 padding-top: 10px;
                 min-height: 300px;
                 border-radius: 5px;
+                margin-right: 65px;
 
                 .el-form-item {
                     display: flex;
