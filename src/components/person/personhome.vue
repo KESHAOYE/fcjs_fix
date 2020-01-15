@@ -3,11 +3,11 @@
         <div class="person_info">
             <div class="user_info_left">
                 <div class="user_info_head">
-                    <img src="../../assets/phone/iphone5s.png" alt="">
+                    <img :src="userinfo.headimg" alt="">
                     <div class="user_brand">用户</div>
                 </div>
-                <span class="user_name">柯少爷-</span>
-                <span class="user_score">1200</span>
+                <span class="user_name">{{userinfo.username}}</span>
+                <!-- <span class="user_score">1200</span> -->
                 <div class="user_info_left_foot">
                     <span class="order_tip">进入订单中心查看详情</span>
                     <div class="enter_order">进入</div>
@@ -172,6 +172,11 @@
             return {
 
             }
+        },
+        computed:{
+          userinfo () {
+              return this.$store.state.userinfo
+          }
         }
     }
 </script>

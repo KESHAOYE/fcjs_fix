@@ -8,7 +8,7 @@ import search from './views/shop/search'
 import shopdetail from './views/shop/shopdetail'
 import personcenter from './components/person/personcenter'
 import el from "element-ui"
-import Vuex from 'vuex'
+import Vuex from './store'
 Vue.use(Router)
 
 export default new Router({
@@ -104,7 +104,17 @@ export default new Router({
             path: "/login",
             name: "login",
             component: () =>
-                import ("./components/login")
+                import ("./components/login"),
+            beforeEnter(to, from, next) {
+                if (!Vuex.state.islogin) {
+                    next()
+                } else {
+                    el.Message({
+                        message: '已登录',
+                        type: 'error'
+                    })
+                }
+            },
         },
         {
             path: "/getcoupon",
@@ -116,6 +126,17 @@ export default new Router({
             path: "/personcenter",
             name: "personcenter",
             component: personcenter,
+            beforeEnter(to, from, next) {
+                if (!Vuex.state.islogin) {
+                    el.Message({
+                        message: '暂未登录,请先登录',
+                        type: 'error'
+                    })
+                    next({ path: '/login' })
+                } else {
+                    next()
+                }
+            },
             children: [{
                     path: "/",
                     name: "personhome",

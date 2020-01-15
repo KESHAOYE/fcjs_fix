@@ -105,16 +105,25 @@
                   }
                   login(data).then(data=>{
                         if(data.code === 200){
-                            window.localStorage.setItem('_T_',datas._T_)
+                            console.log('111')
+                            window.localStorage.setItem('_T_',data._T_)
                             const qss = {
-                              id:data.userid
+                              id:null,
+                              phone: that.username
                             }
-                            getuserinfo(qss).then(datass=>{
-                              console.log(datass)
-                              that.$store.commit('changeUserInfo', datass.info)
+                            getuserinfo(qss).then(datas=>{
+                              console.log(datas)
+                              that.$store.commit('changeUserInfo', datas.info)
+                              that.$message({
+                                  message: '登录成功',
+                                  type: 'success',
+                                  duration: 1500
+                              })
+                              that.username = ''
+                              that.password = ''
+                              this.canLogin = false
+                              that.$router.push({name:"home"})    
                             })
-                              console.log(that.$store.state.userinfo)
-                              that.$router.push({name:"fullinfo"})    
                             }else{
                                 this.$message({
                                     message: `登录失败:${data.message}`,
@@ -222,7 +231,7 @@
         },
         mounted() {
             that = this
-        },
+        }
     }
 </script>
 
