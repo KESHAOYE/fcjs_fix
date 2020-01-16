@@ -8,31 +8,55 @@
 </template>
 <script>
   import headers from './components/header.vue'
-
+  import {
+    autologin,
+    getuserinfo
+  } from './http/api'
   export default {
     data() {
       return {
 
       }
     },
-    components: {
+    methods: {
+      tokenLogin() {
+        let info = JSON.parse(window.localStorage.getItem('_T_'))
+        let phone = info.phone
+        let token = info._T_
+        const d = {
+          phone: phone,
+          token: token
+        }
+        autologin(d)
+          .then(data => {
+            if (data.code === 200) {
+              window.localStorage.setItem('_T_', JSON.stringify({
+                phone: data.phone,
+                _T_: `'${data._T_}'`
+              }))
+              const qss = {
+                id: null,
+                phone: data.phone
+              }
+              getuserinfo(qss).then(datas => {
+                this.$store.commit('changeUserInfo', datas.info)
+                if(this.$route.name == 'login'){
+                  this.$router.push({path: '/'})
+                }
+              })
+            } else {
+              console.log('token登录失败')
+            }
+      })
+  }
+  },
+  components: {
       headers
     },
+    created () {
+      this.tokenLogin()
+    },
     mounted() {
-      let data={adid: '3'}
-      let query=`query{
-        adinfos(adinfo:3){
-          id
-          adid
-          adimg
-          createTime
-          startdue
-        }
-      }`
-      //this.$http.post("/adapi",{
-        //query:query,
-        //variables:data
-      //})
     }
   }
 </script>
@@ -47,12 +71,15 @@
   img {
     border: 0
   }
+
   .icon {
-       width: 1em; height: 1em;
-       vertical-align: -0.15em;
-       fill: currentColor;
-       overflow: hidden;
-    }
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+  }
+
   .alipay {
     background: #00a0e9;
     border: 0;
@@ -119,5 +146,4 @@
     font-family: iconfont !important;
     font-style: normal;
   }
-
 </style>

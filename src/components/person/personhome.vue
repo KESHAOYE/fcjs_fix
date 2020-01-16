@@ -291,10 +291,10 @@
                 flex-flow: row nowrap;
                 justify-content: space-around;
                 align-items: center;
+                transition: 1s;
 
                 .right_items:hover {
                     box-shadow: 1px 1px 10px #e2e2e2;
-                    transition: .5s;
                 }
 
                 .right_items {

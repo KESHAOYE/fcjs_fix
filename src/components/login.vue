@@ -105,8 +105,11 @@
                   }
                   login(data).then(data=>{
                         if(data.code === 200){
-                            console.log('111')
-                            window.localStorage.setItem('_T_',data._T_)
+                            const result = {
+                                phone: this.username,
+                                _T_:`'${data._T_}'`
+                            }
+                            window.localStorage.setItem('_T_',JSON.stringify(result))
                             const qss = {
                               id:null,
                               phone: that.username
