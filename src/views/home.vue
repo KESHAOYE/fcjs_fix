@@ -11,6 +11,7 @@
                             <template v-if="index<=6">
                                 <li>{{item.name}}/{{item.value}}</li>
                                 <div class='sortInfo' :class="'sort'+index">
+                                    
                                 </div>
                             </template>
                         </router-link>
