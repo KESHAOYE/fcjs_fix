@@ -15,7 +15,6 @@
                                 </div>
                             </template>
                         </router-link>
-                        <router-link to="/chat">liaotian</router-link>
                     </ul>
                 </div>
                 <div class="showimg">
