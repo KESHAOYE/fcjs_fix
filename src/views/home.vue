@@ -11,7 +11,12 @@
                             <template v-if="index<=6">
                                 <li>{{item.name}}/{{item.value}}</li>
                                 <div class='sortInfo' :class="'sort'+index">
-                                    
+                                  <ul>
+                                      <li class="shopitem" v-for="(shopitem,index) in item.data" :data='shopitem.shopid' :key="index">
+                                         <img :src="shopitem.shopimg" alt="加载失败">
+                                         <span>{{shopitem.shopname}}</span>
+                                      </li>
+                                  </ul>
                                 </div>
                             </template>
                         </router-link>
