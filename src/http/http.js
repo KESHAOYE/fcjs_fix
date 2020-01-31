@@ -1,7 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
 import { Message } from 'element-ui';
-import store from '../store';
 import router from 'vue-router';
 //判断环境
 if (process.env.NODE_ENV == "development") {
