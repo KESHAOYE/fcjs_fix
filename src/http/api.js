@@ -4,8 +4,6 @@
  * Time: 2020-01-08
  */
 import {get, post } from './http'
-
-const Token = localStorage.getItem('_FCT_')
     /******************************** 登录注册相关 ********************************/
     //获取图片验证码
 export const getImgValidator = data => post('/api/imgValidator/GET', data)
@@ -13,6 +11,8 @@ export const getImgValidator = data => post('/api/imgValidator/GET', data)
 export const checkImgValidator = data => post('/api/imgValidator/CHECK', data)
     //注册
 export const register = data => post('/api/register/REGISTERNEW', data)
+export const getphonevalidator = data=>post('/api/phoneValidator/GET',data)
+export const checkphonevalidator = data=>post('/api/phoneValidator/CHECK',data)
     // 补充信息
 export const fullinfo = data => post('/api/register/FULLINFO', data)
     // 登录
@@ -21,3 +21,39 @@ export const login = data => post('/api/login/LOGINU', data)
 export const autologin = data => post('/api/login/LOGINAUTO', data)
     // 获取用户信息
 export const getuserinfo = data => post('/api/login/GETUSERINFO', data)
+// 获取首页分类
+export const getsort = data=> post('/api/sort/GETSORT',data)
+//获取首页广告 
+export const getad = data=> post('/api/ad/GETAD',data)
+//获取搜索词
+export const searchlist = data=> post('/api/search/SEARCHLIST',data)
+export const searchresult = data => post('/api/search/SEARCHRESULT',data)
+// 获取商品
+export const getshopinfo = data=> post('/api/shop/GETSHOPBYID',data)
+export const getstock = data =>post('/api/shop/GETSTOCK',data)
+export const getfirstcomment = data => post('/api/comment/GETFIRST',data)
+export const getcomments = data => post('/api/comment/GETCOMMENTS',data)
+export const getshopcoupon = data =>post('/api/coupon/GETSHOPCOUPON',data)
+export const getcomment = data =>post('/api/comment/GETCOMMENT',data)
+export const like = data => post('/api/comment/like',data)
+export const addshopcar = data=>post('/api/shopcar/ADDSHOPCAR',data)
+export const getshopcar = data=>post('/api/shopcar/GETSHOPCAR',data)
+export const deleteshopcar = data=>post('/api/shopcar/DELETESHOPCAR',data)
+
+// 地址
+export const addaddress = data => post('/api/address/ADDADDRESS',data)
+export const getaddress = data => post('/api/address/GETADDRESS',data)
+export const updateaddress = data => post('/api/address/UPDATEADDRESS',data)
+export const deleteaddress = data => post('/api/address/DELETEADDRESS',data)
+
+//优惠券
+export const getcoupon = data => post('/api/coupon/USERGETCOUPON',data)
+export const getusercoupon = data=>post('/api/coupon/GETUSERCOUPON',data)
+
+//订单
+export const createorders = data => post('/api/order/CREATEORDERSHOP',data)
+export const getordershop = data => post('/api/order/GETORDERSHOP',data)
+export const getordercoupon = data => post('/api/order/GETORDERCOUPON',data)
+
+// 个人中心
+export const getordercount = data=> post('/api/order/GETORDERCOUNT',data)

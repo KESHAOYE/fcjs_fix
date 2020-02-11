@@ -12,7 +12,8 @@
                         <span class="searchresult" v-if="shoptype">"{{shoptype|shoptype}}"</span>
                         <span class="searchresult" v-if="newtype">"{{newtype|newtype}}"</span>
                         <span class="searchresult" v-if="newtypelevel">"{{newtypelevel|newtypelevel}}"</span>
-                        <span class="searchresult" v-if="this.$route.query.maxmoney&&this.$route.query.minmoney">"{{minmoney}}元-{{maxmoney}}元"</span>
+                        <span class="searchresult"
+                            v-if="this.$route.query.maxmoney&&this.$route.query.minmoney">"{{minmoney}}元-{{maxmoney}}元"</span>
                     </el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
@@ -38,8 +39,8 @@
                         @click="changetype('price',[item.maxmoney,item.minmoney])">{{item.maxmoney}}元-{{item.minmoney}}元</span>
                     <span class="sort_item">
                         自定义:
-                        <input type="text" v-model="vmin" placeholder="￥" min="0"/>-
-                        <input type="text" v-model="vmax" placeholder="￥" min="0"/>  
+                        <input type="text" v-model="vmin" placeholder="￥" min="0" />-
+                        <input type="text" v-model="vmax" placeholder="￥" min="0" />
                     </span>
                     <div class="sortbyprice" @click="changetype('price',[vmax,vmin])">确认</div>
                 </div>
@@ -59,28 +60,37 @@
                         <i class="el-icon-bottom"></i>
                     </span>
                 </div>
-                <div class="resultitem" value="0001" @click="todetail">
-                    <div class="isold smallold">
+                <div class='null' v-if='shopList.length <= 0'>暂无结果</div>
+                <div class="resultitem" v-for='(item,index) in shopList' :value="item.shop_id" @click="todetail">
+                    <div class="isold smallold" v-if='item.isold == 1'>
                     </div>
                     <div class="resultimg">
-                        <img src="../../assets/phone/iphone5s.png" alt="" srcset="">
+                        <img :src="item.shopimg" alt="" srcset="">
                     </div>
-                    <span class="resultprice">5000</span>
-                    <span class="resultname">Apple iPhone XR (A2108) 128GB 红色 移动联通电信4G手机 双卡双待</span>
+                    <span class="resultprice">{{item.price}}</span>
+                    <span class="resultname">{{item.shopname}}</span>
                 </div>
             </div>
+            <el-pagination background layout="prev, pager, next" :total="total">
+            </el-pagination>
         </div>
     </div>
     </div>
 </template>
 
 <script>
-    let that=""
+    let that = ""
+    import {
+        searchresult
+    } from '@/http/api'
     export default {
         data() {
             return {
-                vmax:"",
-                vmin:"",
+                currentPage: 1,
+                pageSize: 10,
+                total: 0,
+                vmax: "",
+                vmin: "",
                 shoptypes: [{
                         name: "手机",
                         value: "phone"
@@ -120,33 +130,53 @@
                         value: "low8"
                     }
                 ],
-                price:[
-                    {
-                        maxmoney:"0",
-                        minmoney:"100",
+                price: [{
+                        maxmoney: "0",
+                        minmoney: "100",
                     },
                     {
-                       maxmoney:"100",
-                       minmoney:"1000",
+                        maxmoney: "100",
+                        minmoney: "1000",
                     },
                     {
-                      maxmoney:"1000",
-                      minmoney:"10000"
+                        maxmoney: "1000",
+                        minmoney: "10000"
                     },
-                ]
+                ],
+                shopList: []
             }
         },
         methods: {
             back() {
                 if (JSON.stringify(this.$route.query) == "{}") {
-                    this.$router.push({name:"home"})
+                    this.$router.push({
+                        name: "home"
+                    })
                 }
             },
+            getSearch() {
+                const qdata = {
+                    key: this.$route.query.search, //搜索词
+                    page: this.currentPage,
+                    pageSize: this.pageSize,
+                    sort: this.$route.query.shoptype, //所属分类
+                    isold: this.$route.query.newtype, //二手标识
+                    oldtype: this.$route.query.newtypelevel, //二手状态
+                    min_price: this.$route.query.maxmoney, //价格区间
+                    max_price: this.$route.query.minmoney
+                }
+                searchresult(qdata)
+                    .then(data => {
+                        this.shopList = []
+                        this.shopList = data.info
+                    })
+            },
             todetail(el) {
+                console.dir(el.currentTarget.attributes[0].value)
                 this.$router.push({
                     name: "shopdetail",
                     query: {
-                        shopid: el.currentTarget.value
+                        shopid: el.currentTarget.attributes[0].value
                     }
                 })
             },
@@ -173,75 +203,81 @@
                         };
                         break;
                     case "price":
-                        let temp=""
-                        if(value[0]>value[1]){
-                            temp=value[0];
-                            value[0]=value[1];
-                            value[1]=temp;
-                        }else if(value[0].length==0){
-                            value[0]=value[1]
-                        }else if(value[1].length==0){
-                            value[1]=value[0]
-                        }else if(value[1].length==0&&value[0].length==0){
+                        let temp = ""
+                        if (value[0] > value[1]) {
+                            temp = value[0];
+                            value[0] = value[1];
+                            value[1] = temp;
+                        } else if (value[0].length == 0) {
+                            value[0] = value[1]
+                        } else if (value[1].length == 0) {
+                            value[1] = value[0]
+                        } else if (value[1].length == 0 && value[0].length == 0) {
                             this.$notify({
-                                message:"请输入内容",
-                                type:"error",
-                                duration:1500
+                                message: "请输入内容",
+                                type: "error",
+                                duration: 1500
                             })
-                            return ;
+                            return;
                         }
                         newsearch = {
                             ...nowsearch,
                             maxmoney: value[1],
-                            minmoney:value[0]
+                            minmoney: value[0]
                         };
-                        break;  
+                        break;
                 }
-                this.$router.push({name:"search",query:newsearch})
+                this.$router.push({
+                    name: "search",
+                    query: newsearch
+                })
             },
 
         },
-        filters:{
-            shoptype(value){
-              let newval="";
-              for(var i of that.shoptypes){
-                  if(i.value==value){
-                  newval=i.name;
-                  }
-              }
-              return newval;
+        filters: {
+            shoptype(value) {
+                let newval = "";
+                for (var i of that.shoptypes) {
+                    if (i.value == value) {
+                        newval = i.name;
+                    }
+                }
+                return newval;
             },
-            newtype(val){
-                let newval="";
-              for(var i of that.newtypes){
-                  if(i.value==val){
-                  newval=i.name;
-                  }
-              }
-              return newval;
+            newtype(val) {
+                let newval = "";
+                for (var i of that.newtypes) {
+                    if (i.value == val) {
+                        newval = i.name;
+                    }
+                }
+                return newval;
             },
-            newtypelevel(val){
-              let newval="";
-              for(var i of that.newtypelevels){
-                  if(i.value==val){
-                  newval=i.name;
-                  }
-              }
-              return newval;
+            newtypelevel(val) {
+                let newval = "";
+                for (var i of that.newtypelevels) {
+                    if (i.value == val) {
+                        newval = i.name;
+                    }
+                }
+                return newval;
             }
         },
-        watch:{
-            vmin(val){
-              let reg=new RegExp(/^[1-9]\d*$/)
-              if(Number(val)<0||!reg.test(val)){
-                  this.vmin=""
-              }
+        watch: {
+            vmin(val) {
+                let reg = new RegExp(/^[1-9]\d*$/)
+                if (Number(val) < 0 || !reg.test(val)) {
+                    this.vmin = ""
+                }
             },
-            vmax(val){
-                let reg=new RegExp(/^[1-9]\d*$/)
-                if(Number(val)<0||!reg.test(val)){
-                  this.max=""
-              }
+            vmax(val) {
+                let reg = new RegExp(/^[1-9]\d*$/)
+                if (Number(val) < 0 || !reg.test(val)) {
+                    this.max = ""
+                }
+            },
+            $route(to, from) {
+                this.$router.go(0)
             }
         },
         computed: {
@@ -264,12 +300,13 @@
                 return this.$route.query.maxmoney
             }
         },
-        beforeCreate(){
-            that=this
+        beforeCreate() {
+            that = this
         },
         mounted() {
             this.back();
-        },
+            this.getSearch()
+        }
     }
 </script>
 
@@ -433,10 +470,14 @@
 
         .resultname {
             width: 90%;
-            height: 30px;
+            height: 35px;
             display: block;
             margin-top: 5px;
             font-size: 0.9em;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-line-clamp: 2;
         }
 
         .resultprice {
@@ -489,5 +530,20 @@
         position: relative;
         top: 10px;
         right: -70px;
+    }
+
+    .null {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .el-pagination.is-background .el-pager li:not(.disabled).active {
+        background-color: #ff3333 !important;
+        color: #FFF;
+    }
+
+    .el-pagination.is-background .el-pager li:not(.disabled):hover {
+        color: #ff3333 !important;
     }
 </style>

@@ -9,11 +9,8 @@
             <div class="headright">
                 <div class="search">
                     <div class="searchinput">
-                        <!-- <div class="hoticon" v-if="!isselect">
-                                <i>&#xe6a6;</i>
-                            </div> -->
                         <input type="text" v-model="search" placeholder="iPhone8 Plus" @keyup.enter="searchto"
-                            @change="changeselect" @blur="changeselect" />
+                            @input="changeselect" @blur="changeselect" />
                         <div class="searchbutton" @click="searchto">
                             <i class="searchicon">&#xe623;</i>
                         </div>
@@ -41,7 +38,11 @@
                                     <li>死机</li>
                                 </router-link>
                             </ul>
-                            <div class="searchresult" v-if="showresult"></div>
+                            <div class="searchresult" v-if="searchList.length > 0">
+                                <div v-for='(item,index) in searchList'>
+                                    <span class='results'>{{item.key}}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -56,6 +57,9 @@
 </template>
 
 <script>
+    import {
+        searchlist
+    } from '@/http/api'
     export default {
         props: ["searchs"],
         props: ["isopen"],
@@ -64,6 +68,7 @@
                 hotsearch: [
 
                 ],
+                searchList: [],
                 search: this.searchs,
                 showresult: false,
                 isselect: false,
@@ -73,20 +78,38 @@
         },
         methods: {
             changeselect() {
+                this.searchList = []
                 if (this.search.length == 0) {
                     this.isselect = false;
                 } else {
+                    const qdata = {
+                        key: this.search,
+                        count: 10
+                    }
+                    searchlist(qdata)
+                        .then(data => {
+                            this.$nextTick(() => {
+                                this.searchList = data.info
+                            })
+                        })
                     this.isselect = true;
                 }
             },
             searchto() {
+                if(this.search.length != 0){
                 this.$router.push({
                     name: "search",
                     query: {
                         search: this.search
                     }
                 })
-                this.search = ""
+                this.searchList =[]
+                }else {
+                    this.$message({
+                        message: '搜索词不可为空',
+                        type: 'error'
+                    })
+                }
             },
             inithead() {
                 this.search = this.$props.searchs && this.$props.searchs.length != 0 ? this.$props.searchs : ""
@@ -141,7 +164,7 @@
     //  logo begin
     .logo {
         height: 95px;
-        background:black;
+        background: black;
         margin-left: 25px;
 
         .logo_top {
@@ -261,14 +284,33 @@
 
         .searchresult {
             width: 660px;
-            min-height: 50px;
+            min-height: 30px;
             background: #fff;
             z-index: 999;
-            position:absolute;
+            position: absolute;
             top: 0;
             left: -16px;
             border: 1px solid #b2b2b2;
             border-top: 0;
+
+            div {
+                cursor: pointer;
+
+                &:hover {
+                    background: rgb(180, 180, 180)
+                }
+            }
+
+            .results {
+                height: 40px;
+                width: 90%;
+                line-height: 40px;
+                display: block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                margin-left: 25px;
+            }
         }
     }
 

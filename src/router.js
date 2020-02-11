@@ -126,17 +126,6 @@ export default new Router({
             path: "/personcenter",
             name: "personcenter",
             component: personcenter,
-            beforeEnter(to, from, next) {
-                if (!Vuex.state.islogin) {
-                    el.Message({
-                        message: '暂未登录,请先登录',
-                        type: 'error'
-                    })
-                    next({ path: '/login' })
-                } else {
-                    next()
-                }
-            },
             children: [{
                     path: "/",
                     name: "personhome",
@@ -193,18 +182,18 @@ export default new Router({
                         import ("./components/person/myaccount/changepassword")
                 },
                 {
-                    path: "/chat",
-                    name: "chat",
-                    component: () =>
-                        import ("./components/chat")
-                },
-                {
                     name: "addressmanage",
                     path: "/addressmanage",
                     component: () =>
                         import ("./components/person/myaccount/addressmanage")
                 }
             ]
+        },
+        {
+            path: "/chat",
+            name: "chat",
+            component: () =>
+                import ("./components/chat")
         },
         {
             name: "ordersubmit",

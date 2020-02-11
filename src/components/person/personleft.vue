@@ -28,11 +28,7 @@
           },
           {
             name: "我的钱包",
-            data: [{
-                personmenuid: "21",
-                name: "余额",
-                router: "balance",
-              },
+            data: [
               {
                 personmenuid: "22",
                 name: "优惠券",
@@ -57,11 +53,6 @@
                 name: "售后查询",
                 router: "myorder",
                 activetype: "dealing",
-              },
-              {
-                personmenuid: "33",
-                name: "我的客服",
-                router: "chat",
               }
             ]
           },

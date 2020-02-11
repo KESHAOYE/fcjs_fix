@@ -9,14 +9,15 @@
                         <router-link v-for="(item,index) in sortList" :key="index" @mouseleave="showMenu('out',index)"
                             @mouseenter="showMenu('in',index)" to="#">
                             <template v-if="index<=6">
-                                <li>{{item.name}}/{{item.value}}</li>
+                                <li>{{item.sortname}}/{{item.sortename}}</li>
                                 <div class='sortInfo' :class="'sort'+index">
-                                  <ul>
-                                      <li class="shopitem" v-for="(shopitem,index) in item.data" :data='shopitem.shopid' :key="index">
-                                         <img :src="shopitem.shopimg" alt="加载失败">
-                                         <span>{{shopitem.shopname}}</span>
-                                      </li>
-                                  </ul>
+                                    <ul>
+                                        <li class="shopitem" v-for="(shopitem,index) in item.data"
+                                            :data='shopitem.shopid' :key="index">
+                                            <img :src="shopitem.shopimg" alt="加载失败">
+                                            <span>{{shopitem.shopname}}</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </template>
                         </router-link>
@@ -24,8 +25,8 @@
                 </div>
                 <div class="showimg">
                     <swiper :options="swiperOption" ref="homeswipers">
-                        <swiper-slide v-for="(items,index) in homeswiper" :key="index" :color="items.color">
-                            <router-link :to="items.router"><img :src="items.src" alt="图片加载失败"></router-link>
+                        <swiper-slide v-for="(items,index) in homeswiper" :key="index">
+                            <img :src="items.adimg" alt="图片加载失败">
                         </swiper-slide>
                     </swiper>
                     <div class="imgpagination"></div>
@@ -63,66 +64,13 @@
                     <div class="wrapper" ref="wrapper">
                         <ul ref="scroll">
                             <swiper :options="shopshowoption" ref="shopshow">
-                                <swiper-slide>
+                                <swiper-slide v-for='(item,index) in recomment' :key='index'>
                                     <li>
-                                        <img src="../assets/ryzhp.jpg" alt="" srcset="">
-                                        <span class="shop_name">华为 鸿蒙系统 荣耀智慧屏</span>
-                                        <span class="shopdes">国民电视！中国人自己的系统！</span>
+                                        <img :src="item.adimg" alt="图片加载失败" srcset="">
+                                        <span class="shop_name">{{item.shopname}}</span>
+                                        <span class="shopdes">{{item.shopdes}}</span>
                                         <span class="shopprice">3999</span>
                                     </li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>
-                                        <img src="../assets/phone/mate30pro.png" alt="" srcset="">
-                                        <span class="shop_name">华为Mate 30 Pro</span>
-                                        <span class="shopdes">双模5G 快速到达</span>
-                                        <span class="shopprice">4999</span>
-                                    </li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>
-                                        <img src="../assets/phone/oneplus7pro.jpg" alt="" srcset="">
-                                        <span>一加7Pro</span>
-                                    </li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>
-                                        <img src="../assets/phone/xiaomi9pro.jpg" alt="" srcset="">
-                                        <span>小米9Pro 5G版</span>
-                                    </li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>5</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>6</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>7</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>8</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>9</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>10</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>11</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>12</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>13</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>14</li>
-                                </swiper-slide>
-                                <swiper-slide>
-                                    <li>15</li>
                                 </swiper-slide>
                             </swiper>
 
@@ -250,27 +198,16 @@
 </template>
 
 <script>
+    import {
+        getsort,
+        getad
+    } from '@/http/api'
     export default {
         name: "home",
         data() {
             var myvue = this
             return {
-                homeswiper: [{
-                        src: require("../assets/index_background/1.jpg"),
-                        color: "#0c1124",
-                        router: "#"
-                    },
-                    {
-                        src: require("../assets/index_background/2.webp"),
-                        color: "#c5e3ed",
-                        router: "#"
-                    },
-                    {
-                        src: require("../assets/index_background/3.webp"),
-                        color: "#bedde0",
-                        router: "#"
-                    }
-                ],
+                homeswiper: [],
                 elseFunction: [{
                         icon: '#icon-fuzhouditie',
                         value: '地铁',
@@ -350,7 +287,8 @@
                     "#ffac13", //橙色
                     "#2196f3", //蓝色
                     "#83c44e", //绿色
-                ]
+                ],
+                recomment: []
             }
         },
         methods: {
@@ -381,16 +319,16 @@
             //创建加载图片
             loadingcommends() {
                 let arr = []
-                for (let index = 0; index < 10; index++) {
+                for (let index = 0; index < 12; index++) {
                     let cdiv = document.createElement('div');
                     cdiv.innerHTML =
                         `<div class="commend_top">
                     </div>
                     `;
-                    let i = Math.floor(this.$refs.commend_shop.childNodes.length / 10) * 10 + index;
-                    i = (i + 1) % 10 == 0 && i != 0 ? i -= 10 : i;
+                    let i = Math.floor(this.$refs.commend_shop.childNodes.length / 12) * 12 + index;
+                    i = (i + 1) % 12 == 0 && i != 0 ? i -= 12 : i;
                     let parendNode = document.getElementsByClassName("commend_top");
-                    if (this.$refs.commend_shop.childNodes.length <= 50) {
+                    if (this.$refs.commend_shop.childNodes.length <= 60) {
                         this.$refs.commend_shop.appendChild(cdiv)
                         //插入图片对象
                         let init = this.virtual.init(parendNode, i);
@@ -441,12 +379,47 @@
                     e.childNodes[0].style.borderTop = "1px solid" + this.swipercolor[i++];
                 })
             },
-            unopen () {
-              this.$message({
-                message: '该功能暂未开放,稍后福城建设将为您提供更多服务',
-                duration: 1500,
-                type: 'error'
-              })
+            unopen() {
+                this.$message({
+                    message: '该功能暂未开放,稍后福城建设将为您提供更多服务',
+                    duration: 1500,
+                    type: 'error'
+                })
+            },
+            getsorts() {
+                const qdata = {
+                    page: 1,
+                    pageSize: 8,
+                    sortname: ''
+                }
+                getsort(qdata).then(data => {
+                        this.$store.commit('changesort', data.info)
+                        console.log(this.$store.state.sortList)
+                    })
+                    .catch(err => {
+                        this.$message({
+                            message: '分类获取失败',
+                            type: 'error'
+                        })
+                    })
+            },
+            getads(adid) {
+                const qdata = {
+                    adid: adid
+                }
+                getad(qdata).then(data => {
+                        if (adid == 1) {
+                            this.homeswiper = data.info
+                        } else {
+                            this.recomment = data.info
+                        }
+                    })
+                    .catch(err => {
+                        this.$message({
+                            message: '分类获取失败',
+                            type: 'error'
+                        })
+                    })
             }
         },
         computed: {
@@ -456,6 +429,9 @@
         },
         mounted() {
             this.getnews();
+            this.getsorts()
+            this.getads(1);
+            this.getads(2);
             this.beautiswiper();
         },
         activated() {
@@ -492,6 +468,7 @@
         }
 
         .swiper-container {
+            width: 100% !important;
             height: 420px;
         }
 
@@ -591,7 +568,8 @@
                     flex-flow: row wrap;
                     align-items: center;
                     list-style: none;
-                    li{
+
+                    li {
                         margin-left: 10px;
                         width: 60px;
                         height: 70px;
@@ -599,9 +577,10 @@
                         flex-flow: column nowrap;
                         justify-content: space-around;
                         align-items: center;
-                        font-size:0.8em;
+                        font-size: 0.8em;
                         cursor: pointer;
-                        .icon{
+
+                        .icon {
                             width: 30px;
                             height: 30px;
                         }
@@ -1049,6 +1028,7 @@
         justify-content: space-between;
         margin-top: 20px;
         margin-bottom: 20px;
+
         .shopshow_title {
             float: left;
             width: 150px;
@@ -1148,9 +1128,13 @@
             }
 
             .wrapper {
-                width: 100%;
+                width: 100% !important;
                 height: 300px;
                 background: #fff;
+
+                .swiper-container {
+                    width: 100%;
+                }
 
                 ul {
                     display: flex;
@@ -1161,6 +1145,7 @@
                     list-style-type: none;
                     height: 300px;
                     background: #f4f4f4;
+                    width: 100%;
 
                     //     .swiper-slide:first-child{
                     //         li{
@@ -1190,12 +1175,16 @@
                         }
 
                         .shop_name {
+                            width: 98%;
                             z-index: 999;
                             color: #000;
-                            height: 30px;
+                            height: 35px;
                             font-family: "等线";
                             font-size: 1em;
-                            margin-top: 6px;
+                            margin: 6px auto 0px auto;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
                         }
 
                         .shopdes {

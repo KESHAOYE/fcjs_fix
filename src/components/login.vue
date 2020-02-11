@@ -35,12 +35,13 @@
                         <div class="validator_top">
                             <span>请完成拼图验证</span>
                             <div>
-                                <span class="validator_refresh" @click="initValidator"><i class="el-icon-refresh"></i>换一张</span>
+                                <span class="validator_refresh" @click="initValidator"><i
+                                        class="el-icon-refresh"></i>换一张</span>
                                 <span class="close" @click="show_validator = false"><i class="el-icon-close"></i></span>
                             </div>
                         </div>
                         <div class="validator_img_content" ref="mainValidator">
-                            <img :src="mainValidator" alt="加载失败" >
+                            <img :src="mainValidator" alt="加载失败">
                             <img :src=" slideValidator" alt="" ref="slide_block" class="slide_block"
                                 :style="{top: slide_top + 'px', left:slide_left + 'px', width:slideWidth + 'px', height:slideWidth + 'px'}">
                         </div>
@@ -60,7 +61,13 @@
 
 <script>
     import reg from '../utils/reg'
-    import {getImgValidator,checkImgValidator,login,getuserinfo} from '../http/api'
+    import {
+        getImgValidator,
+        checkImgValidator,
+        login,
+        getuserinfo,
+        getshopcar
+    } from '../http/api'
     let that
     export default {
         name: "login",
@@ -96,47 +103,58 @@
             back() {
                 this.$router.go(-1)
             },
-            Login () {
-              if(reg.checkphonenumber(null,this.username,this.checkok)&&reg.checkpassword(null,this.password,this.checkok)){
-                  // 验证成功
-                  const data= {
-                      phone: this.username,
-                      password: this.password
-                  }
-                  login(data).then(data=>{
-                        if(data.code === 200){
+            Login() {
+                if (reg.checkphonenumber(null, this.username, this.checkok) && reg.checkpassword(null, this.password,
+                        this.checkok)) {
+                    // 验证成功
+                    const data = {
+                        phone: this.username,
+                        password: this.password
+                    }
+                    login(data).then(data => {
+                        if (data.code === 200) {
                             const result = {
                                 phone: this.username,
-                                _T_:`'${data._T_}'`
+                                _T_: `'${data._T_}'`
                             }
-                            window.localStorage.setItem('_T_',JSON.stringify(result))
+                            window.localStorage.setItem('_T_', JSON.stringify(result))
                             const qss = {
-                              id:null,
-                              phone: that.username
+                                id: null,
+                                phone: that.username
                             }
-                            getuserinfo(qss).then(datas=>{
-                              console.log(datas)
-                              that.$store.commit('changeUserInfo', datas.info)
-                              that.$message({
-                                  message: '登录成功',
-                                  type: 'success',
-                                  duration: 1500
-                              })
-                              that.username = ''
-                              that.password = ''
-                              this.canLogin = false
-                              that.$router.push({name:"home"})    
-                            })
-                            }else{
-                                this.$message({
-                                    message: `登录失败:${data.message}`,
-                                    type: 'error',
-                                    duration:1500
+                            getuserinfo(qss).then(datas => {
+                                    console.log(datas)
+                                    that.$store.commit('changeUserInfo', datas.info)
+                                    that.$message({
+                                        message: '登录成功',
+                                        type: 'success',
+                                        duration: 1500
+                                    })
                                 })
-                                this.canLogin =false
-                            }
-                        })
-              }
+                                .then(() => {
+                                    getshopcar({
+                                            userid: this.$store.state.userinfo.phone
+                                        })
+                                        .then(data => {
+                                            this.$store.commit('getshopcar', data.info)
+                                            that.username = ''
+                                            that.password = ''
+                                            this.canLogin = false
+                                            that.$router.push({
+                                                name: "home"
+                                            })
+                                        })
+                                })
+                        } else {
+                            this.$message({
+                                message: `登录失败:${data.message}`,
+                                type: 'error',
+                                duration: 1500
+                            })
+                            this.canLogin = false
+                        }
+                    })
+                }
             },
             drapSlide(el) {
                 let slideRound = this.$refs.slideRound
@@ -153,7 +171,7 @@
                 slideRound.onmouseleave = (event) => {
                     slideRound.onmousemove = null
                     slideRound.onmouseleave = null
-                    slideRound.onmouseup =null
+                    slideRound.onmouseup = null
                     this.validatorimg()
                 }
                 slideRound.onmouseup = (event) => {
@@ -163,37 +181,42 @@
                     this.validatorimg()
                 }
             },
-            initValidator () {
-              if(!this.canLogin&&reg.checkphonenumber(null,this.username,this.checkok)&&reg.checkpassword(null,this.password,this.checkok)){
-              this.show_validator = true
-              this.slide_left =0
-              this.$nextTick(function(){
-               let {offsetWidth, offsetHeight} = this.$refs.mainValidator
-               this.imgWidth = offsetWidth
-               this.imgHeight = offsetHeight
-               this.$refs.isSlide.style.background = 'linear-gradient(90deg, rgba(62, 192, 251, 1) 18%, rgba(0, 212, 255, 1) 63%)'
-               const data = {
-                   width: this.imgWidth,
-                   height: this.imgHeight,
-                   phone: this.username
-               }
-               getImgValidator(data).then(data=>{
-                  this.mainValidator = data.data.bg
-                  this.slideValidator = data.data.patch
-                  this.slide_top = data.data.y
-                  this.slideWidth = data.data.valwidth
-               })
-              })
-              }else{
-                  this.Login()
-              }
+            initValidator() {
+                if (!this.canLogin && reg.checkphonenumber(null, this.username, this.checkok) && reg.checkpassword(null,
+                        this.password, this.checkok)) {
+                    this.show_validator = true
+                    this.slide_left = 0
+                    this.$nextTick(function () {
+                        let {
+                            offsetWidth,
+                            offsetHeight
+                        } = this.$refs.mainValidator
+                        this.imgWidth = offsetWidth
+                        this.imgHeight = offsetHeight
+                        this.$refs.isSlide.style.background =
+                            'linear-gradient(90deg, rgba(62, 192, 251, 1) 18%, rgba(0, 212, 255, 1) 63%)'
+                        const data = {
+                            width: this.imgWidth,
+                            height: this.imgHeight,
+                            phone: this.username
+                        }
+                        getImgValidator(data).then(data => {
+                            this.mainValidator = data.data.bg
+                            this.slideValidator = data.data.patch
+                            this.slide_top = data.data.y
+                            this.slideWidth = data.data.valwidth
+                        })
+                    })
+                } else {
+                    this.Login()
+                }
             },
             /**
              * 验证拼图验证码
              */
             validatorimg() {
                 if (!this.canLogin) {
-                    const data ={
+                    const data = {
                         x: this.slide_left,
                         phone: this.username
                     }
@@ -202,27 +225,27 @@
                             if (data.code === 200) {
                                 this.canLogin = true
                                 this.$refs.isSlide.style.background = '#66ff33'
-                                setTimeout(()=>{
-                                that.Login()                                
-                                this.show_validator = false
-                                this.slide_left = 0
-                                },500)
-                                return 
+                                setTimeout(() => {
+                                    that.Login()
+                                    this.show_validator = false
+                                    this.slide_left = 0
+                                }, 500)
+                                return
                             } else {
                                 this.$refs.isSlide.style.background = '#e31515'
-                                setTimeout(()=>{
-                                this.initValidator()
-                                console.log(1)
-                                },500)
+                                setTimeout(() => {
+                                    this.initValidator()
+                                    console.log(1)
+                                }, 500)
                                 return
                             }
                         })
                         .catch(err => {
                             this.$refs.isSlide.style.background = '#e31515'
-                            setTimeout(()=>{
+                            setTimeout(() => {
                                 this.initValidator()
-                                },500)
-                                return
+                            }, 500)
+                            return
                         })
                 }
             },
@@ -410,14 +433,17 @@
         padding: 10px;
         box-shadow: 0 0 15px #d2d2d2;
         border-radius: 10px;
-        i{
-          font-family: 'element-icons' !important;
+
+        i {
+            font-family: 'element-icons' !important;
         }
+
         .validator_top {
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
             align-items: center;
+
             .validator_refresh {
                 color: #06c;
                 cursor: pointer;
@@ -450,7 +476,7 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-                border:1px solid #fff;
+                border: 1px solid #fff;
             }
         }
 

@@ -11,7 +11,7 @@
                         <el-input v-model="userinfo.name" placeholder="请输入昵称"></el-input>
                     </el-form-item>
                     <el-form-item label="手机号码" prop="phone">
-                        <el-input v-model="userinfo.phone" placeholder="请输入电话号码"></el-input>
+                        <el-input v-model="userinfo.phone" ref='phone' placeholder="请输入电话号码"></el-input>
                     </el-form-item>
                     <el-form-item label="验证码" prop="code">
                         <el-input v-model="userinfo.code" maxlength='4' :placeholder="codeplaceholder" class="code">
@@ -27,7 +27,8 @@
                         <el-input v-model="userinfo.spassword" type='password' placeholder="请确认密码"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="register('userinfo')" style="margin-left:80px;" :disabled='buttonUse'>{{buttonText}}</el-button>
+                        <el-button type="primary" @click="register('userinfo')" style="margin-left:80px;"
+                            :disabled='buttonUse'>{{buttonText}}</el-button>
                         <el-button type="info" @click="cancel" :disabled='buttonUse'>取消</el-button>
                     </el-form-item>
                 </el-form>
@@ -50,7 +51,14 @@
 </template>
 
 <script>
-    import {register,fullinfo,login,getuserinfo} from '../http/api'
+    import {
+        register,
+        fullinfo,
+        login,
+        getuserinfo,
+        getphonevalidator,
+        checkphonevalidator
+    } from '../http/api'
     let that;
     export default {
         data() {
@@ -80,7 +88,7 @@
                     password: "",
                     spassword: ""
                 },
-                loading:"",
+                loading: "",
                 buttonText: "注册",
                 buttonUse: false,
                 bookVisiable: true,
@@ -102,23 +110,23 @@
                                 },
                                 {
                                     name: "1.4",
-                                    content:'本协议不具备法律效应,本项目为毕业设计。'
+                                    content: '本协议不具备法律效应,本项目为毕业设计。'
                                 },
                             ],
                         },
                         {
                             name: "2.内测特别提醒",
                             children: [{
-                                 name: "2.1",
-                                 content: "感谢您参与福城建设商城内测活动，目前协议不完善，待正式版上线后将完善本协议,注册账号即为同意本公司所有协议(包括后期),谢谢!"
+                                    name: "2.1",
+                                    content: "感谢您参与福城建设商城内测活动，目前协议不完善，待正式版上线后将完善本协议,注册账号即为同意本公司所有协议(包括后期),谢谢!"
                                 },
                                 {
-                                 name: "2.2",
-                                 content: "注册时建议使用真实信息,以免后续带来不便"
+                                    name: "2.2",
+                                    content: "注册时建议使用真实信息,以免后续带来不便"
                                 },
                                 {
-                                  name: "2.3",
-                                  content: '本项目于2019年9月开工'
+                                    name: "2.3",
+                                    content: '本项目于2019年9月开工'
                                 }
                             ]
                         }
@@ -157,76 +165,99 @@
         },
         methods: {
             register(val) {
-                this.$refs[val].validate(function(valid){
+                this.$refs[val].validate((valid)=>{
                     if (valid) {
-                    that.buttonText = '注册中...'
-                    that.buttonUse = true
-                      register(that.userinfo)
-                      .then(data=>{
-                          if(data.code === 200){
-                            that.$message({
-                              message: '注册成功',
-                              type: 'success',
-                              duration: 1500
-                            })
-                            return data.userId
-                          } else {
-                            that.$message({
-                              message: `注册失败:${data.message}`,
-                              type: 'error',
-                              duration: 1500
-                            })
-                          }
-                          that.buttonText = '注册'
-                          that.buttonUse = false
-                      })
-                      .then(data=>{
-                          const qs = {
-                                phone:that.userinfo.phone, 
-                                password: that.userinfo.password
-                            }
-                            login(qs).then(datas=>{
-                                if(datas.code === 200){
-                                  window.localStorage.setItem('_T_',datas._T_)
-                                  const qss = {
-                                      id:data
-                                  }
-                                  getuserinfo(qss).then(datass=>{
-                                    console.log(datass)
-                                    that.$store.commit('changeUserInfo', datass.info)
-                                  })
-                                  console.log(that.$store.state.userinfo)
-                                  that.$router.push({name:"fullinfo"})    
+                        that.buttonText = '注册中...'
+                        that.buttonUse = true
+                        checkphonevalidator({phone: this.userinfo.phone,v:this.userinfo.code})
+                        .then(data=>{
+                            if(data.code == 200){
+                        register(that.userinfo)
+                            .then(data => {
+                                if (data.code === 200) {
+                                    that.$message({
+                                        message: '注册成功',
+                                        type: 'success',
+                                        duration: 1500
+                                    })
+                                    return data.userId
+                                } else {
+                                    that.$message({
+                                        message: `注册失败:${data.message}`,
+                                        type: 'error',
+                                        duration: 1500
+                                    })
                                 }
+                                that.buttonText = '注册'
+                                that.buttonUse = false
                             })
-                      })
+                            .then(data => {
+                                const qs = {
+                                    phone: that.userinfo.phone,
+                                    password: that.userinfo.password
+                                }
+                                login(qs).then(datas => {
+                                    if (datas.code === 200) {
+                                        window.localStorage.setItem('_T_', datas._T_)
+                                        const qss = {
+                                            id: data
+                                        }
+                                        getuserinfo(qss).then(datass => {
+                                            console.log(datass)
+                                            that.$store.commit('changeUserInfo', datass
+                                                .info)
+                                        })
+                                        console.log(that.$store.state.userinfo)
+                                        that.$router.push({
+                                            name: "fullinfo"
+                                        })
+                                    }
+                                })
+                            })
+                            }
+                        })
+                        .catch(err=>{
+                            this.$message({
+                                message: err,
+                                type:'error'
+                            })
+                        })
                     } else {
                         console.log("验证失败");
                     }
                 })
             },
-            cancel(){
+            cancel() {
                 this.$router.go(-1)
             },
             sendmessage() {
-                this.buttoninfo.disable = true
-                let interval = setInterval(() => {
-                    let time = this.buttoninfo.time--;
-                    this.buttoninfo.message = time + "秒后发送";
-                    if (time <= 0) {
-                        this.buttoninfo = {
-                            message: "重新发送码",
-                            time: "60",
-                            disable: false
-                        }
-                        clearInterval(interval)
+                 this.$refs['userinfo'].validateField('phone',(validate) => {
+                    if (!validate) {
+                        getphonevalidator({
+                                phone: this.userinfo.phone
+                            })
+                            .then(data => {
+                                this.buttoninfo.disable = true
+                                let interval = setInterval(() => {
+                                    let time = this.buttoninfo.time--;
+                                    this.buttoninfo.message = time + "秒后发送";
+                                    if (time <= 0) {
+                                        this.buttoninfo = {
+                                            message: "重新发送码",
+                                            time: "60",
+                                            disable: false
+                                        }
+                                        clearInterval(interval)
+                                    }
+                                }, 1000);
+                            })
                     }
-                }, 1000);
+                })
             }
         },
         mounted() {
-          that=this;
-    },
+            that = this;
+        },
     }
 </script>
 
@@ -242,6 +273,7 @@
         display: flex;
         flex-flow: column nowrap;
         align-items: center;
+
         .r_title {
             font-size: 1.5em;
             font-family: "等线";

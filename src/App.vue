@@ -1,16 +1,20 @@
 <template>
   <div id="app">
-    <keep-alive>
+    <keep-alive v-if="$route.meta.keepAlive">
       <router-view>
       </router-view>
     </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive">
+      <!-- 这里是不被缓存的视图组件 -->
+    </router-view>
   </div>
 </template>
 <script>
   import headers from './components/header.vue'
   import {
     autologin,
-    getuserinfo
+    getuserinfo,
+    getshopcar
   } from './http/api'
   export default {
     data() {
@@ -30,34 +34,40 @@
         autologin(d)
           .then(data => {
             if (data.code === 200) {
-              window.localStorage.setItem('_T_', JSON.stringify({
-                phone: data.phone,
-                _T_: `'${data._T_}'`
-              }))
               const qss = {
                 id: null,
                 phone: data.phone
               }
               getuserinfo(qss).then(datas => {
-                this.$store.commit('changeUserInfo', datas.info)
-                if(this.$route.name == 'login'){
-                  this.$router.push({path: '/'})
-                }
-              })
+                  this.$store.commit('changeUserInfo', datas.info)
+                  if (this.$route.name == 'login') {
+                    this.$router.push({
+                      path: '/'
+                    })
+                  }
+                })
+                .then(() => {
+                  getshopcar({
+                      userid: this.$store.state.userinfo.phone
+                    })
+                    .then(data => {
+                      this.$store.commit('getshopcar', data.info)
+                    })
+                })
             } else {
               console.log('token登录失败')
             }
-      })
-  }
-  },
-  components: {
+          })
+      }
+    },
+    components: {
       headers
     },
-    created () {
-      this.tokenLogin()
+    created() {
+      if (window.localStorage.getItem('_T_'))
+        this.tokenLogin()
     },
-    mounted() {
-    }
+    mounted() {}
   }
 </script>
 <style lang="scss">

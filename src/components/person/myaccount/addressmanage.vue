@@ -8,27 +8,27 @@
             <div class="address_title">我的地址</div>
 
             <div class="now_address">
-                <div class="address_item">
+                <div class="address_item" v-for='(item,index) in addressList' :key='index'>
                     <div class="address_row">
                         <span class="address_item_title">收货人:</span>
-                        <span class="address_info"></span>
+                        <span class="address_info">{{item.name}}</span>
                     </div>
                     <div class="address_row">
                         <span class="address_item_title">收货地区:</span>
-                        <span class="address_info"></span>
+                        <span class="address_info">{{item.area|address}}</span>
                     </div>
                     <div class="address_row">
                         <span class="address_item_title">收货地址:</span>
-                        <span class="address_info"></span>
+                        <span class="address_info">{{item.address}}</span>
                     </div>
                     <div class="address_row">
                         <span class="address_item_title">手机号码:</span>
-                        <span class="address_info"></span>
+                        <span class="address_info">{{item.phone}}</span>
                     </div>
                     <div class="address_tool">
-                        <span class="address_tool_item">设为默认地址</span>
+                        <span class="address_tool_item" :class="{active: item.isDefault == 1}" @click='update(item)'>设为默认地址</span>
                         <span class="address_tool_item">编辑</span>
-                        <span class="address_tool_item">删除</span>
+                        <span class="address_tool_item" @click='deletes(item.addressid)'>删除</span>
                     </div>
                 </div>
             </div>
@@ -37,32 +37,98 @@
                 <span>添加地址</span>
             </div>
         </div>
-        <addaddress/>
+        <addaddress @addsuccess='get()' />
     </div>
 </template>
 
 <script>
-import addaddress from "../../../views/addaddress"
+    import addaddress from "../../../views/addaddress"
+    import {
+        getaddress,
+        updateaddress,
+        deleteaddress
+    } from '@/http/api'
     export default {
-        name:"addressmanage",
-        data(){
-            return{
-
+        name: "addressmanage",
+        data() {
+            return {
+                addressList: []
             }
         },
-        methods:{
-            add(){
-             this.$store.commit("ocaddress",true)
+        filters: {
+            address(val) {
+                val = JSON.parse(val)
+                let str = ''
+                for (let i in val) {
+                    if (val[i] != null) {
+                        str += val[i].value
+                    }
+                }
+                return str
             }
         },
-        components:{
+        methods: {
+            add() {
+                this.$store.commit("ocaddress", true)
+            },
+            get() {
+                if (Object.keys(this.$store.state.userinfo).length > 0) {
+                    getaddress({
+                            userid: this.$store.state.userinfo.userid
+                        })
+                        .then(data => {
+                            this.addressList = data.info
+                            console.log(this.addressList)
+                        })
+                }
+            },
+            update(el) {
+                el.isDefault = 1
+                updateaddress(el)
+                .then(data=>{
+                  if(data.code == 200){
+                      this.$message({
+                          message: '设置成功',
+                          type: 'success'
+                      })
+                      this.get()
+                  }else if(data.code == 600){
+                      this.$message({
+                          message: '设置失败',
+                          type: 'error'
+                      })
+                  }
+                })
+            },
+            deletes(el){
+              deleteaddress({addressid: el})
+              .then(data=>{
+                  if(data.code == 200){
+                      this.$message({
+                          message: '删除成功',
+                          type: 'success'
+                      })
+                      this.get()
+                  } else {
+                     this.$message({
+                          message: '删除失败',
+                          type: 'error'
+                      }) 
+                  }
+              })
+            }
+        },
+        components: {
             addaddress
+        },
+        created() {
+            this.get()
         }
     }
 </script>
 
 <style lang="scss">
-.person_head {
+    .person_head {
         width: 100%;
         height: 50px;
         background: white;
@@ -75,9 +141,10 @@ import addaddress from "../../../views/addaddress"
             margin-left: 25px;
         }
     }
+
     .address_detail {
         width: 100%;
-        min-height: 300px;
+        min-height: 125px;
         background: white;
         margin-top: 30px;
         border-radius: 5px;
@@ -116,6 +183,11 @@ import addaddress from "../../../views/addaddress"
                 .address_tool {
                     text-align: right;
                     margin-bottom: 5px;
+
+                    .active {
+                        pointer-events: none;
+                        color: #d2d2d2 !important;
+                    }
 
                     .address_tool_item {
                         margin-left: 10px;

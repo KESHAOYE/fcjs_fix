@@ -17,9 +17,9 @@
                 <router-link to="/myorder?mid=11"><span>我的订单</span></router-link>
                 <router-link to="#"><span @mouseleave="showpilot=false" @mouseenter="showpilot=true"
                         :class="{select:showpilot}">网站导航</span></router-link>
+                <div @mouseenter="changeshopcar" @mouseleave="changeshopcar">
                 <router-link to="" class="myshopcar" v-if="isshowshopcar" :class={select:shopcarshow} @click.native="toshopcar">
-                    <div class="shopcarbutton" @mouseenter="changeshopcar"
-                        @mouseleave="changeshopcar" @blur="changeshopcar">
+                    <div class="shopcarbutton">
                         <span style="min-width:100px;display:flex;flex-flow:row nowrap">
                         <i style="font-size:1.5em;font-weight:bolder;position:relative;"> &#xe635;</i>
                         <i style="font-size:0.7em;font-weight:bold;position:relative;top:-5px;margin-right:3px;font-family:'幼圆'">{{this.$store.state.shopcar.length}}</i>
@@ -27,25 +27,26 @@
                         </span>
                     </div>
                     </router-link>
-                    <div class="shopcarlist" v-show="shopcarshow" @mouseover="changeshopcar" @mouseout="changeshopcar">
+                    <div class="shopcarlist" v-show="shopcarshow">
                     <div class="empty" v-if="this.$store.state.shopcar.length<=0">
                         <i class="shopempty"></i>
                         购物车中没有东西，赶紧下单选购吧！
                     </div>
                     <div class="shopcar_item" v-for="(item,index) in shopcar" :key="index">
-                        <img :src="item.img" alt="">
+                        <img :src="item.shopimg" alt="">
                         <div class="shopname">
                             {{item.shopname}}
                         </div>
                         <div class="shopprice">
-                            <span class="price">{{item.price}}*{{item.count}}</span>
-                            <span class="delete" style="font-size:0.9em">删除</span>
+                            <span class="price">{{item.per_price}}*{{item.count}}</span>
+                            <span class="delete" style="font-size:0.9em" @click='deletes(item)'>删除</span>
                         </div>
                     </div>
                     <div class="shopcar_bottom">
-                        <div class="shopcar_count">共<span class="showcount">{{this.shopcar.length}}</span>件商品,总计<span
-                                class="showcount">{{this.shopprice}}</span>元</div>
+                        <div class="shopcar_counts">共<span class="showcount">{{this.shopcar.length}}</span>件商品,总计<span
+                                class="showcount">￥{{this.shopprice}}</span></div>
                         <div class="toshopcar" @click="toshopcar">去购物车</div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -77,6 +78,11 @@
 </template>
 
 <script>
+  import {
+    addshopcar,
+    deleteshopcar,
+    getshopcar
+  } from '@/http/api'
     export default {
         name: "person",
         data() {
@@ -169,7 +175,25 @@
                 this.$store.commit('outlogin')
                 window.localStorage.removeItem('_T_')
                 this.$router.push({name:'login'})
-            }
+            },
+            deletes(el) {
+        console.log('1')
+        let da = {
+          shopid: el.shopid,
+          userid: this.$store.state.userinfo.phone,
+          sku_id: el.sku_id,
+        }
+        deleteshopcar(da)
+          .then(data => {
+            getshopcar({
+                userid: this.$store.state.userinfo.phone
+              })
+              .then(data => {
+                this.shopcarshow = false
+                this.$store.commit('getshopcar', data.info)
+              })
+          })
+      },
         }
     }
 </script>
@@ -379,7 +403,7 @@
                 font-size: 0.8em;
                 justify-content: space-between;
 
-                .shopcar_count {
+                .shopcar_counts {
                     min-width: 200px;
                     justify-content: flex-start;
                     display: flex;
@@ -395,6 +419,8 @@
                     font-weight: bolder;
                     width: 35px;
                     line-height:41px; 
+                    float:left;
+                    display:block;
                 }
 
                 .toshopcar {

@@ -1,63 +1,64 @@
 <template>
   <div class="shopdetail">
-    <personbar/>
+    <personbar />
     <headers :isopen="false" />
     <div class="content">
       <div class="shop_top">
         <div class="left">
-          <swiper :options="swiperOptionTop" class="gallery-top" ref="swiperTop">
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-          </swiper>
-          <swiper :options="swiperOptionThumbs" class="gallery-thumbs" ref="swiperThumbs">
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
-            <swiper-slide><img src="../../assets/phone/iphone5s.png"></swiper-slide>
+          <pic-zoom :url="img" class="gallery-top" :scale="3"></pic-zoom>
+          <swiper :options="swiperOptionThumbs" class="gallery-thumbs" ref="swiper">
+            <swiper-slide v-for='(item,index) in shopInfo.img' :key="'info'+index"><img :src='item.path'></swiper-slide>
+            <div class="swiper-button-next" slot="button-next">
+              <i class='el-icon-arrow-right'></i>
+            </div>
+            <div class="swiper-button-prev" slot="button-prev">
+              <i class='el-icon-arrow-left'></i>
+            </div>
           </swiper>
         </div>
         <div class="right">
           <div class="shop_name">
-            <div class="isold"></div>
-            荣耀8X 千元屏霸 91%屏占比 2000万AI双摄 4GB+64GB 幻夜黑 移动联通电信4G全面屏手机 双卡双待
+            <div class="isold" v-if='shopInfo.isold == 1'></div>
+            {{shopInfo.shopName}}
           </div>
-          <div class="shop_des">商品介绍</div>
+          <div class="shop_des">{{shopInfo.shopdes}}</div>
           <div class="shop_price">
-            <span style="margin-left:20px">价格</span>
-            <span class="price">500</span>
-            <span class="oldprice">900</span>
+            <div class="prices">
+              <span style="margin-left:20px">价格</span>
+              <span class="price">{{price}}</span>
+            </div>
+            <div class="coupon" v-if='couponList.length>0'>
+              <span style="margin-left:20px">优惠券</span>
+              <span class="counpon_item" v-for='(item,index) in couponList' :key="index"
+                :title='item.note' @click= "getcoupons(item.coupon_id)">满{{item.min_price}}减{{item.amount}}</span>
+            </div>
           </div>
-          <div class="shop_type" v-for="(el,index) in type" :key="index">
-            <span class="shop_title">{{el.name}}:</span>
-            <span class="type">{{el.data}}</span>
+          <div class="express">快递费: ￥0.00</div>
+          <div class='info'>
+            <div class="shopcount">月销量<span>{{shopInfo.sailCount}}</span></div>
+            <div class="shopcomment">累计评价<span>{{commentCount}}</span></div>
           </div>
-          <hr/>
           <div class="specs">
-            <div class="specs_items" v-for="(e,index) in specs" :key="index">
-            <span class="shop_title" :value="e.name">{{e.name}}</span>
-            <div class="choosespecs">
-              <div class="specs_item" v-for="(el,index) in e.data" :value="el.specs_id" :class="{active:e.select==el.specs_id}" :key="index" @click="changespecs(e,el.specs_id)">
-                {{el.specs_name}}
+            <div class="specs_items" v-for="(e,index) in shopInfo.sku" :key="index">
+              <span class="shop_title" :value="e.name">{{e.specName}}</span>
+              <div class="choosespecs">
+                <div class="specs_item" v-for="(el,indexs) in e.value" :value="e.specId"
+                  :class="{active: ischoose(el) !=-1 }" :key="indexs" @click="changespecs(e,el)">
+                  {{el.specValue}}
+                </div>
               </div>
             </div>
           </div>
-          </div>
           <div class="shopsubmit">
             <div class="count">
-            <el-input-number v-model="shopnumber" @change="changecount" :min="1"></el-input-number>
-          </div>
-            <div class="add_shopcar">
-              加入购物车
+              <el-input-number v-model="shopnumber" @change="changecount" :min="1"></el-input-number>
             </div>
-            <div class="add_order">
-              立即下单
-            </div>
+            <el-button class="add_shopcar" :disabled='stocks <= 0' @click='addshopcars'>
+              {{addshopcar}}
+            </el-button>
           </div>
-          <div class="null" style="width:100%;height:15px;text-align:left;position:relative;top:-15px;color:#d2d2d2;font-size:0.7em;">
+          <div
+            style="width:100%;height:15px;text-align:left;position:relative;top:-15px;color:#d2d2d2;font-size:0.7em;">
             *由福城建设发货并提供售后服务
           </div>
         </div>
@@ -66,47 +67,57 @@
         <div class="comment">
           <div class="comment_top"><span>商品评论</span></div>
           <div class="comment_tag">
-            <div class="tag_item active">有图(50)</div>
-            <div class="tag_item">好评(23)</div>
-            <div class="tag_item">中评(77)</div>
-            <div class="tag_item">差评(3)</div>
-            <div class="tag_item">特别好用(31)</div>
-            <div class="tag_item">质量好(30)</div>
-            <div class="tag_item">速度快(63)</div>
+            <div class="tag_item active" v-if='picture > 0'>有图({{picture}})</div>
+            <div class="tag_item" v-if='good > 0'>好评({{good}})</div>
+            <div class="tag_item" v-if='middle > 0'>中评({{middle}})</div>
+            <div class="tag_item" v-if='bad > 0'>差评({{bad}})</div>
           </div>
           <div class="comment_list">
-            <div class="comment_detail" v-for="(items,index) in commonList" :key="index">
+            <div class="null" v-if='commentList.length <= 0'>该商品暂无评论</div>
+            <div class="comment_detail" v-for="(items,index) in commentList" :key="index">
               <div class="comment_user">
                 <div class="user_head">
-                  <img :src="items.authorhead" alt="" srcset="">
+                  <img :src="items.headimg" alt="" srcset="">
                   <span class="user_name">
-                    {{items.author}}
+                    {{items.username}}
                   </span>
                 </div>
-                <el-rate :value=items.rate disabled text-color="#ff9900" score-template="{rate}">
+                <el-rate :value=items.score disabled text-color="#ff9900" score-template="{rate}">
                 </el-rate>
               </div>
               <span class="comment_text">
-                 {{items.text}}
+                {{items.comment}}
               </span>
               <div class="comment_img">
-                 <el-image v-for="(imgs,index) in items.img" :src="imgs" :key="index" :preview-src-list="items.img"></el-image>
+                <el-image v-for="(imgs,index) in items.img" :src="imgs" :key="index" :preview-src-list="items.img">
+                </el-image>
+              </div>
+              <div class="comment_time">
+                {{items.comment_time|date}}
               </div>
               <div class="comment_tool">
                 <div class="comment_report tool_item">举报</div>
-                <div class="comment_good tool_item">({{items.like}})</div>
-                <div class="comment_comment tool_item">({{items.comment}})</div>
+                <div class="comment_good tool_item" :class="{active: items.islike > 0}" @click='likes(items.commentid)'>
+                  ({{items.likes}})</div>
               </div>
             </div>
+            <el-pagination background layout="prev, pager, next" :total="total" v-if='ismore&&commentList.length > 0'
+              @current-change="handleCurrentChange" @size-change="handleSizeChange">
+            </el-pagination>
           </div>
-          <div class="comment_more" :v-show="isshowmore" @click="loadmore">
+          <div class="comment_more" v-if="(!ismore)&&commentList.length > 0" @click="loadmore">
             点击加载更多...
           </div>
         </div>
         <div class="shop_introduce">
           <div class="comment_top"><span>商品详情</span></div>
-          <div class="introduce_detail">
-              
+          <div class="spu_show">
+            <div>品牌: {{shopInfo.brandname}}/{{shopInfo.brandename}}</div><br />
+            <span v-for='(item,index) in shopInfo.spu' :key="index">
+              {{item.spec_name}}:{{item.spec_value}}
+            </span>
+          </div>
+          <div class="introduce_detail" v-html='shopInfo.shopdetail'>
           </div>
         </div>
       </div>
@@ -116,15 +127,31 @@
 </template>
 
 <script>
+  var that;
+  import {
+    getshopinfo,
+    getstock,
+    getfirstcomment,
+    getshopcoupon,
+    getcomment,
+    like,
+    autologin,
+    getuserinfo,
+    addshopcar,
+    getshopcar,
+    getcoupon
+  } from '@/http/api'
+  import PicZoom from 'vue-piczoom'
   export default {
     name: "shopdetail",
+    components: {
+      PicZoom
+    },
     data() {
       return {
-        shopnumber:1,
-        isshowmore:true,
-        swiperOptionTop: {
-          spaceBetween: 10,
-        },
+        shopnumber: 1,
+        isshowmore: true,
+        img: '',
         swiperOptionThumbs: {
           navigation: {
             nextEl: '.swiper-button-next',
@@ -134,111 +161,321 @@
           centeredSlides: true,
           slidesPerView: 'auto',
           touchRatio: 0.2,
-          slideToClickedSlide: true
-        },
-        commonList:[
-          {
-            authorhead:require("../../assets/fixbg.png"),
-            author:"KESHAOYE",
-            text:"支持华为!爱中国，爱华为!",
-            rate:5,
-            like:"20",
-            comment:"13",
-            img:[
-              require("../../assets/phone/mate30pro.png"),
-              require("../../assets/phone/mate30pro.png"),
-              require("../../assets/phone/mate30pro.png"),
-            ]
-          }
-        ],
-        type:[
-          {
-            name:"类型",
-            data:"二手"
-          },
-          {
-            name:"新旧程度",
-            data:"9.5成新"
-          },
-          {
-            name:"重量",
-            data:"1.8KG"
-          }
-        ],
-        specs:[{
-           name:"颜色",
-           select:"",           
-           data:[
-             {
-               specs_id:"0213",
-               specs_name:"黑色",
-             },
-             {
-               specs_id:"0214",
-               specs_name:"白色",
-             },
-             {
-               specs_id:"0215",
-               specs_name:"金色"
-             }
-           ]
-        },{
-          name:"存储",
-          select:"",
-          data:[
-            {
-              specs_id:"0216",
-              specs_name:"64G",
-              price:"",
-            },
-            {
-               specs_id:"0217",
-               specs_name:"256G",
-               price:""
+          slideToClickedSlide: true,
+
+          on: {
+            slideChange: function () {
+              that.img = that.shopInfo.img[this.activeIndex].path
             }
-          ]
+          }
         },
-        {
-          name:"成色",
-          select:"",
-          data:[
-            {
-              specs_id:"0218",
-              specs_name:"95新"
-            }
-          ]
-        }],
-        choosespecs:[],
+        commentList: [],
+        couponList: [],
+        shopInfo: '',
+        stock: [],
+        price: 0,
+        stocks: 0,
+        sku_id: '',
+        sku_name: '',
+        choosespecs: [],
+        ismore: false,
+        good: 0,
+        middle: 0,
+        bad: 0,
+        picture: 0,
+        commentCount: 0,
+        total: 0,
+        currentPage: 1
       }
     },
-    methods:{
-      async loadmore(){
-          if(document.getElementsByClassName("loadinganimate")[0]==undefined){
-            await this.animate.loading("comment_list");
-           }
+    filters: {
+      date(val) {
+        let reg = new RegExp(/^\d+-\d+-\d+[T]\d+:\d+/)
+        return reg.exec(val)[0].replace('T', ' ')
+      }
+    },
+    computed: {
+      ischoose: (val) => {
+        return function (val) {
+          let index = this.choosespecs.findIndex(el => {
+            return el.value == val.specValue
+          })
+          return index
+        }
       },
-      changecount(value){
-        this.shopnumber=value;
+      addshopcar() {
+        return this.stocks == 0 ? "无货" : "加入购物车"
       },
-      commenttypechange(el){
-        
+      userinfo() {
+        return this.$store.state.userinfo
+      }
+    },
+    methods: {
+      async loadmore() {
+        if (document.getElementsByClassName("loadinganimate")[0] == undefined) {
+          await this.animate.loading("comment_list");
+        }
+        const data = {
+          page: this.currentPage,
+          pageSize: 10,
+          shopid: this.shopInfo.shop_id,
+          userid: this.userinfo.phone
+        }
+        getcomment(data)
+          .then(res => {
+            this.$nextTick(() => {
+              this.ismore = true
+              this.commentList = res.info
+              this.animate.stoploading();
+            })
+          })
+      },
+      getcoupons(el){
+        if (Object.keys(this.$store.state.userinfo).length > 0) {
+          getcoupon({id: el})
+          .then(data=>{
+            if(data.code == 200){
+              this.$message({
+                message: '领取成功',
+                type:'success'
+              })
+            }else{
+              this.$message({
+                message: '领取失败'+data.message,
+                type:'error'
+              })
+            }
+          })
+        }
+      },
+      likes(el) {
+        let userid = this.userinfo.phone
+        like({
+            commentid: el,
+            userid: userid
+          })
+          .then(data => {
+            const da = {
+              page: this.currentPage,
+              pageSize: 10,
+              shopid: this.shopInfo.shop_id,
+              userid: userid
+            }
+            if (this.ismore == true) {
+              getcomment(da)
+                .then(res => {
+                  this.$nextTick(() => {
+                    this.ismore = true
+                    this.commentList = res.info
+                  })
+                })
+            } else {
+              getfirstcomment({
+                  shopid: this.$route.query.shopid,
+                  userid: userid
+                })
+                .then(data => {
+                  this.commentList = data.info.comment
+                })
+            }
+          })
+      },
+      changecount(value) {
+        this.shopnumber = value;
+      },
+      getShop() {
+        getshopinfo({
+            shopid: this.$route.query.shopid
+          })
+          .then(data => {
+            let result = []
+            data.info[0].sku.forEach(el => {
+              let index = result.findIndex(es => {
+                return el.spec_id == es.specId
+              })
+              if (index != -1) {
+                const data = {
+                  'specValue': el.value[0].spec_value,
+                  'stock': el.value[0].stock,
+                  'price': el.value[0].price,
+                  'skuId': el.value[0].sku_id
+                }
+                result[index].value.push(data)
+              } else {
+                const data = {
+                  specId: el.spec_id,
+                  specName: el.spec_name,
+                  value: [{
+                    specValue: el.value[0].spec_value,
+                    stock: el.value[0].stock,
+                    price: el.value[0].price,
+                    skuId: el.value[0].sku_id
+                  }]
+                }
+                result.push(data)
+              }
+            })
+            data.info[0].sku = result
+            this.shopInfo = data.info[0]
+            this.price = this.shopInfo.price + '起'
+            console.log(this.shopInfo)
+            this.img = this.shopInfo.img[0].path
+            getshopcoupon({
+                shopid: this.$route.query.shopid,
+                sortid: data.info[0].sortid
+              })
+              .then(data => {
+                this.$nextTick(() => {
+                  this.couponList = data.info
+                })
+              })
+          })
+          .catch(err => {
+            this.$router.go('-1')
+          })
+        getstock({
+            shopid: this.$route.query.shopid
+          })
+          .then(data => {
+            this.stock = data.info
+          })
+        let info = JSON.parse(window.localStorage.getItem('_T_'))
+        let phone = info.phone
+        let token = info._T_
+        const d = {
+          phone: phone,
+          token: token
+        }
+        autologin(d)
+          .then(data => {
+            if (data.code === 200) {
+              const qss = {
+                id: null,
+                phone: data.phone
+              }
+              getuserinfo(qss).then(datas => {
+                getfirstcomment({
+                    shopid: this.$route.query.shopid,
+                    userid: datas.info.phone
+                  })
+                  .then(data => {
+                    this.commentList = data.info.comment
+                    this.good = data.info.good
+                    this.middle = data.info.middle
+                    this.bad = data.info.bad
+                    this.picture = data.info.picture
+                    this.commentCount = data.info.commentCount
+                  })
+              })
+            } else {
+              console.log('token登录失败')
+            }
+          })
+      },
+      commenttypechange(el) {
+
+      },
+      isObjectValueEqual(a, b) {
+        var aProps = Object.getOwnPropertyNames(a);
+        var bProps = Object.getOwnPropertyNames(b);
+        if (aProps.length != bProps.length) {
+          return false;
+        }
+        for (var i = 0; i < aProps.length; i++) {
+          var propName = aProps[i];
+          if (a[propName] !== b[propName]) {
+            return false;
+          }
+        }
+        return true;
+      },
+      findstock() {
+        let result = {}
+        this.choosespecs.forEach(el => {
+          result[el.name] = el.value
+        })
+        let index = this.stock.findIndex(el => {
+          let a = JSON.parse(el.sku_concat)
+          return this.isObjectValueEqual(a, result)
+        })
+        let stock = this.stock[index]
+        if (stock) {
+          this.price = stock.price
+          this.stocks = stock.stock
+          this.sku_id = stock.id
+          this.sku_name = stock.sku_concat
+        }
+      },
+      getshopcars(){
+        getshopcar({userid: this.$store.state.userinfo.phone})
+        .then(data=>{
+          this.$store.commit('getshopcar', data.info)
+        })
       },
       /**
        * 改变商品规格，同时更改商品售价
        */
-      changespecs(name,data){
-        this.choosespecs.push({name:name.name,data:data})
-        name.select=data;
-    }
+      changespecs(name, el) {
+        let index = this.choosespecs.findIndex(el => {
+          return el.name == name.specName
+        })
+        if (index != -1) {
+          this.choosespecs.splice(index, 1)
+        }
+        this.choosespecs.push({
+          id: name.specId,
+          name: name.specName,
+          value: el.specValue,
+        })
+        this.findstock()
+      },
+      addshopcars() {
+       if (Object.keys(this.$store.state.userinfo).length > 0) {
+        let da = {
+          shopimg: this.shopInfo.img[0].path,
+          shopid: this.$route.query.shopid,
+          sku_id: this.sku_id,
+          count: this.shopnumber,
+          shopname: this.shopInfo.shopName,
+          sku_name: this.sku_name,
+          price: this.shopnumber * this.price
+        }
+        this.$store.commit('addshopcar', da)
+          da = {
+            shopid: this.$route.query.shopid,
+            userid: this.$store.state.userinfo.phone,
+            sku_id: this.sku_id,
+            count: this.shopnumber,
+          }
+          addshopcar(da)
+          .then(data=>{
+            this.getshopcars()
+          })
+        } else {
+          this.$message({
+            message: '请先登录!',
+            type: 'error'
+          })
+          this.$router.push({name: "login"})
+        }
+      },
+      handleCurrentChange(el) {
+        this.currentPage = el
+        this.getads()
+      },
+      handleSizeChange(el) {
+        this.pageSize = el;
+        this.getads()
+      },
+      onSlideChangeEnd(e) {
+        console.log(e)
+      }
     },
-    mounted() {
-      this.$nextTick(() => {
-        const swiperTop = this.$refs.swiperTop.swiper
-        const swiperThumbs = this.$refs.swiperThumbs.swiper
-        swiperTop.controller.control = swiperThumbs
-        swiperThumbs.controller.control = swiperTop
-      })
-    }
+    created() {
+      this.getShop()
+      that = this
+    },
+    mounted() {}
   }
 </script>
 
@@ -250,15 +487,18 @@
         flex-flow: row nowrap;
         justify-content: space-around;
         align-items: center;
-        min-height: 500px;
+        min-height: 600px;
         margin-top: 20px;
         background: #fff;
+
         .left {
           width: 500px;
-          height: 500px;
+          height: 550px;
 
           .gallery-top {
             margin-top: 50px;
+            width: 500px;
+            height: 300px;
 
             img {
               width: 300px;
@@ -268,10 +508,12 @@
 
           .gallery-thumbs {
             margin-top: 30px;
+            box-sizing: border-box;
 
             .swiper-slide {
               width: 100px;
               height: 100px;
+              left: -160px;
 
               img {
                 width: 90px;
@@ -281,26 +523,30 @@
 
             .swiper-button-next,
             .swiper-button-prev {
-              width: 35px;
+              width: 40px;
               height: 100px;
-              background: #ff3333;
-              color: white;
+              color: #b2b2b2;
               position: absolute;
               top: 20px;
+              line-height: 100px;
+              font-size: 3.5em;
+              background: white;
+              text-align: center;
+              font-weight: bolder;
             }
 
             .swiper-button-prev {
-              left: -120px;
+              left: 0px;
             }
 
             .swiper-button-next {
-              right: -120px;
+              right: 0px;
             }
 
             .swiper-slide-active {
               width: 100px;
               height: 100px;
-              border: 1px solid #ff3333;
+              border: 2px solid #ff3333;
             }
           }
         }
@@ -309,6 +555,7 @@
           width: 680px;
           min-height: 500px;
           overflow: hidden;
+
           .shop_name {
             font-size: 1.1em;
             margin-top: 10px;
@@ -316,7 +563,8 @@
             width: 100%;
             height: 100%;
           }
-          .shop_des{
+
+          .shop_des {
             width: 100%;
             height: 100%;
             color: red;
@@ -324,14 +572,17 @@
             text-align: left;
             font-size: 0.9em;
           }
+
           .shop_title {
             font-size: 0.9em;
             float: left;
           }
-           hr{
-             border: 0;
-             border-top: 1px solid #d2d2d2;
-           }
+
+          hr {
+            border: 0;
+            border-top: 1px solid #d2d2d2;
+          }
+
           .shop_type {
             width: 100%;
             height: 100%;
@@ -340,6 +591,7 @@
             text-align: left;
             margin-left: 15px;
             color: #b2b2b2;
+
             .type {
               margin-left: 4px;
               font-size: 0.8em;
@@ -348,7 +600,7 @@
 
           .shop_price {
             width: 100%;
-            height: 50px;
+            min-height: 50px;
             background: #f2f2f2;
             margin-top: 15px;
             line-height: 50px;
@@ -385,6 +637,41 @@
               position: relative;
               top: -1px;
             }
+
+            .counpon_item {
+              position: relative;
+              height: 16px;
+              padding: 2px 10px;
+              line-height: 15px;
+              text-align: center;
+              border: 1px solid #df3033;
+              background: #ffdedf;
+              font-size: 14px;
+              white-space: nowrap;
+              color: #df3033;
+              margin-left: 13px;
+              cursor: pointer;
+            }
+          }
+
+          .express {
+            width: 100%;
+            margin-top: 10px;
+            color: #b2b2b2;
+            text-align: left;
+            margin-left: 10px;
+          }
+
+          .info {
+            width: 100%;
+            height: 35px;
+            border: 1px solid #d9d9d9;
+            border-left: 0;
+            border-right: 0;
+            margin: 15px auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
           }
 
           .specs {
@@ -392,17 +679,19 @@
             height: 100%;
             margin-top: 0px;
             text-align: left;
-            display:flex;
-            flex-flow:column wrap;
+            display: flex;
+            flex-flow: column wrap;
 
           }
-          .specs_items{
+
+          .specs_items {
             margin-top: 20px;
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
             height: 100%;
           }
+
           .choosespecs {
             display: flex;
             flex-flow: row wrap;
@@ -412,56 +701,66 @@
             margin-left: 15px;
 
             .active {
-              background: #ff3333;
-              color: white;
+              // background: #ff3333;
+              // color: white;
               border: 1px solid #ff3333 !important;
             }
 
             .specs_item {
-              min-width: 50px;
+              min-width: 70px;
               padding: 2px 5px;
-              border: 1px solid #00303c;
+              border: 1px solid #c2c2c2;
               text-align: center;
-              height: 20px;
-              line-height: 20px;
+              height: 30px;
+              line-height: 30px;
               font-size: 0.8em;
               cursor: pointer;
-              font-family: "幼圆";
               margin-left: 10px;
+
+              &:hover {
+                border: 1px solid #ff3333 !important;
+              }
             }
           }
         }
-        .count{
-          width:75px;
-          height:25px;
-          margin:0;
+
+        .count {
+          width: 75px;
+          height: 25px;
+          margin: 0;
           margin-right: 15px;
-          .el-input-number{
+
+          .el-input-number {
             width: 75px;
           }
-          .el-input-number__decrease,.el-input-number__increase{
+
+          .el-input-number__decrease,
+          .el-input-number__increase {
             width: 18px;
           }
-          .el-input input{
-            padding:0;
+
+          .el-input input {
+            padding: 0;
           }
         }
+
         .shopsubmit {
           width: 100%;
           height: 60px;
           display: flex;
-          margin-bottom:20px;
-          margin-top: 40px;
+          margin-bottom: 20px;
+          margin-top: 30px;
           align-items: center;
+
           .add_shopcar,
           .add_order {
             width: 150px;
             height: 50px;
-            line-height: 50px;
-            background: #ff8533;
+            // line-height: 50px;
+            background: #ff3333;
             color: white;
-            cursor: pointer;
-            font-size:1.2em;
+            // cursor: pointer;
+            font-size: 1.2em;
           }
 
           .add_order {
@@ -475,24 +774,27 @@
         width: 100%;
         min-height: 200px;
         margin-top: 30px;
+
         .comment_top {
-            width: 100%;
-            height: 50px;
-            line-height: 50px;
-            background: #f2f2f2;
-            text-align: left;
-            border: 1px solid #c2c2c2;
-            margin-top: 30px;
-            span {
-              margin-left: 20px;
-            }
+          width: 100%;
+          height: 50px;
+          line-height: 50px;
+          background: #f2f2f2;
+          text-align: left;
+          border: 1px solid #c2c2c2;
+          margin-top: 30px;
+
+          span {
+            margin-left: 20px;
           }
+        }
+
         .comment {
           width: 100%;
-          min-height: 200px;
+          min-height: 100px;
           background: white;
 
-          
+
 
           .comment_tag {
             width: 98%;
@@ -510,7 +812,7 @@
               background: #f2f2f2;
               margin-left: 5px;
               cursor: pointer;
-              font-size:0.8em;
+              font-size: 0.8em;
             }
 
             .active {
@@ -521,8 +823,7 @@
 
           .comment_list {
             width: 100%;
-            min-height: 200px;
-            margin-top: 20px;
+            min-height: 50px;
 
             .comment_detail {
               width: 92%;
@@ -532,41 +833,56 @@
               border-top: 1px solid #d2d2d2;
               border-bottom: 1px solid #d2d2d2;
               text-align: left;
-              .comment_user{
+              padding-bottom: 30px;
+
+              .comment_user {
                 display: flex;
                 flex-flow: row nowrap;
                 align-items: center;
                 width: 500px;
                 margin-bottom: 10px;
-                .user_head{
-                min-width: 0px;
-                height: 50px;
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: center;
-                margin-right:20px;
-                img{
-                  width:35px;
-                  height: 35px;
-                  border-radius: 50%;
+
+                .el-rate__icon {
+                  margin: 0;
                 }
-                .user_name{
-                  margin-left: 5px;
-                }
+
+                .user_head {
+                  min-width: 0px;
+                  height: 50px;
+                  display: flex;
+                  flex-flow: row nowrap;
+                  align-items: center;
+                  margin-right: 15px;
+
+                  img {
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                  }
+
+                  .user_name {
+                    margin-left: 15px;
+                  }
                 }
               }
+
               .comment_img {
                 display: flex;
                 flex-flow: row nowrap;
-                margin-top: 10px;
+                margin: 10px 0;
+                margin-bottom: 30px;
 
                 img {
                   width: 100px;
                   height: 100px;
                   cursor: pointer;
                   border: 1px solid #d2d2d2;
-                  margin-left:5px;
+                  margin-left: 5px;
                 }
+              }
+
+              .comment_time {
+                float: left;
               }
 
               .comment_tool {
@@ -593,6 +909,12 @@
                   top: 1px;
                 }
 
+                .active {
+                  color: #ff3333;
+                  pointer-events: none;
+                  cursor: pointer;
+                }
+
                 .comment_comment::before {
                   content: "\e61a";
                   font-size: 1.2em;
@@ -600,23 +922,72 @@
                   top: 1px;
                 }
               }
-              
+
             }
           }
-          .comment_more{
-                cursor:pointer;
-                width: 100%;
-                height:50px;
-                line-height: 50px;
-              }
+
+          .comment_more {
+            cursor: pointer;
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+          }
         }
       }
-      .shop_introduce{
-        width:100%;
-        min-height:100px;
-        background: white;
-        margin-bottom:30px;
+
+      .shopcount,
+      .shopcomment {
+        width: 50%;
+
+        span {
+          color: #ff3333;
+          margin-left: 5px;
+          font-weight: bolder;
+        }
       }
+
+      .shopcount {
+        border-right: 1px solid #d2d2d2;
+      }
+
+      .shop_introduce {
+        width: 100%;
+        min-height: 100px;
+        background: white;
+        margin-bottom: 30px;
+
+        .spu_show {
+          width: calc(100% - 40px);
+          min-height: 10px;
+          border: 1px solid #d2d2d2;
+          border-top: 0;
+          display: flex;
+          padding: 20px;
+
+          span {
+            width: 30%;
+            display: block;
+            margin-left: 15px;
+            text-align: left;
+          }
+
+          div {
+            width: 30%;
+            display: block;
+            text-align: left;
+          }
+        }
+
+        .introduce_detail {
+          width: 100%;
+          display: block;
+          padding: 15px 0;
+        }
+      }
+    }
+
+    .el-pagination {
+      padding: 12px 10px !important;
     }
   }
 </style>

@@ -15,38 +15,38 @@
             </div>
             <div class="user_order_right">
                 <div class="right_items">
-                    <el-badge :value="12" class="item">
+                    <el-badge :value="count.waitpay" :hidden='count.waitpay == 0' class="item">
                         <i>&#xe617;</i>
                         <span>待付款</span>
                     </el-badge>
 
                 </div>
                 <div class="right_items">
-                    <el-badge :value="12" class="item">
+                    <el-badge :value="count.waitfix" :hidden='count.waitfix == 0' class="item">
                         <i>&#xe669;</i>
                         <span>待维修</span>
                     </el-badge>
                 </div>
                 <div class="right_items">
-                    <el-badge :value="12" class="item">
+                    <el-badge :value="count.fixing" :hidden='count.fixing == 0' class="item">
                         <i>&#xe624;</i>
                         <span>维修中</span>
                     </el-badge>
                 </div>
                 <div class="right_items">
-                    <el-badge :value="12" class="item">
+                    <el-badge :value="count.waitsend" :hidden='count.waitsend == 0' class="item">
                         <i>&#xe690;</i>
                         <span>待发货</span>
                     </el-badge>
                 </div>
                 <div class="right_items">
-                    <el-badge :value="12" class="item">
+                    <el-badge :value="count.waitreceive" :hidden='count.waitreceive == 0' class="item">
                         <i>&#xe684;</i>
                         <span>待收货</span>
                     </el-badge>
                 </div>
                 <div class="right_items">
-                    <el-badge :value="12" class="item">
+                    <el-badge :value="count.waitcomment" :hidden='count.waitcomment == 0' class="item">
                         <i>&#xe60b;</i>
                         <span>待评价</span>
                     </el-badge>
@@ -125,7 +125,7 @@
                         </router-link>
                     </div>
                     <div class="item">
-                        <router-link to="#">
+                        <router-link tag="a" target='_blank' :to="{name: 'chat'}">
                             <i>&#xe609;</i>
                             <span>我的客服</span>
                         </router-link>
@@ -166,18 +166,30 @@
 </template>
 
 <script>
+    import {getordercount} from '@/http/api'
     export default {
         name: "personhome",
         data() {
             return {
-
+              count:{}
             }
         },
         computed:{
           userinfo () {
               return this.$store.state.userinfo
           }
-        }
+        },
+        methods: {
+            getordercounts(){
+              getordercount()
+              .then(data=>{
+                  this.count = data.info
+              })
+            }
+        },
+        mounted() {
+            this.getordercounts()
+        },
     }
 </script>
 <style lang="scss">

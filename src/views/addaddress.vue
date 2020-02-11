@@ -1,20 +1,21 @@
 <template>
-        <el-dialog width="650px" :before-close="close" :visible.sync="addressvisiable" :append-to-body="true" :lock-scroll="true">
+    <el-dialog width="650px" :before-close="close" :visible.sync="addressvisiable" :append-to-body="true"
+        :lock-scroll="true">
         <div slot="title" class="address_main_top">
-                填写您的地址
-            </div>
+            填写您的地址
+        </div>
         <div class="address_main">
             <div class="row">
                 <div class="row_title">姓名</div>
-                <input type="text" v-model="name" placeholder="姓名" @blur="checkname"/>
+                <input type="text" v-model="name" placeholder="姓名" @blur="checkname" />
             </div>
             <div class="row">
                 <div class="row_title">电话</div>
-                <input type="text" v-model="phone" placeholder="电话" @blur="checknumber"/>
+                <input type="text" v-model="phone" placeholder="电话" @blur="checknumber" />
             </div>
             <div class="row">
                 <div class="row_title">地区</div>
-                <v-region class="pick_address" v-model="area"></v-region>
+                <v-region class="pick_address" @values="regionChange"></v-region>
             </div>
             <div class="row">
                 <div class="row_title">详细地址</div>
@@ -25,52 +26,85 @@
                 </el-switch><span style="position:relative;top:-10px;left:10px;">是否为默认地址</span>
             </div>
             <div class="row">
-                <div class="next">确认</div>
+                <div class="next" @click='add'>确认</div>
             </div>
         </div>
-        </el-dialog>
+    </el-dialog>
 </template>
 
 <script>
-import reg from '../utils/reg'
+    import {
+        addaddress
+    } from '@/http/api'
+    import reg from '../utils/reg'
     export default {
         data() {
             return {
                 isdefault: false,
-                name:"",
-                phone:"",
-                area:"",
-                address:"",
+                name: "",
+                phone: "",
+                area: "",
+                address: "",
             }
         },
-        methods:{
-          close(){
-              this.$store.commit("ocaddress",false)
-          },
-          checkname(){
-            this.reg.checkname(null,this.name,this.errormsg)
-          },
-          checknumber(){
-              this.reg.checkphonenumber(null,this.phone,this.errormsg)
-          },
-          errormsg(val){
-              this.$message({
-                  message:val,
-                  type:"error",
-                  duration:1500
-              })
-          }
+        methods: {
+            close() {
+                this.$store.commit("ocaddress", false)
+            },
+            checkname() {
+                this.reg.checkname(null, this.name, this.errormsg)
+            },
+            checknumber() {
+                this.reg.checkphonenumber(null, this.phone, this.errormsg)
+            },
+            regionChange(el) {
+                this.area = el
+            },
+            errormsg(val) {
+                if (val)
+                    this.$message({
+                        message: val,
+                        type: "error",
+                        duration: 1500
+                    })
+            },
+            add() {
+                const da = {
+                    userid: this.$store.state.userinfo.userid,
+                    name: this.name,
+                    phone: this.phone,
+                    area: JSON.stringify(this.area),
+                    address: this.address,
+                    isdefault: this.isdefault == true ? 1 : 0
+                }
+                addaddress(da)
+                    .then(data => {
+                        if (data.code == 200) {
+                            this.$emit('addsuccess')
+                            this.$message({
+                                message: '添加成功',
+                                type: 'success'
+                            })
+                            this.$store.commit("ocaddress", false)
+                        } else {
+                            this.$message({
+                                message: data.message,
+                                type: 'error'
+                            })
+                        }
+                    })
+            }
         },
-        computed:{
-           addressvisiable(){
-               return this.$store.state.isopenaddress
-           }
-        }
+        computed: {
+            addressvisiable() {
+                return this.$store.state.isopenaddress
+            }
+        },
     }
 </script>
 
 <style lang="scss">
-    .el-dialog__body{
+    .el-dialog__body {
         .address_main {
             // width: 600px;
             // height: 400px;
@@ -96,7 +130,8 @@ import reg from '../utils/reg'
                 justify-content: flex-start;
                 margin-top: 20px;
                 padding-left: 50px;
-                .next{
+
+                .next {
                     width: 120px;
                     height: 35px;
                     line-height: 35px;
@@ -109,6 +144,7 @@ import reg from '../utils/reg'
                     margin-left: -60px;
                     text-align: center;
                 }
+
                 .row_title {
                     margin-right: 15px;
                     width: 70px;

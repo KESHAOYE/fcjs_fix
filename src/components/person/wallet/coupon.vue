@@ -5,56 +5,77 @@
         </div>
         <div class="coupon_detail">
             <div class="coupon_tool">
-                <span class="active" @click="changecoupon">全部</span>
-                <span @click="changecoupon">维修</span>
-                <span @click="changecoupon">回收</span>
-                <span @click="changecoupon">商品</span>
+                <span @click="changecoupon(0)" :class = '{active: type == 0}'>可用</span>
+                <span @click="changecoupon(1)" :class = '{active: type == 1}'>已使用</span>
+                <span @click="changecoupon(2)" :class = '{active: type == 2}'>已过期</span>
             </div>
             <div class="coupon_items">
-                <div class="coupon_item">
+                <div class="coupon_item" v-for='(item,index) in couponList' :key='index'>
                     <div class="coupon_tip_left"></div>
                     <div class="coupon_item_detail">
                         <span class="coupon_title">
-                            限维修使用
+                            {{item.note}}
                         </span>
                         <span class="coupon_price">
-                            5
+                            {{item.amount}}
                         </span>
                         <span class="coupon_time">
-                            2019年9月30日过期
+                            {{item.over_time|date}}过期
                         </span>
                     </div>
                     <div class="coupon_tip_right"></div>
                     <div class="coupon_item_bottom">
                         <span class="coupon_trandition">
-                            满40可用
+                            满{{item.min_price}}可用
                         </span>
                     </div>
                 </div>
-                <!-- <div class="coupon_null">
-                <span><i>&#xe708;</i>暂没有订单，快去<span class="active">领券中心</span>吧</span>
-            </div> -->
+                <div class="coupon_null" v-if='couponList.length <= 0'>
+                <span><i>&#xe708;</i>暂没有优惠券</span>
+            </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import {
+        getusercoupon
+    } from '@/http/api'
     export default {
         name: "coupon",
         data() {
             return {
-
+                couponList: [],
+                type: 0
+            }
+        },
+        filters: {
+            date(val) {
+                let reg = new RegExp(/^\d+-\d+-\d+/)
+                return reg.exec(val)[0]
             }
         },
         methods: {
-            changecoupon(el) {
-                let arr = Array.from(document.getElementsByClassName("coupon_tool")[0].children)
-                arr.forEach((e) => {
-                    e.classList.remove("active")
-                })
-                el.currentTarget.classList.add("active")
+            changecoupon(type) {
+                this.type = type
+                this.get(type)
+            },
+            get(type) {
+                this.couponList = []
+                if (Object.keys(this.$store.state.userinfo).length > 0) {
+                    getusercoupon({
+                            userid: this.$store.state.userinfo.userid,
+                            type: type
+                        })
+                        .then(data => {
+                            this.couponList = data.info
+                        })
+                }
             }
+        },
+        created() {
+            this.get(0)
         }
     }
 </script>
@@ -114,11 +135,15 @@
                 display: flex;
                 flex-flow: row wrap;
                 margin-top: 25px;
-
+                .coupon_item{
+                    position:relative;
+                    top:0;
+                    transition: .4s;
+                }
                 .coupon_item:hover {
                     box-shadow: 0px 15px 30px rgba(#f4ca3a, 0.4);
-                    transform: translate3d(0, -2px, 0);
-                    transition: all .2s linear;
+                    // transform: translate3d(0, -2px, 0);
+                    top: -3px;
                 }
 
                 @keyframes coupontop {
@@ -253,10 +278,11 @@
                     text-align: center;
                     position: relative;
                     top: 50%;
-                    margin-top: -25px;
+                    margin-top: 30px;
+                    font-size: 1.2em;
 
                     i {
-                        font-size: 2.8em;
+                        font-size: 3em;
                         margin-right: 10px;
                     }
 

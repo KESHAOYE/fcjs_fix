@@ -3,23 +3,16 @@ import qs from 'qs';
 import { Message } from 'element-ui';
 import router from 'vue-router';
 //判断环境
-if (process.env.NODE_ENV == "development") {
-    process.env.BASE_API = "localhost:3000"
-} else if (process.env.NODE_ENV == "debug") {
-    process.env.BASE_API = "localhost:3000"
-} else if (process.env.NODE_ENV == "production") {
-    process.env.BASE_API = "localhost:3000"
-}
-const server = axios.create({
-        baseURL: process.env.BASE_API,
-        //时延 5s
-        timeout: 10000
-    })
+axios.defaults.timeout = 10000
     //请求拦截器-在发送请求前判断是否带token
-server.interceptors.request.use(
+axios.interceptors.request.use(
         config => {
+            if(JSON.parse(window.localStorage.getItem('_T_'))){
             const token = JSON.parse(window.localStorage.getItem('_T_'))._T_
             token && (config.headers.Authorization = token);
+            const phone = JSON.parse(window.localStorage.getItem('_T_')).phone
+            phone && (config.headers.phone=phone)
+            }
             return config;
         },
         error => {
@@ -27,7 +20,7 @@ server.interceptors.request.use(
         }
     )
     //响应拦截器-如果状态码错误，则报错
-server.interceptors.response.use(
+axios.interceptors.response.use(
         response => {
             if (response.status === 200) {
                 return Promise.resolve(response)
@@ -105,6 +98,13 @@ server.interceptors.response.use(
                                 duration: "2500"
                             })
                             break;
+                            case 600:
+                                Message({
+                                    message: error,
+                                    type: "error",
+                                    duration: "2500"
+                                })
+                                break;
                         default:
                             Message({
                                 message: "发生错误,请重试！" + error,
@@ -159,4 +159,4 @@ export function post(url, params) {
     })
 }
 
-export default server;
+export default axios;

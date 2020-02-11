@@ -121,7 +121,7 @@
             },
             jumpstep() {
                 this.$router.push({
-                    name: "login"
+                    name: "home"
                 })
             },
             beforeAvatarUpload(file) {
