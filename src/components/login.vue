@@ -20,7 +20,7 @@
                     <div class="password">
                         <i>&#xe64e;</i>
                         <input type="password" id="userpassword" v-model="password" placeholder="请输入密码"
-                            @blur="reg.checkpassword(null,password,checkok)" />
+                            @blur="reg.checkpassword(null,password,checkok)" @keyup.enter='initValidator' />
                     </div>
                     <!-- <div class="reg">
              <i>&#xe6a0;</i>
@@ -123,7 +123,6 @@
                                 phone: that.username
                             }
                             getuserinfo(qss).then(datas => {
-                                    console.log(datas)
                                     that.$store.commit('changeUserInfo', datas.info)
                                     that.$message({
                                         message: '登录成功',
@@ -235,7 +234,6 @@
                                 this.$refs.isSlide.style.background = '#e31515'
                                 setTimeout(() => {
                                     this.initValidator()
-                                    console.log(1)
                                 }, 500)
                                 return
                             }

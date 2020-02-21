@@ -154,7 +154,6 @@
                 handler(val,oldval){
                     if(val.path=='/shopcar'){
                         this.isshowshopcar=false
-                        console.log(this.isshowshopcar);
                     }else{
                         this.isshowshopcar=true
                     }
@@ -174,10 +173,9 @@
             outlogin(){
                 this.$store.commit('outlogin')
                 window.localStorage.removeItem('_T_')
-                this.$router.push({name:'login'})
+                // this.$router.push({name:'login'})
             },
             deletes(el) {
-        console.log('1')
         let da = {
           shopid: el.shopid,
           userid: this.$store.state.userinfo.phone,

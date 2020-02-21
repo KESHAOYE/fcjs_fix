@@ -91,7 +91,6 @@
             changeuserinfo(val) {
                 this.$refs[val].validate((valid) => {
                     if (valid) {
-                        console.log("success");
                     } else {
 
                     }
@@ -99,7 +98,6 @@
             },
             handleAvatarSuccess(res, file) {
                 this.userinfo.head = URL.createObjectURL(file.raw);
-                console.log(this.userinfo.head);
             },
             beforeAvatarUpload(file) {
                 const isLt2M = file.size / 1024 / 1024 < 10;

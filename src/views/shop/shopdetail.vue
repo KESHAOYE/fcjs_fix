@@ -85,15 +85,14 @@
                 <el-rate :value=items.score disabled text-color="#ff9900" score-template="{rate}">
                 </el-rate>
               </div>
-              <span class="comment_text">
-                {{items.comment}}
+              <span class="comment_text" v-html='items.comment'>
               </span>
               <div class="comment_img">
-                <el-image v-for="(imgs,index) in items.img" :src="imgs" :key="index" :preview-src-list="items.img">
+                <el-image v-for="(imgs,index) in items.comment_img" :src="imgs" :key="index" :preview-src-list="items.comment_img">
                 </el-image>
               </div>
               <div class="comment_time">
-                {{items.comment_time|date}}
+                {{items.comment_time|datewithtime}}
               </div>
               <div class="comment_tool">
                 <div class="comment_report tool_item">举报</div>
@@ -142,6 +141,7 @@
     getcoupon
   } from '@/http/api'
   import PicZoom from 'vue-piczoom'
+  import {datewithtime} from '../../utils/filters'
   export default {
     name: "shopdetail",
     components: {
@@ -186,12 +186,6 @@
         commentCount: 0,
         total: 0,
         currentPage: 1
-      }
-    },
-    filters: {
-      date(val) {
-        let reg = new RegExp(/^\d+-\d+-\d+[T]\d+:\d+/)
-        return reg.exec(val)[0].replace('T', ' ')
       }
     },
     computed: {
@@ -318,7 +312,6 @@
             data.info[0].sku = result
             this.shopInfo = data.info[0]
             this.price = this.shopInfo.price + '起'
-            console.log(this.shopInfo)
             this.img = this.shopInfo.img[0].path
             getshopcoupon({
                 shopid: this.$route.query.shopid,
@@ -450,6 +443,10 @@
           addshopcar(da)
           .then(data=>{
             this.getshopcars()
+            this.$message({
+              message: '加入成功',
+              type: 'success'
+            })
           })
         } else {
           this.$message({
@@ -466,9 +463,6 @@
       handleSizeChange(el) {
         this.pageSize = el;
         this.getads()
-      },
-      onSlideChangeEnd(e) {
-        console.log(e)
       }
     },
     created() {

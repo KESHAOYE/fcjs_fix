@@ -8,21 +8,25 @@
                     <el-step title="选择基本属性" icon="process_step"></el-step>
                     <el-step title="价格评估" icon="process_step"></el-step>
                     <el-step title="提交订单" icon="process_step"></el-step>
-                    <el-step title="生成订单" icon="process_step"></el-step>
                 </el-steps>
             </div>
             <div class="first">
                 <div class="choosephone">
                     <div class="title"><span>选择您的机型</span>
-                        <hr/>
+                        <hr />
                     </div>
                     <div class="choose">
-                        <div class="null_phone" v-show="this.phonelist.length<=0">暂无可维修的机型</div>
-                        <el-tabs v-model="activeName" @tab-click="handleClick" v-show="this.phonelist.length>0">
-                            <el-tab-pane v-for="(item,index) in phonelist" :key="index" :label="item.name" :name="item.value">
+                        <div class="null_phone" v-show="this.phoneList.length<=0">暂无可维修的机型</div>
+                        <el-tabs v-model="activeName" @tab-click="handleClick" v-show="this.phoneList.length>0">
+                            <el-tab-pane v-for="(item,index) in phoneList" :key="index"
+                                :label="`${item.brandname}/${item.brandename}`" :name="item.value">
                                 <ul class="phone">
-                                    <li v-for="(phone,index) in item.list" :key="index" @click="choosephone"
-                                        :value="phone.phonename" :class="{active:fixedmodel.selectphone==phone.phonename}">{{phone.phonename}}</li>
+                                    <div class="null_problem" v-show="item.list.length<=0">该品牌暂无可维修机型</div>
+                                    <li v-for="(phone,index) in item.list" :key="index" @click="choosephone(phone)"
+                                        :class="{active:fixedmodel.selectphone==phone.model_id}">
+                                        <el-image :src='phone.model_img' style="width: 60px; height: 60px;"></el-image>
+                                        <span>{{phone.model_name}}</span>
+                                    </li>
                                 </ul>
                             </el-tab-pane>
                         </el-tabs>
@@ -33,22 +37,22 @@
                         <hr />
                     </div>
                     <div class="problem">
-                        <div class="null_problem" v-show="this.fixitem.length<=0">该机型暂无可维修项目</div>
-                        <el-collapse v-model="activefix" v-if="this.fixitem.length>0">
-                            <el-collapse-item v-for="(item,index) in fixitem" :key="index" :title="item.typename" :accordion="true" :name="item.name" >
+                        <div class="null_problem" v-show="this.fixitems.length<=0">该机型暂无可维修项目</div>
+                        <el-collapse v-model="activefix" v-if="this.fixitems.length>0">
+                            <el-collapse-item v-for="(item,index) in fixitems" :key="index" :name='item.sort_name' :title="item.sort_name" :accordion="true">
                                 <div class="problemitem">
-                                    <div class="item" v-for="(fix,index) in item.typeitem" :key="index"
-                                        @click="problemclick($event)" :name="fix.name" :price="fix.price" :value="fix.value" :class="{active:fixedmodel.selectitems.indexOf(fix.name)>=0}">
+                                    <div class="item" v-for="(fix,indexs) in item.info" :key="indexs"
+                                        @click="problemclick(fix)" :class="{active:ischoose(fix)!=-1}">
                                         <div class="title">
                                             <div class="title_top">
-                                                <span>{{fix.name}}</span>
+                                                <span>{{fix.item_name}}</span>
                                                 <span>维修价格:{{fix.price}}元</span>
                                             </div>
-                                            <hr/>
+                                            <hr />
                                         </div>
                                         <div class="detail">
                                             <div class="row"><span>故障描述：</span><span>{{fix.des}}</span></div>
-                                            <div class="row"><span>维修方式：</span><span>{{fix.methods}}</span></div>
+                                            <div class="row"><span>维修方式：</span><span>{{fix.method}}</span></div>
                                         </div>
                                         <i class="success_tag">
                                             <i>&#xe714;</i>
@@ -61,7 +65,8 @@
                 </div>
                 <div class="count" v-show="this.fixedmodel.selectphone.length>0">
                     <div class="infoshow">
-                        <span>共选择了<span class="show">{{fixedmodel.selectitems.length}}</span>项,共计<span class="show">{{fixedmodel.totalprice}}</span>元</span>
+                        <span>共选择了<span class="show">{{fixedmodel.selectitems.length}}</span>项,共计<span
+                                class="show">{{fixedmodel.totalprice}}</span>元</span>
                     </div>
                     <div class="next" @click="next()">下一步</div>
                 </div>
@@ -70,60 +75,100 @@
     </div>
 </template>
 <script>
+    import {
+        ugetfixbrand,
+        getfixmodelbyid
+    } from '@/http/api'
     export default {
         data() {
             return {
                 activeName: "null",
                 activefix: "",
-                fixitem: [{
-                    typename: "屏幕维修",
-                    name: "screenfix",
-                    typeitem: [{
-                        name: "外屏更换",
-                        value: "cos",
-                        price: "300",
-                        des: "外屏破碎(玻璃裂))",
-                        methods: "更换外屏（质保180天）-旧屏回收 严选品质非原厂配件"
-                    }]
-                }],
-                fixedmodel:{
+                phoneList: [],
+                fixitems: [],
+                fixedmodel: {
                     selectphone: "",
+                    phonename:'',
                     selectitems: [],
                     totalprice: "0"
                 }
             }
         },
+        computed: {
+          ischoose(val) {
+            return function (val) {
+              return this.fixedmodel.selectitems.findIndex(el=>{
+                return el.id == val.item_id
+              })
+            }
+          }
+        },
         methods: {
             handleClick(tab, event) {
                 this.fixedmodel.selectphone = ""
-                this.fixedmodel.selectitems=[]
+                this.fixedmodel.selectitems = []
                 //关闭Collapse面板
-                this.activefix=""
-                localStorage.setItem("selectphone", "")
+                this.activefix = ""
             },
             //机型选择
             choosephone(el) {
-                this.fixedmodel.selectphone = el.srcElement.attributes.value.value
-                //写入localstorage
-                localStorage.setItem("selectphone", this.fixedmodel.selectphone)
+                this.fixedmodel.selectphone = el.model_id
+                this.fixedmodel.phonename = el.model_name
+                this.fixedmodel.img = el.model_img
                 //清空问题表
-                this.fixedmodel.selectitems=[];
+                this.fixedmodel.selectitems = [];
+                getfixmodelbyid({
+                        model_id: el.model_id
+                    })
+                    .then(data => {
+                        this.fixitems = data.info
+                        let result = []
+                        this.fixitems[0].item.forEach((item) => {
+                            let index = result.findIndex(el => {
+                                return el.sort_name == item.sort_name
+                            })
+                            if (index == -1) {
+                                result.push({
+                                    sort_name: item.sort_name,
+                                    info: [{
+                                        item_id: item.item_id,
+                                        item_name: item.item_name,
+                                        price: item.price,
+                                        des: item.des,
+                                        method: item.method,
+                                    }]
+                                })
+                            } else {
+                                result[index].info.push({
+                                    item_id: item.item_id,
+                                    item_name: item.item_name,
+                                    price: item.price,
+                                    des: item.des,
+                                    method: item.method,
+                                })
+                            }
+                        })
+                        this.fixitems = result
+                    })
             },
             //问题选择
-            problemclick(el) {
-                let fixinfo=el.currentTarget.attributes;
-                let name=fixinfo.name.value;
-                let price=fixinfo.price.value;
-                let value=fixinfo.value.value;
-                let active=this.fixedmodel.selectitems.indexOf(name)
-                if(active<0){
-                    this.fixedmodel.selectitems.push(name);
-                    console.log(this.fixedmodel.selectitems);
-                    this.fixedmodel.totalprice=Number(this.fixedmodel.totalprice)+Number(price);
-                }else{
-                    this.fixedmodel.selectitems.splice(active,1);
-                    this.fixedmodel.totalprice=Number(this.fixedmodel.totalprice)-Number(price);
-                }
+            problemclick(item) {
+              this.ischoose(item) == -1 ? this.fixedmodel.selectitems.push({id: item.item_id,name:item.item_name,price: item.price}) : this.fixedmodel.selectitems.splice(this.ischoose(item),1)
+              this.fixedmodel.totalprice = 0
+              this.fixedmodel.selectitems.forEach(el=>{
+                  this.fixedmodel.totalprice = parseInt(this.fixedmodel.totalprice) + parseInt(el.price)
+              })
+            }, 
+            get() {
+                let load = this.$loading({
+                  lock: true,
+                  text: '加载中..'
+                })
+                ugetfixbrand()
+                    .then(data => {
+                        this.phoneList = data.info
+                        load.close()
+                    })
             },
             //跳转至下一步
             next() {
@@ -134,26 +179,17 @@
                         position: "top-right",
                     })
                 } else {
-                    console.log(this.fixedmodel);
-                    this.$store.commit("changefixedmodel",this.fixedmodel)
+                    this.$store.commit("changefixedmodel", this.fixedmodel)
                     this.$router.push({
                         path: "/fixsecond"
                     })
                 }
             }
         },
-        computed: {
-            phonelist() {
-                return this.$store.state.fixmodel
-            }
-        },
         mounted() {
-            this.activeName = this.$route.query.brand ? this.$route.query.brand : "Apple";
+            this.get()
+            this.activeName = ''
         },
-        activated() {
-            //根据路由参数决定品牌，默认为苹果。
-            this.activeName = this.$route.query.brand ? this.$route.query.brand : "Apple";
-        }
     }
 </script>
 <style lang="scss">
@@ -231,6 +267,11 @@
         }
     }
 
+    .null_problem {
+        height: 50px;
+        padding: 15px 0;
+    }
+
     // 选择机型
     .choosephone {
         width: 100%;
@@ -256,28 +297,41 @@
                     width: 180px;
                     margin: 8px 8px;
                     border: 1px solid #d2d2d2;
-                    height: 45px;
-                    line-height: 45px;
+                    height: auto;
+                    display: flex;
+                    flex-flow: row nowrap;
+                    align-items: center;
+                    justify-content: space-around;
                     cursor: pointer;
+                    padding: 5px;
+                    transition: .3s;
+
+                    span {
+                        width: auto;
+                        height: 20px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
                 }
 
                 li:hover {
-                    border: 1px solid #ff3333;
+                    border: 2px solid #ff3333;
                 }
 
                 .active {
-                    background: #ff3333;
-                    color: white;
-                    border: 0;
-                }
-
-                .active:hover {
-                    border: 0;
+                    border: 2px solid #ff3333;
                 }
             }
         }
 
-        //
+        .el-tabs__nav {
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
         .el-tabs__nav-wrap::after {
             background: none;
         }
@@ -291,18 +345,13 @@
             color: #ff3333;
         }
 
-        .el-tabs__item {
-            font-size: 1em;
-            width: 80px;
-        }
-
         .el-tabs__item.is-active {
             color: #ff3333;
         }
     }
 
-    // 选择机型结束
-    //选择问题开始
+    /* 选择机型结束
+    选择问题开始 */
     .chooseproblem {
         width: 1098px;
         height: auto;
@@ -404,7 +453,8 @@
                     border-style: solid;
                     border-color: #ff3333 #ff3333 transparent transparent;
                     display: none;
-                    i{
+
+                    i {
                         color: white;
                         position: relative;
                         top: -5px;

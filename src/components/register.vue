@@ -203,11 +203,9 @@
                                             id: data
                                         }
                                         getuserinfo(qss).then(datass => {
-                                            console.log(datass)
                                             that.$store.commit('changeUserInfo', datass
                                                 .info)
                                         })
-                                        console.log(that.$store.state.userinfo)
                                         that.$router.push({
                                             name: "fullinfo"
                                         })

@@ -6,15 +6,14 @@
                 <div class="content fixcontent">
             <div class="fix_step">
                 <el-steps :active="2" align-center finish-status="success" process-status="success">
-                    <el-step title="选择基本属性" icon="process_step"></el-step>
+                    <el-step title="选择属性" icon="process_step"></el-step>
                     <el-step title="价格评估" icon="process_step"></el-step>
                     <el-step title="提交订单" icon="process_step"></el-step>
-                    <el-step title="生成订单" icon="process_step"></el-step>
                 </el-steps>
             </div>
             <div class="second_detail">
             <div class="second_detail_left">
-                <img src="../../assets/phone/iphone5s.png" alt="">
+                <img :src="phoneimg" alt="">
             </div>
             <div class="second_detail_right">
                 <div class="brand">{{phone}}</div>
@@ -29,7 +28,7 @@
                 </div>
                 <div class="row fix_detail">
                     <span class="row_title">维修项目：</span>
-                    <el-tag v-for="(item,index) in selectitem" :key="index">{{item.name}}</el-tag>
+                    <el-tag v-for="(item,index) in selectitem" :key="index" style="margin-left:15px;">{{item.name}}</el-tag>
                 </div>
             </div>
         </div>
@@ -43,9 +42,9 @@
                 说明：请认真核对。IMEI码输入错误可能导致错误维修他人机器。
             </div>
         </div>
-        <myaddress/>
+        <myaddress @orderaddress="changeaddress" :addressid="addressid" />
             <div class="count">
-                    <div class="next" @click="next()">提交订单</div>
+                    <div class="next" @click="add()">提交订单</div>
             </div>
         </div>
     </div>
@@ -54,24 +53,41 @@
 
 <script>
 import myaddress from '../../components/myaddress'
+import {createfixorder} from '@/http/api'
 export default {
     data(){
         return{
-            imei:""
+            imei:"",
+            addressid: ''
         }
     },
     computed:{
         phone(){
-            return this.$store.state.fixedmodel.selectphone;
+            return this.$store.state.fixedmodel.phonename;
         },
         totalprice(){
             return this.$store.state.fixedmodel.totalprice;
         },
         selectitem(){
             return this.$store.state.fixedmodel.selectitems;
+        },
+        phoneimg(){
+            return this.$store.state.fixedmodel.img;
         }
     },
     methods:{
+      add(){
+        createfixorder({info:this.$store.state.fixedmodel,addressId: this.addressid,imei: this.imei})
+        .then(data=>{
+          this.$message({
+            message: '下单成功',
+            type: 'success'
+          })
+        })
+      },
+      changeaddress(data) {
+        this.addressid = data.addressid 
+      },
     },
     components:{
         myaddress
@@ -106,9 +122,10 @@ export default {
 }
     .count{
         position: relative;
+        height: 70px;
         .next{
             position: absolute;
-            right: 50px;
+            right: 10px;
         }
     }
 </style>

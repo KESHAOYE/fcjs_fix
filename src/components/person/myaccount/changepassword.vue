@@ -72,7 +72,6 @@
             changepassword(val) {
                 this.$refs[val].validate((valid) => {
                     if (valid) {
-                        console.log("success");
                     }
                 })
             },

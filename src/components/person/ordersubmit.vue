@@ -14,10 +14,12 @@
                 </div>
                 <div class="pay_content">
                     <div class="pay_item"
-                        :class="[{alipay:p.ename=='alipay'},{zsbank:p.ename=='zsbank'},{nybank:p.ename=='nybank'},{wechat:p.ename=='wechat'},{jsbank:p.ename=='jsbank'}]"
+                        :class="[{active:ischoosebank(p)},{alipay:p.receive_ename=='alipay'},{zsbank:p.receive_ename=='zsbank'},{nybank:p.receive_ename=='nybank'},{wechat:p.receive_ename=='wechat'},{jsbank:p.receive_ename=='jsbank'}]"
                         v-for="(p,index) in userpay" :key="index" @click="choosebank(p)">
-                        <i>{{p.icon}}</i>
-                        <span>{{p.card|account}}</span>
+                        <svg class="icon" aria-hidden="true">
+                            <use :xlink:href="p.receive_logo"></use>
+                        </svg>
+                        <span>{{p.paym_cid|account}}</span>
                     </div>
                 </div>
             </div>
@@ -27,7 +29,8 @@
                     <hr>
                 </div>
                 <div class="pay_content">
-                    <div class="coupon_item" v-for="(p,index) in couponList" :key="index">
+                    <div class="coupon_item" :class="{active: ischoosecoupon(p)}" @click='choosecoupon(p)'
+                        v-for="(p,index) in couponList" :key="index">
                         <span>满{{p.min_price}}减{{p.amount}}</span>
                         <span class="date">有效期至:{{p.over_time|date}}</span>
                     </div>
@@ -65,10 +68,18 @@
                     <div class="confirm_item">收货人:{{addressinfo.name}}</div>
                     <div class="confirm_item">收货地址:{{addressinfo.str}}{{addressinfo.address}}</div>
                     <div class="confirm_item">收货电话:{{addressinfo.phone}}</div>
-                    <div class="confirm_item">订单类型:{{orderinfo.order_type}}</div>
-                    <div class="confirm_item">付款信息:{{orderinfo.payment.name}}-{{orderinfo.payment.card|account}}</div>
+                    <div class="confirm_item">订单类型:{{orderinfo.order_type|orderstate}}</div>
+                    <div class="confirm_item">付款信息:{{payinfo.receive_name}} {{payinfo.paym_cid}}</div>
                 </div>
-                <div class="confirm_info"></div>
+            </div>
+            <div class="confirm_info">
+               <div class="price">
+                   <span class="coupon_price" v-if='orderinfo.coupon_price > 0'>优惠: - ￥{{orderinfo.coupon_price}} </span>
+                   <span class="order_price">总价:￥{{orderinfo.order_price - orderinfo.coupon_price}}</span>
+               </div>
+               <div class="button" @click='pays()'>
+                   去付款
+               </div>
             </div>
         </div>
     </div>
@@ -78,46 +89,45 @@
     import myaddress from '../myaddress'
     import {
         getordershop,
-        getordercoupon
+        getordercoupon,
+        getuserreceive,
+        pay
     } from '@/http/api'
+    import {
+        orderstate
+    } from '@/utils/filters'
     export default {
         data() {
             return {
                 orderinfo: {
-                    order_id: "22234568582",
-                    order_price: "8000.00",
-                    address_id: "01239",
-                    order_type: "维修（需用户自行寄修）",
-                    payment: {
-                        name: "农业银行",
-                        card: "6222 1002 2003 1234"
-                    },
-                    order_shop: []
+                    order_id: this.$route.query.orderid,
+                    order_price: 0,
+                    address_id: "",
+                    coupon_id: '',
+                    order_type: "",
+                    coupon_price: 0,
+                    payid: ''
                 },
-                userpay: [{
-                        icon: "\ue628",
-                        bankname: "农业银行",
-                        ename: "nybank",
-                        card: "6222 2222 2222 2222",
-                    },
-                    {
-                        icon: "\ue659",
-                        bankname: "招商银行",
-                        ename: "zsbank",
-                        card: "6222 2222 2222 2222",
-                    },
-                    {
-                        icon: "\ue647",
-                        bankname: "支付宝",
-                        ename: "alipay",
-                        card: "柯少爷-"
-                    },
-                ],
+                userpay: [],
                 addressinfo: {
 
                 },
+                payinfo:'',
                 couponList: [],
-                shopList: []
+                shopList: [],
+                load:''
+            }
+        },
+        computed: {
+            ischoosebank(val) {
+                return function (val) {
+                    return this.orderinfo.payid == val.paym_id
+                }
+            },
+            ischoosecoupon(val) {
+                return function (val) {
+                    return this.orderinfo.coupon_id == val.coupon_id
+                }
             }
         },
         filters: {
@@ -126,9 +136,17 @@
                 return val
             },
             date(val) {
-                let reg = new RegExp(/^\d+-\d+-\d+[T]\d+:\d+/)
-                return reg.exec(val)[0].replace('T', ' ')
-            }
+                let reg = new RegExp(/^\d+-\d+-\d+/)
+                return reg.exec(val)[0]
+            },
+            payinfo(val){
+                if(!val == ''){
+                  let index = this.userpay(el=>{
+                      return el
+                  })
+                }
+                return val == ''? '未选择' : ''
+         }
         },
         components: {
             myaddress
@@ -136,10 +154,33 @@
         methods: {
             changeaddress(data) {
                 this.addressinfo = data;
+                this.orderinfo.address_id = data.addressid 
+            },
+            choosecoupon(data) {
+                this.orderinfo.coupon_id = data.coupon_id
+                this.orderinfo.coupon_price = data.amount
             },
             choosebank(data) {
-                this.orderinfo.payment.name = data.bankname;
-                this.orderinfo.payment.card = data.card
+                this.orderinfo.payid = data.paym_id
+                this.payinfo = data
+            },
+            countPrice(){
+              this.shopList.forEach(el => {
+                this.orderinfo.order_price = parseInt(this.orderinfo.order_price) + parseInt(el.price)
+              })
+            },
+            pays(){
+                this.load = this.$loading({
+                    lock: true,
+                    text: '付款中..',
+                })
+                pay({user_id: this.$store.state.userinfo.userid,...this.orderinfo})
+                .then(data=>{
+                    setTimeout(()=>{
+                        this.load.close()
+                        this.$router.push({name: 'myorder'})
+                    },1000)
+                })
             },
             getordershops() {
                 getordershop({
@@ -147,7 +188,16 @@
                     })
                     .then(data => {
                         this.shopList = data.info
+                        this.countPrice()
                     })
+            },
+            getpay(){
+              getuserreceive({userid: this.$store.state.userinfo.userid})
+              .then(data=>{
+                  if(data.code == 200){
+                    this.userpay = data.info
+                  }
+              })
             },
             getordercoupons() {
                 getordercoupon({
@@ -160,8 +210,12 @@
             }
         },
         mounted() {
-            this.getordershops()
-            this.getordercoupons()
+            this.orderinfo.order_type = this.$route.query.type
+            setTimeout(()=>{
+              this.getordershops()
+              this.getordercoupons()
+              this.getpay()
+            },0)
         },
     }
 </script>
@@ -222,6 +276,23 @@
                     transform: scale(1.05);
                     top: -2px;
                 }
+            }
+
+            .active:before {
+                content: '已选';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                font-family: '幼圆';
+                font-weight: bolder;
             }
 
             .coupon_item:hover,
@@ -289,7 +360,8 @@
                 display: flex;
                 flex-flow: column nowrap;
                 justify-content: center;
-                .date{
+
+                .date {
                     margin-top: 10px;
                     font-size: 0.8em;
                 }
@@ -317,9 +389,9 @@
                     width: 100%;
                     min-height: 150px;
                     margin-left: 3%;
-                    border-bottom: 1px solid #d2d2d2;
+                    border-bottom: 1px solid #f2f2f2;
                     padding: 15px 0;
-                    background: #f9f9f9;
+                    background: #fcfcfc;
                     display: flex;
                     flex-flow: row nowrap;
                     align-items: center;
@@ -407,7 +479,6 @@
             min-height: 120px;
             background: white;
             margin-top: 25px;
-            margin-bottom: 50px;
 
             .title {
                 width: 95%;
@@ -420,7 +491,6 @@
                 flex-flow: column nowrap;
                 justify-content: center;
                 align-items: flex-start;
-                margin-bottom: 25px;
                 margin-left: 35px;
                 padding-bottom: 20px;
 
@@ -432,5 +502,41 @@
                 }
             }
         }
+        .confirm_info{
+        width: 100%;
+        background: white;        
+        margin-top: 20px;
+        height: 80px;
+        margin-bottom: 50px;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: flex-end;
+        .coupon_price{
+            margin-right: 10px;
+            color: #d2d2d2;
+            font-size: 1em;
+        }
+        .order_price{
+          font-size: 1.5em;
+          font-weight: bolder;
+          color:#ff3333;
+          margin-right: 25px;
+        }
+        .button{
+            width: 100px;
+            height: 50px;
+            background: #ff3333;
+            color:#fff;
+            display: block;
+            line-height: 50px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+     }
     }
+    .icon{
+            width: 2em;
+            height: 2em;
+        }
 </style>

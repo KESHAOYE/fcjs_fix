@@ -8,7 +8,6 @@
                     <el-step title="选择基本属性" icon="process_step"></el-step>
                     <el-step title="价格评估" icon="process_step"></el-step>
                     <el-step title="提交订单" icon="process_step"></el-step>
-                    <el-step title="生成订单" icon="process_step"></el-step>
                 </el-steps>
             </div>
         <div class="second_detail">
@@ -28,7 +27,7 @@
                 </div>
                 <div class="row fix_detail">
                     <span class="row_title">维修项目：</span>
-                    <el-tag v-for="(item,index) in selectitem" :key="index">{{item}}</el-tag>
+                    <el-tag v-for="(item,index) in selectitem" :key="index" style="margin-left:10px">{{item.name}}</el-tag>
                 </div>
             </div>
         </div>
@@ -44,7 +43,6 @@
 export default {
     data(){
         return{
-          phoneimg:""
         }
     },
     methods:{
@@ -70,13 +68,16 @@ export default {
     },
     computed:{
         phone(){
-            return this.$store.state.fixedmodel.selectphone;
+            return this.$store.state.fixedmodel.phonename;
         },
         totalprice(){
             return this.$store.state.fixedmodel.totalprice;
         },
         selectitem(){
             return this.$store.state.fixedmodel.selectitems;
+        },
+        phoneimg(){
+            return this.$store.state.fixedmodel.img;
         }
     },
     mounted(){

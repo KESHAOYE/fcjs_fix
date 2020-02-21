@@ -2,28 +2,26 @@
     <div class="orderdetail">
         <div class="order_type">
             <div class="now_type">
-                <span class="order_id">1234567890</span>
+                <span class="order_id" v-if='baseinfo[0]'>{{baseinfo[0].order_id}}</span>
                 <span class="status">
-                    <!-- <i>&#xe714;</i> -->
-                    <i>&#xe6af;</i>
-                    提交订单
+                    <i v-if='nowstate.now_state == 7 || nowstate.now_state == 11'>&#xe714;</i>
+                    <i v-if='nowstate.now_state != 7 && nowstate.now_state != 11 '>&#xe6af;</i>
+                    {{nowstate.now_state|state}}
                 </span>
-                <span class="order_time">2019-10-9 11:06</span>
+                <span class="order_time">{{nowstate.createTime|datewithtime}}</span>
             </div>
             <div class="type_detail">
-                <el-steps :active="1" align-center finish-status="success" process-status="wait">
-                    <el-step title="提交订单">
-                        <i slot="icon">&#xe60e;</i>
-                        <span slot="description">2019-10-9 11:06</span>
+                <el-steps :active="nowstate.now_state ==7? state.length  : state.length-1" align-center
+                    finish-status="success" process-status='wait'>
+                    <el-step v-for='(item,index) in state' :title="item.now_state|state" :key="index">
+                        <i slot="icon" class="el-icon-loading"></i>
+                        <span slot="description">{{item.createTime|datewithtime}}</span>
                     </el-step>
                 </el-steps>
             </div>
         </div>
-        <div class="express_detail">
+        <div class="express_detail" v-if='nowstate.now_state >= 5 && nowstate.now_state!=41 && nowstate.now_state!=42'>
             <div class="shop_express">
-                <div class="shop_img">
-                    <img src="../../../assets/phone/iphone5s.png" alt="" srcset="">
-                </div>
                 <div class="shop_express_info">
                     <div class="express_row">
                         <span class="express_title">送货方式</span>
@@ -31,105 +29,163 @@
                     </div>
                     <div class="express_row">
                         <span class="express_title">承运快递</span>
-                        <span class="express_content">顺丰快递</span>
+                        <span class="express_content">京东快递</span>
                     </div>
                     <div class="express_row">
                         <span class="express_title">快递单号</span>
-                        <span class="express_content">0000000000</span>
+                        <span class="express_content">TEST00000001</span>
                     </div>
                 </div>
             </div>
             <div class="express">
                 <el-timeline>
-                    <el-timeline-item timestamp="2018/4/12" placement="top" type="success">
+                    <el-timeline-item timestamp="2019/4/2" placement="top" type="success">
+                        <span class="express_info_detail">已发货</span>
+                    </el-timeline-item>
+                    <el-timeline-item timestamp="2019/4/3" placement="top">
                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
                     </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/3" placement="top">
-                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/2" placement="top">
-                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/2" placement="top">
-                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/2" placement="top">
-                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/2" placement="top">
-                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/2" placement="top">
-                         <span class="express_info_detail">您的订单在京东【福州分拨中心】分拣完成</span>
+                    <el-timeline-item timestamp="2019/4/4" placement="top">
+                        <span class="express_info_detail">订单已收货</span>
                     </el-timeline-item>
                 </el-timeline>
             </div>
         </div>
-        <div class="order_info">
-           <div class="man_info">
-               <span class="info_title">收货人信息</span>
-               <div class="detail_info">
-                  <div class="detail_info_row">
+        <div class="shoplist">
+            <div class="title">
+                <span>订单清单</span>
+                <hr>
+            </div>
+            <div class="shoplist_content">
+                <div class="shoplist_items" v-for='(item,index) in shopList' :key="index">
+                    <el-image style="width:90px;height:90px;" :src='item.path'></el-image>
+                    <div class="shop_info">
+                        <span class="shop_name">{{item.shopname}}</span>
+                        <div class="shop_choose">
+                            <span class="specs">{{item.sku|sku}}</span>
+                        </div>
+                    </div>
+                    <div class="shop_price">
+                        <span class="price">{{item.price}}</span>
+                    </div>
+                    <div class="shop_count">
+                        <span class="scount">{{item.count}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="order_info" v-if='baseinfo[0]'>
+            <div class="man_info">
+                <span class="info_title">收货人信息</span>
+                <div class="detail_info">
+                    <div class="detail_info_row">
                         <span class="detail_title">收货人:</span>
-                        <span class="detail_content">李柯伟</span>
+                        <span class="detail_content">{{baseinfo[0].name}}</span>
                     </div>
                     <div class="detail_info_row">
                         <span class="detail_title">收货电话:</span>
-                        <span class="detail_content">15359639480</span>
+                        <span class="detail_content">{{baseinfo[0].phone}}</span>
                     </div>
                     <div class="detail_info_row">
                         <span class="detail_title">收货地址:</span>
-                        <span class="detail_content">福建省福州市仓山区林浦路闽江世纪城福建省福州市仓山区林浦路闽江世纪城福建省福州市仓山区林浦路闽江世纪城福建省福州市仓山区林浦路闽江世纪城福建省福州市仓山区林浦路闽江世纪城福建省福州市仓山区林浦路闽江世纪城福建省福州市仓山区林浦路闽江世纪城</span>
+                        <span class="detail_content">{{baseinfo[0].area|area}}{{baseinfo[0].address}}</span>
                     </div>
-               </div>
-           </div>
-           <div class="pay_info">
-               <span class="info_title">支付信息</span>
-               <div class="detail_info">
-                  <div class="detail_info">
-                  <div class="detail_info_row">
-                        <span class="detail_title">付款方式:</span>
-                        <span class="detail_content">在线支付</span>
+                </div>
+            </div>
+            <div class="pay_info">
+                <span class="info_title">支付信息</span>
+                <div class="detail_info">
+                    <div class="detail_info">
+                        <div class="detail_info_row">
+                            <span class="detail_title">付款方式:</span>
+                            <span class="detail_content">在线支付-{{payinfo[0].receive_name}}</span>
+                        </div>
+                        <div class="detail_info_row">
+                            <span class="detail_title">付款时间:</span>
+                            <span class="detail_content">{{payinfo[0].pay_bdate|datewithtime}}</span>
+                        </div>
+                        <div class="detail_info_row">
+                            <span class="detail_title">商品金额:</span>
+                            <span class="detail_content price">{{baseinfo[0].order_money}}</span>
+                        </div>
+                        <div class="detail_info_row">
+                            <span class="detail_title">优惠金额:</span>
+                            <span class="detail_content price">-{{baseinfo[0].order_money-payinfo[0].count}}</span>
+                        </div>
+                        <div class="detail_info_row">
+                            <span class="detail_title">实付金额:</span>
+                            <span class="detail_content price">{{payinfo[0].count}}</span>
+                        </div>
                     </div>
-                    <div class="detail_info_row">
-                        <span class="detail_title">付款时间:</span>
-                        <span class="detail_content">2019-10-9 11：06</span>
-                    </div>
-                    <div class="detail_info_row">
-                        <span class="detail_title">商品金额:</span>
-                        <span class="detail_content price">50.00</span>
-                    </div>
-                    <div class="detail_info_row">
-                        <span class="detail_title">优惠金额:</span>
-                        <span class="detail_content price">0.00</span>
-                    </div>
-                    <div class="detail_info_row">
-                        <span class="detail_title">应付金额:</span>
-                        <span class="detail_content price">50.00</span>
-                    </div>
-               </div>
-               </div>
-           </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+    import {
+        getorderdetail,
+        getordershop
+    } from '@/http/api'
+    import {
+        state,
+        datewithtime,
+        area,
+        sku
+    } from '../../../utils/filters'
     export default {
         name: "orderdetail",
         data() {
             return {
-
+                state: [],
+                baseinfo: [],
+                payinfo: [],
+                nowstate: [],
+                shopList: []
             }
         },
-        methods: {
-
+        methods: {},
+        mounted() {
+            getordershop({
+                    'orderid': this.$route.query.orderid
+                })
+                .then(data => {
+                    this.shopList = data.info
+                })
+            getorderdetail({
+                    'order_id': this.$route.query.orderid
+                })
+                .then(data => {
+                    this.state = data.info.state
+                    this.baseinfo = data.info.baseinfo
+                    this.payinfo = data.info.payinfo
+                    this.nowstate = this.state[this.state.length - 1]
+                })
         },
-
     }
 </script>
 
 <style lang="scss" scoped>
+    ::-webkit-scrollbar {
+        height: 5px;
+        background: #d2d2d2;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+    }
+
+    /*定义滑块
+ 内阴影+圆角*/
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        background-color: #6e7577;
+    }
+
     .order_type {
         width: 100%;
         height: 250px;
@@ -150,6 +206,7 @@
             .order_id {
                 color: #c2c2c2;
                 font-family: "等线";
+                font-size: 0.8em;
             }
 
             .order_id::before {
@@ -197,16 +254,18 @@
         }
 
         .type_detail {
-            width: 60%;
+            width: 65%;
             height: 200px;
-            margin-left: 5%;
+            margin-left: 3%;
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
             justify-content: center;
+            overflow-x: auto;
 
             .el-steps--horizontal {
                 width: 100%;
+                display: block;
             }
         }
     }
@@ -250,29 +309,33 @@
                     display: flex;
 
                     .express_title {
-                        font-size: 0.8em;
+                        font-size: 1em;
                         font-family: "等线";
                         color: #c2c2c2;
                     }
 
                     .express_content {
-                        font-size: 0.8em;
+                        font-size: 1em;
                         font-family: "等线";
-                        margin-left: 5px;
+                        margin-left: 8px;
                         color: #3b3b3b;
+                        letter-spacing: 1px;
                     }
                 }
             }
         }
-        .express{
+
+        .express {
             width: 60%;
-                height: 230px;
-                overflow: auto;
-                padding:0 5%;
-                text-align: left;
-            }
+            height: 230px;
+            overflow: auto;
+            padding: 0 5%;
+            text-align: left;
+            margin-top: 85px;
+        }
     }
-    .order_info{
+
+    .order_info {
         width: 100%;
         height: 250px;
         background: white;
@@ -281,18 +344,22 @@
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
-        .man_info{
+
+        .man_info {
             min-width: 50%;
             height: 200px;
         }
-        .pay_info{
+
+        .pay_info {
             height: 200px;
             border-left: 1px solid #d2d2d2;
-            .price::before{
-                content:"￥";
+
+            .price::before {
+                content: "￥";
             }
         }
-        .info_title{
+
+        .info_title {
             font-size: 1.2em;
             color: #000;
             text-align: left;
@@ -301,26 +368,139 @@
             margin-left: 30px;
             font-weight: bolder;
         }
-        .detail_info{
+
+        .detail_info {
             margin-top: 10px;
             display: flex;
             flex-flow: column nowrap;
             align-items: flex-start;
-            .detail_info_row{
-               width: 400px;
-               text-align: left;
-               margin-left: 30px;
-               display: -webkit-box;
-               -webkit-box-orient: vertical;
-               -webkit-line-clamp: 3;
-               text-overflow: ellipsis;
-               overflow: hidden;
-               margin-top: 5px;
-               letter-spacing: 1px;
-               .detail_content{
-                   margin-left: 5px;
-               }
+
+            .detail_info_row {
+                width: 400px;
+                text-align: left;
+                margin-left: 30px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 3;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-top: 5px;
+                letter-spacing: 1px;
+
+                .detail_content {
+                    margin-left: 5px;
+                }
             }
         }
+    }
+
+    .el-timeline-item__wrapper {
+        padding-left: 45px;
+    }
+
+    .shoplist {
+        width: 100%;
+        min-height: 250px;
+        background: white;
+        margin-top: 20px;
+        padding: 15px 0;
+
+        .title {
+            width: 95%;
+        }
+
+        .shoplist_content {
+            width: calc(100% - 80px);
+            display: flex;
+            flex-flow: column wrap;
+            align-items: center;
+
+            .shoplist_items {
+                width: 100%;
+                min-height: 150px;
+                margin-left: 3%;
+                border-bottom: 1px solid #f2f2f2;
+                padding: 15px 0;
+                background: #fcfcfc;
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+
+                .el-image {
+                    width: 150px !important;
+                    height: 150px !important;
+                    margin-left: 25px;
+                }
+
+                .shop_info {
+                    width: 500px;
+                    height: 150px;
+                    display: flex;
+                    flex-flow: column wrap;
+
+                    .shop_name {
+                        width: 430px;
+                        overflow: hidden;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        text-overflow: ellipsis;
+                        word-wrap: break-word;
+                        word-break: break-all;
+                        -webkit-line-clamp: 3;
+                        margin-left: 30px;
+                        text-align: left;
+                        margin-top: 25px;
+                    }
+
+                    .shop_choose {
+                        margin-top: 25px;
+                        display: flex;
+                        flex-flow: row wrap;
+                        font-size: 0.8em;
+                        margin-left: 30px;
+                        justify-content: space-between;
+
+                        .specs {
+                            font-weight: bolder;
+
+                            .data {
+                                font-weight: normal;
+                            }
+                        }
+                    }
+                }
+
+                .shop_price {
+                    width: auto;
+                    flex: 1;
+                    height: 125px;
+                    padding-top: 25px;
+                    color: rgb(255, 68, 68);
+                    font-size: 1.3em;
+                    font-weight: bolder;
+
+                    .price::before {
+                        content: "￥";
+                        position: relative;
+                    }
+                }
+
+                .shop_count {
+                    width: auto;
+                    flex: 1;
+                    height: 120px;
+                    font-size: 1.1em;
+                    padding-top: 30px;
+
+                    .scount::before {
+                        content: "x";
+                        position: relative;
+                    }
+                }
+
+            }
+
+        }
+
     }
 </style>

@@ -3,7 +3,7 @@ import qs from 'qs';
 import { Message } from 'element-ui';
 import router from 'vue-router';
 //判断环境
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 20000
     //请求拦截器-在发送请求前判断是否带token
 axios.interceptors.request.use(
         config => {
@@ -19,111 +19,173 @@ axios.interceptors.request.use(
             return Promise.error(error)
         }
     )
-    //响应拦截器-如果状态码错误，则报错
+     //响应拦截器-如果状态码错误，则报错
 axios.interceptors.response.use(
-        response => {
-            if (response.status === 200) {
-                return Promise.resolve(response)
-            } else {
-                return Promise.reject(response)
+    response => {
+        if (response.data.code === 200 || response.data.code === undefined) {
+            return Promise.resolve(response)
+        } else {
+            switch (response.data.code) {
+                case 201:
+                        Message({
+                            message: "您不是管理员，无法登录此系统",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                //400：请求错误
+                case 400:
+                    Message({
+                        message: "请求发生错误！工程师紧急维修中",
+                        type: "error",
+                        duration: "2500"
+                    })
+                    break;
+                    //401：登陆失败：即用户名或密码错误
+                case 401:
+                    router.push({
+                        path: "/login",
+                    })
+                    Message({
+                        message: "用户名或密码错误",
+                        type: "error",
+                        duration: "2500"
+                    })
+                    break;
+                    //402：验证码错误：手机验证码发生错误
+                case 402:
+                    Message({
+                        message: "验证码错误",
+                        type: "error",
+                        duration: "2500"
+                    })
+                    break;
+                    //601：拒绝访问：token过期/无token情况已经由请求拦截器截拦
+                case 601:
+                    Message({
+                        message: "登陆过期,请重新登录!",
+                        type: "error",
+                        duration: "2500"
+                    })
+                    router.push({
+                      name: 'login'
+                    })
+                    break;
+                    //404：不存在接口
+                case 404:
+                    Message({
+                        message: "请求错误!",
+                        type: "error",
+                        duration: "2500"
+                    })
+                    break;
+                case 600:
+                    Message({
+                        message: response.data.message,
+                        type: "error",
+                        duration: "2500"
+                    })
+                    break;
+                default:
+                    Message({
+                        message: "发生错误,请重试！",
+                        type: "error",
+                        duration: "2500"
+                    })
             }
-        },
-        //如果返回状态码不为2开头，进入报错
-        error => {
-            //其余情况操作，直接打印在控制台
-            if (error.response) {
-                if (error.response.status) {
-                    switch (error.response.status) {
-                        //400：请求错误
-                        case 400:
-                            Message({
-                                message: "请求发生错误！工程师紧急维修中",
-                                type: "error",
-                                duration: "2500"
-                            })
-                            break;
-                            //401：登陆失败：即用户名或密码错误
-                        case 401:
-                            router.push({
-                                path: "/login",
-                            })
-                            Message({
-                                message: "用户名或密码错误",
-                                type: "error",
-                                duration: "2500"
-                            })
-                            break;
-                            //402：验证码错误：手机验证码发生错误
-                        case 402:
-                            Message({
-                                message: "验证码错误",
-                                type: "error",
-                                duration: "2500"
-                            })
-                            break;
-                            //403：拒绝访问：token过期/无token情况已经由请求拦截器截拦
-                        case 403:
-                            localStorage.removeItem("loginToken");
-                            router.push({
-                                path: "/login",
-                                query: {
-                                    prepath: router.currentRoute.fullPath
-                                }
-                            })
-                            Message({
-                                message: "登陆过期,请重新登录!",
-                                type: "error",
-                                duration: "2500"
-                            })
-                            break;
-                            //404：不存在接口
-                        case 404:
-                            Message({
-                                message: "请求错误!",
-                                type: "error",
-                                duration: "2500"
-                            })
-                            break;
-                            //405：未登录
-                        case 405:
-                            router.push({
-                                path: "/login",
-                                query: {
-                                    prepath: router.currentRoute.fullPath
-                                }
-                            })
-                            Message({
-                                message: "您暂未登录!",
-                                type: "error",
-                                duration: "2500"
-                            })
-                            break;
-                            case 600:
-                                Message({
-                                    message: error,
-                                    type: "error",
-                                    duration: "2500"
-                                })
-                                break;
-                        default:
-                            Message({
-                                message: "发生错误,请重试！" + error,
-                                type: "error",
-                                duration: "2500"
-                            })
-                    }
-                    return Promise.reject(error.response)
-                }
-            } else {
-                Message({
-                    message: "网络错误,请刷新重试！",
-                    type: "error",
-                    duration: "2000"
-                })
-                return Promise.reject(error)
-            }
+            return Promise.reject(response)
         }
-    )
+    },
+    //如果返回状态码不为2开头，进入报错
+    error => {
+        //其余情况操作，直接打印在控制台
+        if (error.response) {
+            if (error.response.status) {
+                switch (error.response.status) {
+                    //400：请求错误
+                    case 400:
+                        Message({
+                            message: "请求发生错误！工程师紧急维修中",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                        //401：登陆失败：即用户名或密码错误
+                    case 401:
+                        router.push({
+                            path: "/login",
+                        })
+                        Message({
+                            message: "用户名或密码错误",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                        //402：验证码错误：手机验证码发生错误
+                    case 402:
+                        Message({
+                            message: "验证码错误",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                        //601：拒绝访问：token过期/无token情况已经由请求拦截器截拦
+                    case 601:
+                        router.push({name: login})
+                        Message({
+                            message: "登陆过期,请重新登录!",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                        //404：不存在接口
+                    case 404:
+                        Message({
+                            message: "请求错误!",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                        //405：未登录
+                    case 405:
+                        router.push({
+                            path: "/login",
+                            query: {
+                                prepath: router.currentRoute.fullPath
+                            }
+                        })
+                        Message({
+                            message: "您暂未登录!",
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                    case 600:
+                        Message({
+                            message: error,
+                            type: "error",
+                            duration: "2500"
+                        })
+                        break;
+                    default:
+                        Message({
+                            message: "发生错误,请重试！" + error,
+                            type: "error",
+                            duration: "2500"
+                        })
+                }
+                return Promise.reject(error.response)
+            }
+        } else {
+            Message({
+                message: "网络错误,请刷新重试！",
+                type: "error",
+                duration: "2000"
+            })
+            return Promise.reject(error)
+        }
+    }
+)
     //get方法
     /**
      * 封装的get方法

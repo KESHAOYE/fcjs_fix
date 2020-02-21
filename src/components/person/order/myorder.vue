@@ -11,7 +11,7 @@
                         :class="{'active':activeType==types.value}">{{types.typename}}</span>
                 </div>
                 <div class="order_search">
-                    <el-input size="small" placeholder="订单编号/商品名" v-model="ordersearch"></el-input>
+                    <el-input size="small" placeholder="订单编号" v-model="ordersearch"></el-input>
                     <span class="search el-icon-search"></span>
                 </div>
             </div>
@@ -23,78 +23,48 @@
                 <span class="order_control_title">操作</span>
             </div>
             <div class="order_detail_items">
-                <div class="order_detail_item">
+                <div class="null" v-if='orderInfo.length <= 0'>暂无订单</div>
+                <div class="order_detail_item" v-for='(item,index) in orderInfo' :key="index">
                     <div class="order_detail_head">
                         <span class="order_time">
-                            2019-09-08 18:00:23
+                            {{item.order_date|datewithtime}}
                         </span>
                         <span class="order_id">
-                            订单号:T10000000002
+                            订单号:{{item.order_id}}
                         </span>
                     </div>
                     <div class="order_detail_body">
                         <div class="order_detail_info">
-                            <img src="../../../assets/phone/iphone5s.png" alt="" srcset="">
-                            <span>小米（MI）生态链iHealth九安家用电子血压计 医用全自动上臂式血压仪 测量血压仪器 语</span>
-                            <div class="shop_count">5</div>
+                            <img :src="item.shopimg" alt="" srcset="">
+                            <span><span v-if='item.order_state == 1'>维修:</span>{{item.shopname}}</span>
+                            <div class="shop_count">{{item.itemcount}}</div>
                         </div>
                         <div class="order_detail_man">
                             <span class="order_name">
-                                李柯伟
+                                {{item.name}}
                             </span>
                         </div>
                         <div class="order_detail_price">
                             <span class="order_price">
-                                50.00
+                                {{item.order_money}}
                             </span>
                         </div>
                         <div class="order_detail_state">
-                            已付款
+                            {{item.order_state|state}}
                         </div>
                         <div class="order_detail_control">
-                            <span @click="todetail()">订单详情</span>
-                            <span class="deleteorder" @click="deleteorder()">删除订单</span>
-                            <span class="after_sale">申请售后</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="order_detail_item">
-                    <div class="order_detail_head">
-                        <span class="order_time">
-                            2019-09-08 18:00:23
-                        </span>
-                        <span class="order_id">
-                            订单号:T10000000002
-                        </span>
-                    </div>
-                    <div class="order_detail_body">
-                        <div class="order_detail_info">
-                            <img src="../../../assets/phone/iphone5s.png" alt="" srcset="">
-                            <span>小米（MI）生态链iHealth九安家用电子血压计 医用全自动上臂式血压仪 测量血压仪器 语</span>
-                            <div class="shop_count">5</div>
-                        </div>
-                        <div class="order_detail_man">
-                            <span class="order_name">
-                                李柯伟
-                            </span>
-                        </div>
-                        <div class="order_detail_price">
-                            <span class="order_price">
-                                50.00
-                            </span>
-                        </div>
-                        <div class="order_detail_state">
-                            已付款
-                        </div>
-                        <div class="order_detail_control">
-                            <span @click="todetail()">订单详情</span>
-                            <span class="deleteorder" @click="deleteorder()">删除订单</span>
-                            <span class="after_sale">申请售后</span>
+                            <span @click='topay(item)' v-if='item.order_state == 1'>去付款</span>
+                            <span @click="todetail(item)" v-if='item.order_state > 1'>订单详情</span>
+                            <span class="deleteorder" @click="deleteorder(item)" v-if='item.order_state == 7'>删除订单</span>
+                            <span @click='confirmGet(item)' v-if='item.order_state == 5'>确认收货</span>
+                            <span @click='comment(item)' v-if='item.order_state == 6'>去评论</span>
+                            <span class="after_sale" @click='toaftersail(item)' v-if='item.order_state == 5 || item.order_state == 6 || item.order_state ==7'>申请售后</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <aftersailDialog :id='id' ref="aftersail" @success='getorder'></aftersailDialog>
         <el-dialog title="警告" :visible.sync="dialogVisible" width="30%">
             <span>是否要删除</span>
             <span slot="footer" class="dialog-footer">
@@ -102,75 +72,189 @@
                 <el-button type="primary" @click="dialogVisible = false">确认删除</el-button>
             </span>
         </el-dialog>
+        <el-pagination background layout="prev, pager, next" @current-change="handleCurrentChange" :pageCount='pageCount' v-if='orderInfo.length > 0'>
+        </el-pagination>
     </div>
 </template>
 
 <script>
+    import {
+        getcenterorderinfo,
+        deleteorder,
+        confirm
+    } from '@/http/api'
+    import aftersailDialog from './aftersailDialog'
+    import { datewithtime,state } from '@/utils/filters'
     export default {
         name: "myorder",
         data() {
             return {
                 activeType: "all",
-                ordersearch:"",
+                ordersearch: "",
                 ordertype: [{
                         typename: "全部订单",
-                        value: "all"
+                        value: "all",
+                        type: '>0'
                     },
                     {
                         typename: "待付款",
-                        value: "waitpay"
+                        value: "waitpay",
+                        type: '=1'
                     },
                     {
                         typename: "待维修",
-                        value: "waitfix"
+                        value: "waitfix",
+                        type: '=2'
                     },
                     {
                         typename: "维修中",
-                        value: "fixing"
+                        value: "fixing",
+                        type: '=3'
                     },
                     {
                         typename: "待发货",
-                        value: "waitout"
+                        value: "waitout",
+                        type: '=41 or o.order_state = 42'
                     },
                     {
                         typename: "待收货",
-                        value: "waitin"
+                        value: "waitin",
+                        type: '=5'
                     },
                     {
                         typename: "待评价",
-                        value: "waitsay"
+                        value: "waitsay",
+                        type: '=6'
                     },
                     {
                         typename: "售后处理中",
-                        value: "dealing"
+                        value: "dealing",
+                        type: '>7'
                     },
                 ],
-                dialogVisible: false
+                dialogVisible: false,
+                orderInfo: [],
+                pageSize: 5,
+                currentPage: 1,
+                pageCount: 1,
+                load: '',
+                id: ''
             }
+        },
+        components:{
+            aftersailDialog
         },
         methods: {
             changescreen(el) {
                 this.activeType = el;
-            },
-            todetail() {
                 this.$router.push({
-                    name: "orderdetail",
+                    name: "myorder",
                     query: {
-                        mid: "11"
+                        mid: '11',
+                        activetype: el
                     }
                 })
             },
-            deleteorder() {
+            confirmGet(item){
+              confirm({orderid: item.order_id})
+              .then(data=>{
+                if(data.code == 200){
+                  this.$message({
+                    message: '收货成功',
+                    type: 'success'
+                  })
+                  this.$router.push({
+                    name: 'comment',
+                    query:{orderid: item.order_id,mid: 11}
+                  })
+                }
+              })
+            },
+            topay(item){
+                this.$router.push({
+                    name: "ordersubmit",
+                    query: {
+                        orderid: item.order_id,
+                        type: item.order_type
+                    }
+                })
+            },
+            toaftersail(item){
+              this.id = item.order_id
+              this.$refs.aftersail.open()
+            },
+            comment(item){
+                this.$router.push({
+                    name: "comment",
+                    query: {
+                        mid: "11",
+                        orderid: item.order_id
+                    }
+                })
+            },
+            todetail(item) {
+                this.$router.push({
+                    name: "orderdetail",
+                    query: {
+                        mid: "11",
+                        orderid: item.order_id
+                    }
+                })
+            },
+            handleCurrentChange(){
+                this.getorder()
+            },
+            deleteorder(item) {
                 this.$confirm('确认要删除？')
-                    .then(()=> {
-                        
+                    .then(() => {
+                       deleteorder({orderid: item.order_id})
+                       .then(data=>{
+                          if(data.code == 200){
+                              this.$message({
+                                message: '删除成功',
+                                type: 'success'
+                              })
+                              this.getorder()
+                          }else{
+                            this.$message({
+                                message: '删除失败',
+                                type: 'error'
+                              })
+                          }
+                       })
                     })
-            }
+            },
+            getorder() {
+                let index = this.ordertype.findIndex(el=>{
+                    return el.value == this.activeType
+                })
+                getcenterorderinfo({
+                        userid: this.$store.state.userinfo.userid,
+                        page: this.currentPage,
+                        pageSize: 3,
+                        type: this.ordertype[index].type
+                    })
+                    .then(data => {
+                        this.orderInfo = data.info
+                        this.pageCount = Math.ceil(data.count / this.pageSize)
+                        this.load.close()
+                    })
+            },
+            handleCurrentChange(el) {
+                this.currentPage = el
+                this.getorder()
+            },
         },
         mounted() {
+            this.load = this.$loading({
+                    lock: true,
+                    text: '获取订单中..',
+            });
+            setTimeout(() => {
+                this.getorder()
+            }, 1000)
             this.activeType = this.$route.query.activetype ? this.$route.query.activetype : "all";
         }
-
     }
 </script>
 
@@ -198,7 +282,7 @@
 
         .order_detail {
             width: 100%;
-            min-height: 600px;
+            min-height: 200px;
             background: white;
             margin-top: 30px;
             border-radius: 5px;
@@ -286,7 +370,7 @@
 
         .order_detail_items {
             width: 950px;
-            min-height: 155px;
+            /* min-height: 155px; */
             margin-left: 25px;
             margin-top: 20px;
 
@@ -298,14 +382,14 @@
             .order_detail_head {
                 width: 100%;
                 height: 30px;
-                background: #f2f2f2;
+                background: #f9f9f9;
                 line-height: 30px;
                 text-align: left;
 
                 .order_time {
                     font-size: 0.9em;
                     margin-left: 20px;
-                    color: #b2b2b2;
+                    color: #a5a5a5;
                 }
 
                 .order_id {
@@ -390,10 +474,15 @@
 
                     span {
                         cursor: pointer;
-                        color: skyblue;
+                        color: #ff3333;
                     }
                 }
             }
         }
+    }
+
+    .el-pagination {
+        padding: 20px 0;
+        background: white;
     }
 </style>

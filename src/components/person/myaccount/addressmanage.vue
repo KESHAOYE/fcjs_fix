@@ -78,12 +78,12 @@
                         })
                         .then(data => {
                             this.addressList = data.info
-                            console.log(this.addressList)
                         })
                 }
             },
             update(el) {
                 el.isDefault = 1
+                el.userid = this.$store.state.userinfo.userid
                 updateaddress(el)
                 .then(data=>{
                   if(data.code == 200){

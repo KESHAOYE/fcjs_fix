@@ -2,30 +2,12 @@
     <div class="paymethod">
         <div class="person_head"><span>我的支付方式</span></div>
         <div class="paymethod_detail">
-            <div class="pay_item alipay">
-                <i class="close" @click="deletepay()">&#xe612;</i>
-                <i>&#xe647;</i>
-                <span>柯少爷-</span>
-            </div>
-            <div class="pay_item wechat">
-                <i class="close" @click="deletepay()">&#xe612;</i>
-                <i>&#xe7e5;</i>
-                <span>柯少爷-</span>
-            </div>
-            <div class="pay_item zsbank">
-                <i class="close" @click="deletepay()">&#xe612;</i>
-                <i>&#xe659;</i>
-                <span>{{number|account}}</span>
-            </div>
-            <div class="pay_item jsbank">
-                <i class="close" @click="deletepay()">&#xe612;</i>
-                <i>&#xe651;</i>
-                <span>6222 **** **** 1002</span>
-            </div>
-            <div class="pay_item nybank">
-                <i class="close" @click="deletepay()">&#xe612;</i>
-                <i>&#xe628;</i>
-                <span>6222 **** **** 1002</span>
+            <div class="pay_item" v-for='(item,index) in List' :key="index" :class="[{alipay:item.receive_ename=='alipay'},{zsbank:item.receive_ename=='zsbank'},{nybank:item.receive_ename=='nybank'},{wechat:item.receive_ename=='wechat'},{jsbank:item.receive_ename=='jsbank'}]">
+                <i class="close" @click="deletepay(item)">&#xe612;</i>
+                <svg class="icon" aria-hidden="true">
+                    <use :xlink:href="item.receive_logo"></use>
+                </svg>
+                <span>{{item.paym_cid}}</span>
             </div>
             <div class="pay_item addnew" @click="toaddbank">
                 <i>&#xe61e;</i>
@@ -44,13 +26,20 @@
 
 <script>
     import addbank from '../wallet/addbank'
+    import {getuserreceive,deleteuserpay} from '@/http/api'
     export default {
         name: "paymethod",
         data() {
             return {
-                number: "6222600260001072444",
+                List:[],
                 dialogVisible: false
             }
+        },
+        filters:{
+          icon(val){
+            val = val.replace(/\u/g,'&#x')
+            return val;
+          }
         },
         methods: {
             toaddbank() {
@@ -61,17 +50,34 @@
                     }
                 })
             },
-            deletepay() {
+            deletepay(item) {
                 this.$confirm('确认要删除？')
                     .then(()=> {
-                        
+                        deleteuserpay({paym_id: item.paym_id})
+                        .then(data=>{
+                            if(data.code == 200){
+                                this.$message({
+                                    message: '删除成功',
+                                    type: 'success'
+                                })
+                                this.get()
+                            }
+                        })
                     })
+            },
+            get() {
+              getuserreceive({userid: this.$store.state.userinfo.userid})
+               .then(data=>{
+                 this.List = data.info
+               })
             }
         },
         components: {
             addbank
         },
-        mounted() {}
+        mounted() {
+          this.get()
+        }
     }
 </script>
 
@@ -185,6 +191,10 @@
 
         .addnew {
             color: black;
+        }
+        .icon{
+            width: 2em;
+            height: 2em;
         }
     }
 </style>

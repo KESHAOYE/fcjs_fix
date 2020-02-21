@@ -146,6 +146,15 @@ export default new Router({
                         import ('./components/person/order/orderdetail')
                 },
                 {
+                    path: "/comment",
+                    name: "comment",
+                    meta:{
+                        title: '评论商品'
+                    },
+                    component: () =>
+                        import ('./components/person/order/comment')
+                },
+                {
                     path: "/coupon",
                     name: "coupon",
                     component: () =>

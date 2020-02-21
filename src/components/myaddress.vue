@@ -72,7 +72,7 @@
                         str += val[i].value
                     }
                 }
-                console.log(this.addressid)
+
                 this.$emit('orderaddress', {
                     ...this.myaddress[index],
                     str: str

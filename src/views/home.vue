@@ -7,7 +7,7 @@
                 <div class="selectmachine">
                     <ul>
                         <router-link v-for="(item,index) in sortList" :key="index" @mouseleave="showMenu('out',index)"
-                            @mouseenter="showMenu('in',index)" to="#">
+                            @mouseenter="showMenu('in',index)" to="/">
                             <template v-if="index<=6">
                                 <li>{{item.sortname}}/{{item.sortename}}</li>
                                 <div class='sortInfo' :class="'sort'+index">
@@ -88,7 +88,7 @@
                     <div class="topshop_swiper">
                         <swiper :options="topphoneOption" ref="topphoneswipers">
                             <swiper-slide v-for="(items,index) in homeswiper" :key="index">
-                                <router-link :to="items.router"><img :src="items.src" alt="图片加载失败"></router-link>
+                                <!-- <router-link :to="items.router"><img :src="items.src" alt="图片加载失败"></router-link> -->
                             </swiper-slide>
                         </swiper>
                     </div>
@@ -394,7 +394,6 @@
                 }
                 getsort(qdata).then(data => {
                         this.$store.commit('changesort', data.info)
-                        console.log(this.$store.state.sortList)
                     })
                     .catch(err => {
                         this.$message({
@@ -412,6 +411,9 @@
                             this.homeswiper = data.info
                         } else {
                             this.recomment = data.info
+                            setTimeout(()=>{
+                                this.beautiswiper();
+                            },0)
                         }
                     })
                     .catch(err => {
@@ -432,7 +434,6 @@
             this.getsorts()
             this.getads(1);
             this.getads(2);
-            this.beautiswiper();
         },
         activated() {
             this.getnews();
@@ -769,6 +770,7 @@
                     .shop_name {
                         width: 90%;
                         height: 25px;
+                        margin: auto;
                         text-overflow: ellipsis;
                         white-space: none;
                         overflow: hidden;

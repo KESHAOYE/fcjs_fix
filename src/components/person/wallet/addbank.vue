@@ -13,16 +13,16 @@
                     <el-input v-model="bankform.manid" placeholder="请输入身份证号" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="支付方式" prop="cbank">
-                    <el-select v-model="bankform.cbank" placeholder="请选择">
-                        <el-option v-for="(bank,index) in banks" :key="index" :value="bank.value">
+                    <el-select v-model="bankform.paylist_id" placeholder="请选择">
+                        <el-option v-for="(bank,index) in banks" :key="index" :value="bank.receive_id" :label='bank.receive_name'>
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="methodtitle" prop="methodaccount" v-if="this.methodtitle.length>0">
-                    <el-input v-model="bankform.methodaccount" placeholder="请输入账号"></el-input>
+                    <el-input v-model="bankform.paym_cid" placeholder="请输入账号"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号" prop="bankid" v-show="isbank">
-                    <el-input v-model="bankform.bankid" placeholder="请输入银行卡号"></el-input>
+                    <el-input v-model="bankform.paym_cid" placeholder="请输入银行卡号"></el-input>
                 </el-form-item>
                 <el-form-item label="手机号码" prop="phonenumber">
                     <el-input v-model="bankform.phonenumber" placeholder="请输入手机号码"></el-input>
@@ -52,6 +52,7 @@
     </div>
 </template>
 <script>
+    import {getreceive,addreceive} from '@/http/api'
     export default {
         name: "addbank",
         data() {
@@ -81,32 +82,17 @@
                 },
                 loading: false,
                 bankform: {
-                    cname: "",
+                    user_id: this.$store.state.userinfo.userid,
+                    paym_cid: "",
                     manid: "",
-                    methodaccount: "",
-                    bankid: "",
+                    paylist_id: "",
                     cbank: "",
                     phonenumber: "",
                     isaccess: "",
                 },
                 methodtitle: "",
                 isbank: false,
-                banks: [{
-                        value: "支付宝"
-                    },
-                    {
-                        value: "微信支付"
-                    },
-                    {
-                        value: "中国建设银行"
-                    },
-                    {
-                        value: "中国农业银行"
-                    },
-                    {
-                        value: "招商银行"
-                    },
-                ],
+                banks: [],
                 rules: {
                     cname: [{
                         validator: this.reg.checkname,
@@ -117,40 +103,32 @@
                         trigger: 'blur'
                     }],
                     bankid: [{
-                        validator: this.reg.checkbankid,
+                        // required: 'true',
+                        // validator: this.reg.checkbankid,
+                        message: '请输入银行账户',
                         trigger: "blur"
                     }],
                     phonenumber: [{
                         validator: this.reg.checkphonenumber,
                         trigger: 'blur'
                     }],
-                    cbank: [{
-                        message: "请选择",
-                        trigger: 'change',
-                        required: 'true'
-                    }],
                     isaccess: [{
                         message: "请勾选协议",
                         trigger: 'change',
                         required: 'true'
                     }],
-                    methodaccount: [{
-                        message: "请输入账号",
-                        trigger: 'blur',
-                        required: 'true'
-                    }]
                 }
             }
         },
         computed: {
             cbank() {
-                return this.bankform.cbank
+                return this.bankform.paylist_id
             }
         },
         watch: {
             cbank(val) {
-                this.methodtitle = val == "支付宝" ? "支付宝账号" : val == "微信支付" ? "微信账号" : "";
-                this.isbank = val.indexOf("银行") != -1 ? true : false;
+                this.methodtitle = val == "0baed860-516b-11ea-81bc-2799cc079508" ? "支付宝账号" : val == "d6c78710-4fca-11ea-8830-290af64e5316" ? "微信账号" : "";
+                this.isbank = this.methodtitle.length <= 0 ? true : false;
             },
             book_content(val) {
                 if (val.length > 0) {
@@ -158,11 +136,26 @@
                 }
             }
         },
+        created() {
+            getreceive({page:1,pageSize: 1000})
+            .then(data=>{
+                this.banks = data.info
+            })
+        },
         methods: {
             addbank(val) {
                 this.$refs[val].validate((valid) => {
                     if (valid) {
-                        console.log("success");
+                        addreceive(this.bankform)
+                        .then(data=>{
+                        if(data.code == 200){
+                          this.$message({
+                              message: '添加成功',
+                              type: 'success'
+                          })
+                          this.$router.push({name: 'paymethod'})
+                        }
+                      })
                     }
                 })
             }

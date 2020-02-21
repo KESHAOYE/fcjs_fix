@@ -54,6 +54,29 @@ export const getusercoupon = data=>post('/api/coupon/GETUSERCOUPON',data)
 export const createorders = data => post('/api/order/CREATEORDERSHOP',data)
 export const getordershop = data => post('/api/order/GETORDERSHOP',data)
 export const getordercoupon = data => post('/api/order/GETORDERCOUPON',data)
+export const getuserorder = data => post('/api/order/GETUSERORDER',data)
+export const getcenterorderinfo = data => post('/api/order/GETCENTERORDERINFO',data)
+export const deleteorder = data=> post('/api/order/DELETEORDER',data)
+export const pay = data =>post('/api/order/PAY',data)
+export const getorderdetail = data=>post('/api/order/GETORDERDETAIL',data)
+export const confirm = data=>post('/api/order/CONFIRM',data)
+
+// 收款账号
+export const getreceive = data => post('/api/receive/GETRECEIVE',data)
+export const addreceive = data => post('/api/receive/ADDUSERPAY',data)
+export const getuserreceive = data => post('/api/receive/GETUSERRECEIVE',data)
+export const deleteuserpay = data => post('/api/receive/DELETEUSERPAY',data)
+
+//售后
+export const getaftersail = data => post('/api/aftersail/GETAFTERSAILINFO',data)
+export const addaftersail = data=>post('/api/aftersail/ADDAFTERSAIL',data)
 
 // 个人中心
 export const getordercount = data=> post('/api/order/GETORDERCOUNT',data)
+export const addcomment = data=> post('/api/comment/ADDCOMMENT',data)
+
+// 维修
+
+export const ugetfixbrand = ()=> get('/api/fixmodel/UGETFIXBRAND')
+export const getfixmodelbyid = data=> post('/api/fixmodel/GETMODELBYID',data)
+export const createfixorder = data=>post('./api/order/CREATEFIXORDER',data)

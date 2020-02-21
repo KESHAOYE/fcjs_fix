@@ -10,7 +10,7 @@
                 <span @click="changecoupon(2)" :class = '{active: type == 2}'>已过期</span>
             </div>
             <div class="coupon_items">
-                <div class="coupon_item" v-for='(item,index) in couponList' :key='index'>
+                <div class="coupon_item" :class='{used: item.use_status > 0}' v-for='(item,index) in couponList' :key='index'>
                     <div class="coupon_tip_left"></div>
                     <div class="coupon_item_detail">
                         <span class="coupon_title">
@@ -62,6 +62,10 @@
                 this.get(type)
             },
             get(type) {
+                const load = this.$loading({
+                    loading: true,
+                    text: '获取优惠券'
+                })
                 this.couponList = []
                 if (Object.keys(this.$store.state.userinfo).length > 0) {
                     getusercoupon({
@@ -69,6 +73,7 @@
                             type: type
                         })
                         .then(data => {
+                            load.close()
                             this.couponList = data.info
                         })
                 }
@@ -128,13 +133,20 @@
                     color: red;
                 }
             }
-
+            
             .coupon_items {
                 width: 100%;
                 min-height: 450px;
                 display: flex;
                 flex-flow: row wrap;
                 margin-top: 25px;
+                .used{
+                  filter: grayscale(1);
+                }
+                .used:hover{
+                    box-shadow: 0px 0px 0px rgba(#f4ca3a, 0.4);
+                    top: 0px;
+                }
                 .coupon_item{
                     position:relative;
                     top:0;

@@ -76,7 +76,6 @@
         el = true;
       },
       deletes(el) {
-        console.log('1')
         let da = {
           shopid: el.shopid,
           userid: this.$store.state.userinfo.phone,
@@ -139,7 +138,8 @@
                 this.$router.push({
                   name: 'ordersubmit',
                   query: {
-                    orderid: data.orderid
+                    orderid: data.orderid,
+                    type: 0
                   }
                 })
               }, 1000)
