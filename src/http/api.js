@@ -80,3 +80,9 @@ export const addcomment = data=> post('/api/comment/ADDCOMMENT',data)
 export const ugetfixbrand = ()=> get('/api/fixmodel/UGETFIXBRAND')
 export const getfixmodelbyid = data=> post('/api/fixmodel/GETMODELBYID',data)
 export const createfixorder = data=>post('./api/order/CREATEFIXORDER',data)
+
+// 首页
+export const getcoupons = data =>post('./api/coupon/getcoupons',data)
+export const getsale = data => post('./api/shop/GETSALE',data)
+
+export const changepassword = data => post('./api/register/CHANGEPASSWORD',data)

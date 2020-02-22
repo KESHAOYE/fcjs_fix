@@ -6,7 +6,8 @@ export default class reg {
      * @param {*} callback 回调函数
      */
     static checkmanid(rules, value, callback) {
-        if (value.length <= 0) {
+        console.log(value);
+        if (value == null || value.length <= 0) {
             callback("身份证号不能为空");
             return false;
         }

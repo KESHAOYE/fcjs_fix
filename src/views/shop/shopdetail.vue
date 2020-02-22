@@ -29,8 +29,8 @@
             </div>
             <div class="coupon" v-if='couponList.length>0'>
               <span style="margin-left:20px">优惠券</span>
-              <span class="counpon_item" v-for='(item,index) in couponList' :key="index"
-                :title='item.note' @click= "getcoupons(item.coupon_id)">满{{item.min_price}}减{{item.amount}}</span>
+              <span class="counpon_item" v-for='(item,index) in couponList' :key="index" :title='item.note'
+                @click="getcoupons(item.coupon_id)">满{{item.min_price}}减{{item.amount}}</span>
             </div>
           </div>
           <div class="express">快递费: ￥0.00</div>
@@ -87,8 +87,9 @@
               </div>
               <span class="comment_text" v-html='items.comment'>
               </span>
-              <div class="comment_img">
-                <el-image v-for="(imgs,index) in items.comment_img" :src="imgs" :key="index" :preview-src-list="items.comment_img">
+              <div class="comment_img" v-if="items.comment_img != 'undefined'">
+                <el-image v-for="(imgs,index) in items.comment_img" :src="imgs" :key="index"
+                  :preview-src-list="items.comment_img">
                 </el-image>
               </div>
               <div class="comment_time">
@@ -141,7 +142,9 @@
     getcoupon
   } from '@/http/api'
   import PicZoom from 'vue-piczoom'
-  import {datewithtime} from '../../utils/filters'
+  import {
+    datewithtime
+  } from '../../utils/filters'
   export default {
     name: "shopdetail",
     components: {
@@ -224,21 +227,31 @@
             })
           })
       },
-      getcoupons(el){
+      getcoupons(el) {
         if (Object.keys(this.$store.state.userinfo).length > 0) {
-          getcoupon({id: el})
-          .then(data=>{
-            if(data.code == 200){
-              this.$message({
-                message: '领取成功',
-                type:'success'
-              })
-            }else{
-              this.$message({
-                message: '领取失败'+data.message,
-                type:'error'
-              })
-            }
+          getcoupon({
+              id: el
+            })
+            .then(data => {
+              if (data.code == 200) {
+                this.$message({
+                  message: '领取成功',
+                  type: 'success'
+                })
+              } else {
+                this.$message({
+                  message: '领取失败' + data.message,
+                  type: 'error'
+                })
+              }
+            })
+        } else {
+          this.$message({
+            message: '请先登录',
+            type: 'warning'
+          })
+          this.$router.push({
+            name: 'login'
           })
         }
       },
@@ -283,6 +296,7 @@
           })
           .then(data => {
             let result = []
+            console.log(data.info[0].sku);
             data.info[0].sku.forEach(el => {
               let index = result.findIndex(es => {
                 return el.spec_id == es.specId
@@ -324,7 +338,8 @@
               })
           })
           .catch(err => {
-            this.$router.go('-1')
+            console.log(err);
+            // this.$router.go('-1')
           })
         getstock({
             shopid: this.$route.query.shopid
@@ -332,38 +347,53 @@
           .then(data => {
             this.stock = data.info
           })
-        let info = JSON.parse(window.localStorage.getItem('_T_'))
-        let phone = info.phone
-        let token = info._T_
-        const d = {
-          phone: phone,
-          token: token
-        }
-        autologin(d)
-          .then(data => {
-            if (data.code === 200) {
-              const qss = {
-                id: null,
-                phone: data.phone
+        if (window.localStorage.getItem('_T_')) {
+          let info = JSON.parse(window.localStorage.getItem('_T_'))
+          let phone = info.phone
+          let token = info._T_
+          const d = {
+            phone: phone,
+            token: token
+          }
+          autologin(d)
+            .then(data => {
+              if (data.code === 200) {
+                const qss = {
+                  id: null,
+                  phone: data.phone
+                }
+                getuserinfo(qss).then(datas => {
+                  getfirstcomment({
+                      shopid: this.$route.query.shopid,
+                      userid: datas.info.phone
+                    })
+                    .then(data => {
+                      this.commentList = data.info.comment
+                      this.good = data.info.good
+                      this.middle = data.info.middle
+                      this.bad = data.info.bad
+                      this.picture = data.info.picture
+                      this.commentCount = data.info.commentCount
+                    })
+                })
+              } else {
+                console.log('token登录失败')
               }
-              getuserinfo(qss).then(datas => {
-                getfirstcomment({
-                    shopid: this.$route.query.shopid,
-                    userid: datas.info.phone
-                  })
-                  .then(data => {
-                    this.commentList = data.info.comment
-                    this.good = data.info.good
-                    this.middle = data.info.middle
-                    this.bad = data.info.bad
-                    this.picture = data.info.picture
-                    this.commentCount = data.info.commentCount
-                  })
-              })
-            } else {
-              console.log('token登录失败')
-            }
-          })
+            })
+        } else {
+          getfirstcomment({
+              shopid: this.$route.query.shopid,
+              userid: ''
+            })
+            .then(data => {
+              this.commentList = data.info.comment
+              this.good = data.info.good
+              this.middle = data.info.middle
+              this.bad = data.info.bad
+              this.picture = data.info.picture
+              this.commentCount = data.info.commentCount
+            })
+        }
       },
       commenttypechange(el) {
 
@@ -399,11 +429,13 @@
           this.sku_name = stock.sku_concat
         }
       },
-      getshopcars(){
-        getshopcar({userid: this.$store.state.userinfo.phone})
-        .then(data=>{
-          this.$store.commit('getshopcar', data.info)
-        })
+      getshopcars() {
+        getshopcar({
+            userid: this.$store.state.userinfo.phone
+          })
+          .then(data => {
+            this.$store.commit('getshopcar', data.info)
+          })
       },
       /**
        * 改变商品规格，同时更改商品售价
@@ -423,17 +455,17 @@
         this.findstock()
       },
       addshopcars() {
-       if (Object.keys(this.$store.state.userinfo).length > 0) {
-        let da = {
-          shopimg: this.shopInfo.img[0].path,
-          shopid: this.$route.query.shopid,
-          sku_id: this.sku_id,
-          count: this.shopnumber,
-          shopname: this.shopInfo.shopName,
-          sku_name: this.sku_name,
-          price: this.shopnumber * this.price
-        }
-        this.$store.commit('addshopcar', da)
+        if (Object.keys(this.$store.state.userinfo).length > 0) {
+          let da = {
+            shopimg: this.shopInfo.img[0].path,
+            shopid: this.$route.query.shopid,
+            sku_id: this.sku_id,
+            count: this.shopnumber,
+            shopname: this.shopInfo.shopName,
+            sku_name: this.sku_name,
+            price: this.shopnumber * this.price
+          }
+          this.$store.commit('addshopcar', da)
           da = {
             shopid: this.$route.query.shopid,
             userid: this.$store.state.userinfo.phone,
@@ -441,19 +473,21 @@
             count: this.shopnumber,
           }
           addshopcar(da)
-          .then(data=>{
-            this.getshopcars()
-            this.$message({
-              message: '加入成功',
-              type: 'success'
+            .then(data => {
+              this.getshopcars()
+              this.$message({
+                message: '加入成功',
+                type: 'success'
+              })
             })
-          })
         } else {
           this.$message({
             message: '请先登录!',
             type: 'error'
           })
-          this.$router.push({name: "login"})
+          this.$router.push({
+            name: "login"
+          })
         }
       },
       handleCurrentChange(el) {
@@ -858,6 +892,12 @@
                     margin-left: 15px;
                   }
                 }
+              }
+
+              .comment_text {
+                margin-bottom: 10px;
+                height: auto;
+                display: block;
               }
 
               .comment_img {

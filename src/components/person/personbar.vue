@@ -173,7 +173,8 @@
             outlogin(){
                 this.$store.commit('outlogin')
                 window.localStorage.removeItem('_T_')
-                // this.$router.push({name:'login'})
+                this.$store.commit('changuserinfo','')
+                this.$router.push({name:'login'})
             },
             deletes(el) {
         let da = {
@@ -238,7 +239,6 @@
             height: 35px !important;
             line-height: 32px !important;
             display: inline-block;
-            border: 1px solid #c2c2c2;
             border-bottom: 0;
             box-sizing: border-box;
             color: red;

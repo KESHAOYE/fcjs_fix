@@ -54,43 +54,9 @@
             </div>
         </div>
         <div class="person_row">
-            <!-- <div class="myaddress">
-                <div class="person_title">我的地址</div>
-                <div class="address_row">
-                    <div class="name">
-                        <span class="title">姓名:</span>
-                        李柯伟
-                    </div>
-                    <div class="phone">
-                        <span class="title">电话:</span>
-                        15359639480
-                    </div>
-                    <div class="address">
-                        <span class="title">地址:</span>
-                        <div class="address_detail">福建省泉州市鲤城区媒人桥路泉州师范学院软件学院1#A504</div>
-
-                    </div>
-                    <div class="address_tool">
-                        <span class="change_address">更改</span>
-                        <span class="deleteaddress">删除</span>
-                    </div>
-                </div>
-                <div class="address_row">
-                    <div class="add_address">
-                        <i>&#xe61e;</i>
-                        <span>添加地址</span>
-                    </div>
-                </div>
-            </div> -->
             <div class="mywallet">
                 <div class="person_title">我的钱包</div>
                 <div class="wallet_items">
-                    <div class="item">
-                        <router-link to="/balance">
-                            <i>&#xe608;</i>
-                            <span>余额</span>
-                        </router-link>
-                    </div>
                     <div class="item">
                         <router-link to="/coupon">
                             <i>&#xe625;</i>
@@ -119,12 +85,6 @@
                         </router-link>
                     </div>
                     <div class="item">
-                        <router-link to="#">
-                            <i>&#xe711;</i>
-                            <span>我的举报</span>
-                        </router-link>
-                    </div>
-                    <div class="item">
                         <router-link tag="a" target='_blank' :to="{name: 'chat'}">
                             <i>&#xe609;</i>
                             <span>我的客服</span>
@@ -148,12 +108,6 @@
                         <router-link to="/changepassword">
                             <i>&#xe627;</i>
                             <span>密码修改</span>
-                        </router-link>
-                    </div>
-                    <div class="item">
-                        <router-link to="#">
-                            <i>&#xe687;</i>
-                            <span>我的积分</span>
                         </router-link>
                     </div>
                 </div>
@@ -305,9 +259,6 @@
                 align-items: center;
                 transition: 1s;
 
-                .right_items:hover {
-                    box-shadow: 1px 1px 10px #e2e2e2;
-                }
 
                 .right_items {
                     width: 90px;
@@ -493,10 +444,6 @@
                                 margin-top: 8px;
                             }
                         }
-                    }
-
-                    .item:hover {
-                        box-shadow: 3px 3px 20px #d2d2d2;
                     }
                 }
 

@@ -55,7 +55,9 @@
             return {
                 labelwidth: "120px",
                 labelposition: "right",
-                userinfos:{},
+                userinfos:{
+                  headimg: 'http://localhost:3000/userHead/default.png'
+                },
                 buttonText: '确认',
                 buttonUse: false,
                 size: "large",

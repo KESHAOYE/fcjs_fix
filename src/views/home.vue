@@ -6,21 +6,21 @@
             <div class="topshow">
                 <div class="selectmachine">
                     <ul>
-                        <router-link v-for="(item,index) in sortList" :key="index" @mouseleave="showMenu('out',index)"
-                            @mouseenter="showMenu('in',index)" to="/">
+                        <a v-for="(item,index) in sortList" :key="index" @mouseleave="showMenu('out',index)"
+                            @mouseenter="showMenu('in',index)">
                             <template v-if="index<=6">
                                 <li>{{item.sortname}}/{{item.sortename}}</li>
                                 <div class='sortInfo' :class="'sort'+index">
                                     <ul>
-                                        <li class="shopitem" v-for="(shopitem,index) in item.data"
-                                            :data='shopitem.shopid' :key="index">
+                                        <li class="shopitem" v-for="(shopitem,indexs) in item.data" :key="indexs"
+                                            @click="toshop(shopitem)">
                                             <img :src="shopitem.shopimg" alt="加载失败">
                                             <span>{{shopitem.shopname}}</span>
                                         </li>
                                     </ul>
                                 </div>
                             </template>
-                        </router-link>
+                        </a>
                     </ul>
                 </div>
                 <div class="showimg">
@@ -65,7 +65,7 @@
                         <ul ref="scroll">
                             <swiper :options="shopshowoption" ref="shopshow">
                                 <swiper-slide v-for='(item,index) in recomment' :key='index'>
-                                    <li>
+                                    <li @click="toshop(item)">
                                         <img :src="item.adimg" alt="图片加载失败" srcset="">
                                         <span class="shop_name">{{item.shopname}}</span>
                                         <span class="shopdes">{{item.shopdes}}</span>
@@ -81,63 +81,43 @@
             </div>
             <!-- 热门手机 -->
             <div class="hot_items">
-                <div class="hot_floor_show phoneshow">
-                    <div class="floor first_floor">1F 精品手机</div>
-                </div>
-                <div class="official_recommend">
-                    <div class="topshop_swiper">
-                        <swiper :options="topphoneOption" ref="topphoneswipers">
-                            <swiper-slide v-for="(items,index) in homeswiper" :key="index">
-                                <!-- <router-link :to="items.router"><img :src="items.src" alt="图片加载失败"></router-link> -->
-                            </swiper-slide>
-                        </swiper>
-                    </div>
-                    <div class="topshop_items">
-
-                    </div>
-                </div>
-                <div class="official_recommend_second">
-                    <div class="topshop_items">
-
-                    </div>
-                    <div class="topshop_items">
-
-                    </div>
-                    <div class="topshop_items">
-
-                    </div>
-                </div>
                 <div class="topshop_show">
                     <div class="topshop_head">
-                        TOP榜单
+                        排行榜
+                        <i class="el-icon-right"></i>
                     </div>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <div class="topcount">1</div>
+                    <a>
+                        <div class="topshop_items" v-for="(item,index) in saleList" :key="index">
+                            <div class="topcount" :class="['topcount' + (index+1)]">TOP{{index+1}}</div>
                             <div class="topcontent">
-                                <el-image style="width:120px;height:90px;" src="../assets/battery.png" fit="cover">
+                                <el-image style="width:80px;height:80px;" :src="`http://localhost:3000${item.shopimg}`" fit="cover">
                                 </el-image>
                                 <div class="topshop_content">
-                                    <div class="shop_name">testtesttesttesttesttesttesttesttesttesttesttesttesttest
-                                    </div>
-                                    <div class="shop_des">test test</div>
-                                    <div class="shop_price">1230</div>
+                                    <span
+                                        class="shopname">{{item.shopname}}</span>
                                 </div>
                             </div>
                         </div>
-                    </router-link>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <div class="topcount">2</div>
-                            <div class="topcontent"></div>
+                    </a>
+                </div>
+                <div class="coupon_center">
+                    <div class="topshop_head">
+                        优惠券中心
+                        <i class="el-icon-right"></i>
+                    </div>
+                    <div class="coupon_content">
+                        <div class="null" v-if="couponList.length == 0">暂无优惠券</div>
+                        <div class="coupon_item" v-for="(item,index) in couponList" :key="index" @click="getcoupons(item.coupon_id)">
+                            <div class="coupon_left">
+                                <div class="price">{{item.amount}}</div>
+                                <div class="min_price">满{{item.min_price}}元可使用</div>
+                                <div class="condition">{{item.note}}</div>
+                            </div>
+                            <div class="coupon_right">
+                                {{item.over_time|date}}过期
+                            </div>
                         </div>
-                    </router-link>
-                    <router-link to="#">
-                        <div class="topshop_items">
-                            <div class="topcount">3</div>
-                            <div class="topcontent"></div>
-                        </div>
-                    </router-link>
+                    </div>
                 </div>
             </div>
             <div class="shopshow_bar">
@@ -200,7 +180,9 @@
 <script>
     import {
         getsort,
-        getad
+        getad,
+        getcoupons,
+        getsale
     } from '@/http/api'
     export default {
         name: "home",
@@ -288,7 +270,9 @@
                     "#2196f3", //蓝色
                     "#83c44e", //绿色
                 ],
-                recomment: []
+                recomment: [],
+                couponList: [],
+                saleList:[]
             }
         },
         methods: {
@@ -314,6 +298,34 @@
                     document.getElementsByClassName(`sort${key}`)[0].style.display = 'block'
                 } else if (type === 'out') {
                     document.getElementsByClassName(`sort${key}`)[0].style.display = 'none'
+                }
+            },
+            getcoupons(el) {
+                if (Object.keys(this.$store.state.userinfo).length > 0) {
+                    getcoupon({
+                            id: el
+                        })
+                        .then(data => {
+                            if (data.code == 200) {
+                                this.$message({
+                                    message: '领取成功',
+                                    type: 'success'
+                                })
+                            } else {
+                                this.$message({
+                                    message: '领取失败' + data.message,
+                                    type: 'error'
+                                })
+                            }
+                        })
+                } else {
+                  this.$message({
+                     message: '请先登录',
+                     type: 'warning'
+                  })
+                  this.$router.push({
+                      name: 'login'
+                  })
                 }
             },
             //创建加载图片
@@ -371,6 +383,20 @@
                     }
                 }
             },
+            getallcoupon() {
+                getcoupons({
+                        count: 9
+                    })
+                    .then(data => {
+                        this.couponList = data.info
+                    })
+            },
+            getsales () {
+              getsale()
+              .then(data=>{
+                this.saleList = data.info
+              })
+            },
             /**用于循环美化轮播板块 */
             beautiswiper() {
                 let i = 0;
@@ -411,9 +437,9 @@
                             this.homeswiper = data.info
                         } else {
                             this.recomment = data.info
-                            setTimeout(()=>{
+                            setTimeout(() => {
                                 this.beautiswiper();
-                            },0)
+                            }, 0)
                         }
                     })
                     .catch(err => {
@@ -422,6 +448,15 @@
                             type: 'error'
                         })
                     })
+            },
+            toshop(item) {
+                console.log(item.shopid);
+                this.$router.push({
+                    name: "shopdetail",
+                    query: {
+                        shopid: item.shopid
+                    }
+                })
             }
         },
         computed: {
@@ -434,6 +469,8 @@
             this.getsorts()
             this.getads(1);
             this.getads(2);
+            this.getallcoupon()
+            this.getsales()
         },
         activated() {
             this.getnews();
@@ -496,6 +533,39 @@
                 display: none;
                 box-shadow: 1px 5px 10px #d2d2d2;
                 z-index: 9999;
+
+                ul {
+                    width: 100%;
+                    height: auto;
+                    display: flex;
+                    flex-flow: row wrap;
+                    justify-content: flex-start;
+
+                    .shopitem {
+                        width: 130px;
+                        height: 130px;
+                        background: white;
+                        margin-left: 8px;
+                        margin-top: 8px;
+
+                        img {
+                            width: 110px;
+                            height: 110px;
+                        }
+
+                        span {
+                            width: 120px;
+                            margin: auto;
+                            position: relative;
+                            top: -35px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            color: #000;
+                            display: block;
+                        }
+                    }
+                }
             }
 
             a {
@@ -679,220 +749,33 @@
         margin-top: 25px;
         display: flex;
         flex-flow: row nowrap;
-        background: white;
+        justify-content: space-between;
 
-        .hot_floor_show {
-            width: 235px;
-            height: 350px;
-            border-right: 1px solid #f2f2f2;
-            display: flex;
-            flex-flow: column nowrap;
-            justify-content: center;
-            align-items: center;
+        .topshop_head {
+            width: calc(100%-20px);
+            height: 50px;
+            font-size: 1.2em;
+            font-weight: bolder;
+            line-height: 50px;
+            text-align: left;
+            padding-left: 20px;
+            font-family: '微软雅黑';
+            border-bottom: 1px solid #f2f2f2;
+            cursor: pointer;
 
-            .floor {
-                width: 150px;
-                height: 45px;
+            i {
+                border: 2px solid #ff3333;
+                border-radius: 100%;
+                color: #ff3333;
                 font-weight: bolder;
-                color: white;
-                line-height: 45px;
-                font-size: 1.1em;
-            }
 
-            .first_floor {
-                background: #05948e;
-            }
-
-            .second_floor {
-                background: #dca20a;
-            }
-        }
-
-        .phoneshow {
-            background: #06beb6;
-            /* fallback for old browsers */
-            background: -webkit-linear-gradient(to bottom, #48b1bf, #06beb6);
-            background: linear-gradient(to bottom, #48b1bf, #06beb6);
-        }
-
-        .shopshow {
-            background: #fceabb;
-            /* fallback for old browsers */
-            background: -webkit-linear-gradient(to bottom, #f8b500 60%, #fef7e7);
-            /* Chrome 10-25, Safari 5.1-6 */
-            background: linear-gradient(to bottom, #f8b500 60%, #fef7e7);
-            /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-            margin: 0;
-        }
-
-        .official_recommend {
-            width: 390px;
-            height: 350px;
-            border-right: 1px solid #f2f2f2;
-            display: flex;
-            flex-flow: row wrap;
-            justify-content: space-around;
-            align-items: center;
-
-            .topshop_swiper {
-                width: 380px;
-                height: 200px;
-                margin: 8px;
-
-                .swiper-slide {
-                    height: 200px;
-
-                    img {
-                        width: 380px;
-                        height: 200px;
-                    }
-                }
-            }
-
-            .topshop_items {
-                width: 390px;
-                height: 125px;
-                border: 1px solid #f2f2f2;
-                margin-top: -10px;
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-around;
-                align-items: center;
-                cursor: pointer;
-                border-left: 0;
-                border-right: 0;
-                border-bottom: 0;
-
-                .topshop_content {
-                    width: 180px;
-                    height: 125px;
-
-                    .shop_name {
-                        width: 90%;
-                        height: 25px;
-                        margin: auto;
-                        text-overflow: ellipsis;
-                        white-space: none;
-                        overflow: hidden;
-                        padding-top: 10px;
-                        font-size: 1.2em;
-                        line-height: 25px;
-                        text-align: left;
-                    }
-
-                    .shop_des {
-                        font-size: 1em;
-                        width: 90%;
-                        height: 25px;
-                        line-height: 25px;
-                        text-align: left;
-                        text-overflow: ellipsis;
-                        white-space: none;
-                        overflow: hidden;
-                    }
-
-                    .shop_price {
-                        width: 90%;
-                        height: 30px;
-                        font-size: 1.3em;
-                        color: red;
-                        text-align: left;
-                        margin-top: 15px;
-                    }
-
-                    .shop_price::before {
-                        content: "¥";
-                    }
-                }
-            }
-        }
-
-        .official_recommend_second {
-            width: 275px;
-            height: 350px;
-            border-right: 1px solid #f2f2f2;
-            display: flex;
-            flex-flow: column nowrap;
-            justify-content: center;
-
-            .topshop_items {
-                width: 275px;
-                border: 1px solid #f2f2f2;
-                border-left: 0;
-                border-right: 0;
-                height: 115px;
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-around;
-                align-items: center;
-
-                .topshop_content {
-                    width: 150px;
-                    height: 115px;
-
-                    .shop_name {
-                        width: 90%;
-                        height: 25px;
-                        text-overflow: ellipsis;
-                        white-space: none;
-                        overflow: hidden;
-                        padding-top: 10px;
-                        font-size: 1.1em;
-                        line-height: 25px;
-                        text-align: left;
-                    }
-
-                    .shop_des {
-                        font-size: 0.9em;
-                        width: 90%;
-                        height: 25px;
-                        line-height: 25px;
-                        text-align: left;
-                        text-overflow: ellipsis;
-                        white-space: none;
-                        overflow: hidden;
-                    }
-
-                    .shop_price {
-                        width: 90%;
-                        height: 30px;
-                        font-size: 1.2em;
-                        color: red;
-                        text-align: left;
-                        margin-top: 15px;
-                    }
-
-                    .shop_price::before {
-                        content: "¥";
-                    }
-                }
-            }
-
-            .topshop_items:nth-child(1) {
-                border-top: 0;
-                border-bottom: 0;
-            }
-
-            .topshop_items:nth-child(3) {
-                border-top: 0;
-                border-bottom: 0;
             }
         }
 
         .topshop_show {
             width: 380px;
             height: 350px;
-
-            .topshop_head {
-                width: calc(100%-20px);
-                height: 50px;
-                font-size: 1.2em;
-                color: red;
-                line-height: 50px;
-                text-align: left;
-                padding-left: 20px;
-                border-bottom: 1px solid #f2f2f2;
-            }
+            background: white;
 
             .topshop_items {
                 width: 100%;
@@ -903,21 +786,22 @@
                 margin-top: -1px;
                 display: flex;
                 flex-flow: row nowrap;
+                align-items: center;
 
                 .topcount {
-                    width: 80px;
-                    height: 100px;
-                    line-height: 100px;
-                    font-size: 2.5em;
+                    width: 40px;
+                    height: 40px;
+                    color: #fff;
+                    margin-left: 10px;
                     font-weight: bolder;
-                    color: transparent;
-                    background: #06beb6;
-                    -webkit-background-clip: text !important;
-                    position: relative;
+                    font-size: 0.9em;
+                    display: flex;
+                    flex-flow: row nowrap;
+                    align-items: center;
                 }
 
                 .topcontent {
-                    width: 300px;
+                    width: 350px;
                     height: 100px;
                     display: flex;
                     flex-flow: row nowrap;
@@ -925,97 +809,130 @@
                     align-items: center;
 
                     .topshop_content {
-                        width: 150px;
-                        height: 115px;
+                        width: 180px;
+                        height: 100px;
 
-                        .shop_name {
-                            width: 90%;
-                            height: 25px;
-                            text-overflow: ellipsis;
-                            white-space: none;
+                        .shopname {
+                            width: 100%;
+                            height: 100px;
+                            font-size: 0.8em;
+                            line-height: 100px;
                             overflow: hidden;
-                            padding-top: 10px;
-                            font-size: 1.2em;
-                            line-height: 25px;
-                            text-align: left;
-                        }
-
-                        .shop_des {
-                            font-size: 1em;
-                            width: 90%;
-                            height: 25px;
-                            line-height: 25px;
-                            text-align: left;
-                            text-overflow: ellipsis;
-                            white-space: none;
-                            overflow: hidden;
-                        }
-
-                        .shop_price {
-                            width: 90%;
-                            height: 30px;
-                            font-size: 1.3em;
-                            color: red;
-                            text-align: left;
-                            margin-top: 15px;
-                        }
-
-                        .shop_price::before {
-                            content: "¥";
+                            display: block;
                         }
                     }
                 }
             }
 
-            a:nth-child(2) {
-                border-top: 0;
-
-                .topcount {
+            .topcount2 {
                     background: #ff7e5f;
                     /* fallback for old browsers */
                     background: -webkit-linear-gradient(to right, #feb47b, #ff7e5f);
                     /* Chrome 10-25, Safari 5.1-6 */
                     background: linear-gradient(to right, #feb47b, #ff7e5f);
                     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-                }
-
-                .topcount::before {
-                    content: "\e6b1";
-                    font-family: "iconfont" !important;
-                    font-size: 0.6em !important;
-                    color: #fad530;
-                    position: absolute;
-                    top: -20px;
-                    left: 5px;
-                    font-weight: lighter;
-                }
             }
 
-            a:nth-child(3) {
-                .topcount {
-                    font-size: 2.2em;
-                    background: #00c3ff;
+            .topcount1 {
+                    background: #e58b8b;
                     /* fallback for old browsers */
-                    background: -webkit-linear-gradient(to right, #ffff1c, #00c3ff);
+                    background: -webkit-linear-gradient(to right, #e58b8b, #db4c4c);
                     /* Chrome 10-25, Safari 5.1-6 */
-                    background: linear-gradient(to right, #ffff1c, #00c3ff);
+                    background: linear-gradient(to right, #e58b8b, #db4c4c);
                     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-                }
             }
 
-            a:nth-child(4) {
-                border-top: 0;
-                border-bottom: 0;
-
-                .topcount {
-                    font-size: 1.8em;
-                    background: #bdc3c7;
+            .topcount3 {
+                    background: #fad17e;
                     /* fallback for old browsers */
-                    background: -webkit-linear-gradient(to right, #2c3e50, #bdc3c7);
+                    background: -webkit-linear-gradient(to right, #fad17e, #f3b639);
                     /* Chrome 10-25, Safari 5.1-6 */
-                    background: linear-gradient(to right, #2c3e50, #bdc3c7);
+                    background: linear-gradient(to right, #fad17e, #f3b639);
                     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            }
+        }
 
+        .coupon_center {
+            width: 850px;
+            height: 350px;
+            background: white;
+
+            .coupon_content {
+                width: 850px;
+                height: 300px;
+                display: flex;
+                flex-flow: row wrap;
+
+                .coupon_item {
+                    width: 260px;
+                    height: 85px;
+                    margin: 7px 0 0 15px;
+                    border-radius: 3px;
+                    display: flex;
+                    cursor: pointer;
+
+                    .coupon_left {
+                        width: 160px;
+                        height: 85px;
+                        background: #f6f6f6;
+                        display: flex;
+                        flex-flow: column nowrap;
+                        align-items: flex-start;
+
+                        .price,
+                        .min_price,
+                        .condition {
+                            color: #ff3333;
+                            font-weight: 900;
+                            font-size: 1.8em;
+                            font-family: '幼圆';
+                            float: left;
+                            margin: 0 0 0 20px;
+                        }
+
+                        .price::before {
+                            content: '¥';
+                            font-size: 0.5em;
+                        }
+
+                        .min_price {
+                            color: #999;
+                            font-size: 0.8em;
+                        }
+
+                        .condition {
+                            color: #111;
+                            font-size: 0.85em;
+                            margin-top: 3px;
+                            width: 110px;
+                            font-weight: lighter;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            text-align: left;
+                        }
+                    }
+
+                    .coupon_right {
+                        flex: 1;
+                        height: 85px;
+                        background: #ff3333;
+                        position: relative;
+                        color: #fff;
+                        font-weight: bold;
+                        font-size: 0.8em;
+                        line-height: 85px;
+
+                        &::before {
+                            content: '';
+                            width: 0px;
+                            height: 85px;
+                            border: 1px dashed #fff;
+                            position: absolute;
+                            top: 0;
+                            left: 0px;
+                        }
+                    }
                 }
             }
         }
@@ -1177,7 +1094,7 @@
                         }
 
                         .shop_name {
-                            width: 98%;
+                            width: 90%;
                             z-index: 999;
                             color: #000;
                             height: 35px;

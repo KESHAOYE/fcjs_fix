@@ -4,31 +4,31 @@
             <span>个人信息</span>
         </div>
         <div class="info_detail">
-            <el-alert title="您还未完成实名认证" type="warning" show-icon description="请按下方提示完成实名认证">
+            <el-alert title="您还未完成实名认证" type="warning" v-if="!userinfo.isname" show-icon description="请按下方提示完成实名认证">
             </el-alert>
             <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/"
                 :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-                <el-avatar :size="70" :src="userinfo.head" class="userhead"></el-avatar>
+                <el-avatar :size="70" :src="userinfo.headimg" class="userhead"></el-avatar>
             </el-upload>
-            <el-form  :inline="true" :model="userinfo" ref="userinfo" :label-width="labelwidth" :label-position="labelposition"
-                status-icon :rules="userinforule">
-                <el-form-item label="真实姓名" prop="username">
-                    <el-input v-model="userinfo.username" placeholder="请输入真实姓名"
-                        :disabled="this.userinfo.username.length>0"></el-input>
+            <el-form :inline="true" :model="userinfo" ref="userinfo" :label-width="labelwidth"
+                :label-position="labelposition" status-icon :rules="userinforule">
+                <el-form-item label="真实姓名" prop="name">
+                    <el-input v-model="userinfo.name" placeholder="请输入真实姓名" :disabled="userinfo.isname"></el-input>
                 </el-form-item>
-                <el-form-item label="身份证号" prop="manid">
-                    <el-input v-model="userinfo.manid" placeholder="请输入身份证号" :disabled="this.userinfo.manid.length>0">
+                <el-form-item label="身份证号" prop="id">
+                    <el-input v-model="userinfo.id" placeholder="请输入身份证号" :disabled="userinfo.isname">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="昵称" prop="name">
-                    <el-input v-model="userinfo.name" placeholder="请输入昵称"></el-input>
+                <el-form-item label="昵称" prop="username">
+                    <el-input v-model="userinfo.username" placeholder="请输入昵称"></el-input>
                 </el-form-item>
                 <el-form-item label="出生日期" prop="birth">
-                    <el-date-picker v-model="userinfo.birth" type="date" placeholder="选择日期" :editable='false' :picker-options="pickerOptions">
+                    <el-date-picker v-model="userinfo.birth" type="date" placeholder="选择日期" :editable='false'
+                        :picker-options="pickerOptions">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="手机号码" prop="phonenumber">
-                    <el-input v-model="userinfo.phonenumber" placeholder="请输入电话号码"></el-input>
+                    <el-input v-model="userinfo.phone" placeholder="请输入电话号码"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="changeuserinfo('userinfo')">确认</el-button>
@@ -39,20 +39,16 @@
 </template>
 
 <script>
+    import {
+        fullinfo
+    } from '@/http/api'
     export default {
         name: "myinfo",
         data() {
             return {
                 labelwidth: "120px",
                 labelposition: "right",
-                userinfo: {
-                    head: "",
-                    username: "",
-                    name: "",
-                    manid: "",
-                    phonenumber: "",
-                    birth: ""
-                },
+                userinfos: '',
                 pickerOptions: {
                     disabledDate(time) {
                         let _now = Date.now()
@@ -62,15 +58,15 @@
                 },
                 size: "large",
                 userinforule: {
-                    username: [{
+                    name: [{
                         validator: this.reg.checkname,
                         trigger: 'blur'
                     }],
-                    manid: [{
+                    id: [{
                         validator: this.reg.checkmanid,
                         trigger: 'blur'
                     }],
-                    name: [{
+                    username: [{
                         trigger: 'blur',
                         message: "昵称不能为空",
                         required: "true"
@@ -80,20 +76,33 @@
                         message: "请选择生日",
                         required: "true"
                     }],
-                    phonenumber: [{
+                    phone: [{
                         validator: this.reg.checkphonenumber,
                         trigger: 'blur'
                     }]
                 }
             }
         },
+        computed: {
+            userinfo() {
+                return this.$store.state.userinfo
+            }
+        },
         methods: {
             changeuserinfo(val) {
                 this.$refs[val].validate((valid) => {
                     if (valid) {
-                    } else {
-
-                    }
+                        this.userinfo.isname = true
+                        fullinfo({
+                                ...this.userinfo
+                            })
+                            .then(data => {
+                                this.$message({
+                                    message: '修改成功',
+                                    type: 'success'
+                                })
+                            })
+                    } else {}
                 })
             },
             handleAvatarSuccess(res, file) {
@@ -103,9 +112,20 @@
                 const isLt2M = file.size / 1024 / 1024 < 10;
                 if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
+                } else {
+                    let files = new FileReader();
+                    files.readAsDataURL(file)
+                    files.onload = e => {
+                        let imgFile = e.target.result;
+                        this.userinfo.headimg = imgFile
+                    }
                 }
-                return isLt2M;
             }
+        },
+        created() {
+            this.$nextTick(() => {
+                this.userinfos = this.userinfo
+            })
         }
     }
 </script>
@@ -142,9 +162,11 @@
                 justify-content: center;
                 margin-top: 35px;
             }
-            .el-form-item__content{
-              margin-left: 20px !important;
+
+            .el-form-item__content {
+                margin-left: 20px !important;
             }
+
             .el-alert {
                 width: 80%;
                 margin-left: 10%;

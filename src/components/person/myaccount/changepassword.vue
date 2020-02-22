@@ -6,10 +6,10 @@
         <el-form :model="passwords" class="changepassword" ref="passwords" :label-width="labelwidth"
             :label-position="labelposition" status-icon :rules="passwordrules">
             <el-form-item label="新密码" prop="newpassword">
-                <el-input v-model="passwords.newpassword" placeholder="请输入密码"></el-input>
+                <el-input type='password' v-model="passwords.newpassword" placeholder="请输入密码"></el-input>
             </el-form-item>
             <el-form-item label="确认密码" prop="newspassword">
-                <el-input v-model="passwords.newspassword" placeholder="请确认密码"></el-input>
+                <el-input type='password' v-model="passwords.newspassword" placeholder="请确认密码"></el-input>
             </el-form-item>
             <el-form-item label="验证码" prop="code">
                 <el-input v-model="passwords.code" :placeholder="codeplaceholder" class="code">
@@ -26,6 +26,11 @@
 </template>
 
 <script>
+    import {
+        getphonevalidator,
+        checkphonevalidator,
+        changepassword
+    } from '@/http/api'
     export default {
         name: "changepassword",
         data() {
@@ -64,6 +69,11 @@
                     newspassword: [{
                         validator: checkpassword,
                         trigger: "blur",
+                    }],
+                    code: [{
+                        trigger: "blur",
+                        required: true,
+                        message: "验证码不能为空"
                     }]
                 }
             }
@@ -72,30 +82,54 @@
             changepassword(val) {
                 this.$refs[val].validate((valid) => {
                     if (valid) {
+                        checkphonevalidator({
+                                phone: this.$store.state.userinfo.phone,
+                                v: this.passwords.code
+                            })
+                            .then(data => {
+                                if (data.code == 200) {
+                                    console.log(this.passwords.newpassword);
+                                    changepassword({
+                                            password: this.passwords.newpassword,
+                                            userid: this.$store.state.userinfo.userid
+                                        })
+                                        .then(data => {
+                                            this.$message({
+                                                message: '修改成功',
+                                                type: 'success'
+                                            })
+                                        })
+                                }
+                            })
                     }
                 })
             },
             sendmessage() {
-                this.buttoninfo.disable = true
-                let interval = setInterval(() => {
-                    let time = this.buttoninfo.time--;
-                    this.buttoninfo.message = time + "秒后发送";
-                    if (time <= 0) {
-                        this.buttoninfo = {
-                            message: "重新发送",
-                            time: "60",
-                            disable: false
-                        }
-                        clearInterval(interval)
-                    }
-                }, 1000);
+                getphonevalidator({
+                        phone: this.$store.state.userinfo.phone
+                    })
+                    .then(data => {
+                        this.buttoninfo.disable = true
+                        let interval = setInterval(() => {
+                            let time = this.buttoninfo.time--;
+                            this.buttoninfo.message = time + "秒后发送";
+                            if (time <= 0) {
+                                this.buttoninfo = {
+                                    message: "重新发送码",
+                                    time: "60",
+                                    disable: false
+                                }
+                                clearInterval(interval)
+                            }
+                        }, 1000);
+                    })
             }
         }
     }
 </script>
 
 <style lang="scss">
-.person_head {
+    .person_head {
         width: 100%;
         height: 50px;
         background: white;
@@ -108,6 +142,7 @@
             margin-left: 25px;
         }
     }
+
     .changepassword {
         width: 100%;
         min-height: 500px;
